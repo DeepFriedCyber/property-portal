@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
     "db:migrate": "tsx apps/api/lib/migrate.ts"
   },
   "dependencies": {

@@ -1,8 +1,12 @@
-export default function Home() {
+import { Button } from 'ui';
+
+export default function HomePage() {
   return (
-    <main>
+    <div>
       <h1>Property Portal</h1>
-      <p>Welcome to the Property Portal application.</p>
-    </main>
+      <Button variant="primary" onClick={() => alert('Clicked!')}>
+        Click Me
+      </Button>
+    </div>
   );
 }
