@@ -1,24 +1,8 @@
-// tsconfig.json configuration
-// {
-//   "compilerOptions": {
-//     "jsx": "react",
-//     // other options
-//   }
-// }
+/**
+ * UI Component Library
+ * 
+ * This file exports all UI components for use in the application.
+ */
 
-import React from 'react';
-
+// Export all components
 export * from './components/Button';
-// Add more exports here as you create more components
-
-import Button from "./components/Button";
-
-export default function MyPage() {
-  return (
-    <div>
-      <Button variant="primary" onClick={() => alert('Clicked!')}>
-        {'Click Me'}
-      </Button>
-    </div>
-  );
-}
