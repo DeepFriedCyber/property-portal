@@ -1,0 +1,14 @@
+
+> web@1.0.0 build C:\Users\aps33\Projects\property-portal\apps\web
+> next build
+
+
+> Build error occurred
+Error: > Couldn't find any `pages` or `app` directory. Please create one under the project root
+    at findPagesDir (C:\Users\aps33\Projects\property-portal\node_modules\next\dist\lib\find-pages-dir.js:42:15)
+    at C:\Users\aps33\Projects\property-portal\node_modules\next\dist\build\index.js:237:73
+    at async Span.traceAsyncFn (C:\Users\aps33\Projects\property-portal\node_modules\next\dist\trace\trace.js:105:20)
+    at async build (C:\Users\aps33\Projects\property-portal\node_modules\next\dist\build\index.js:186:29)
+    at async main (C:\Users\aps33\Projects\property-portal\node_modules\next\dist\bin\next:150:5)
+ ELIFECYCLE  Command failed with exit code 1.
+ WARN   Local package.json exists, but node_modules missing, did you mean to install?

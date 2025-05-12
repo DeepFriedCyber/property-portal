@@ -3,29 +3,22 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/*"
   ],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",
-    "db:generate": "drizzle-kit generate:pg",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push:pg",
-    "db:studio": "drizzle-kit studio",
-    "db:run-migrate": "tsx apps/api/lib/migrate.ts"
+    "db:migrate": "tsx apps/api/lib/migrate.ts"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.0",
-    "drizzle-orm": "^0.43.1",
-    "pg": "^8.11.3"
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.43.1"
   },
   "devDependencies": {
-    "dotenv": "^16.5.0",
+    "@types/node": "^22.15.17",
     "drizzle-kit": "^0.31.1",
     "tsx": "^4.19.4",
-    "turbo": "^1.10.0",
-    "@types/pg": "^8.10.9"
+    "turbo": "^1.10.0"
   }
 }
