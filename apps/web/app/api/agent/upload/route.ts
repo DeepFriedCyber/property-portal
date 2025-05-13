@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as csvParse from 'csv-parse/sync';
 import { createUploadRecord, createProperty } from '../../../../../lib/db/queries';
 import { db } from '../../../../../lib/db';
+import { processUploadEmbeddings } from '../../../../../lib/db/property-processor';
 
 export async function POST(request: NextRequest) {
   try {
@@ -89,6 +90,12 @@ export async function POST(request: NextRequest) {
           upload,
           propertyCount: records.length
         };
+      });
+      
+      // Trigger embedding generation in the background
+      // We don't await this to avoid blocking the response
+      processUploadEmbeddings(result.upload.id).catch(err => {
+        console.error('Error generating embeddings:', err);
       });
       
       return NextResponse.json({
