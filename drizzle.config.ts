@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export default {
-  schema: './apps/api/lib/schema.ts',
+  schema: './drizzle/schema.ts',
   out: './drizzle',
   // Specify the database dialect (PostgreSQL)
   dialect: 'postgresql',
