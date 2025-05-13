@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import * as csvParse from 'csv-parse/sync';
-
-// This would be replaced with actual database operations
-const mockUploadRecord = (filename: string, userId: string) => {
-  return {
-    id: uuidv4(),
-    uploaderId: userId,
-    filename,
-    status: 'pending',
-    createdAt: new Date(),
-    propertyCount: 0
-  };
-};
+import { createUploadRecord, createProperty } from '../../../../../lib/db/queries';
+import { db } from '../../../../../lib/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,19 +60,42 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      // Create upload record
-      const upload = mockUploadRecord(file.name, userId);
-      upload.propertyCount = records.length;
-      
-      // In a real implementation, you would:
-      // 1. Save the upload record to the database
-      // 2. Process and save each property record
-      // 3. Link properties to the upload record
+      // Use a transaction to ensure all operations succeed or fail together
+      const result = await db.transaction(async (tx) => {
+        // Create upload record in the database
+        const upload = await createUploadRecord({
+          id: uuidv4(),
+          uploaderId: userId,
+          filename: file.name,
+          status: 'pending',
+          createdAt: new Date()
+        });
+        
+        // Process and save each property record
+        for (const record of records) {
+          await createProperty({
+            id: uuidv4(),
+            uploadId: upload.id,
+            address: record.address,
+            price: parseInt(record.price, 10),
+            bedrooms: record.bedrooms ? parseInt(record.bedrooms, 10) : null,
+            type: record.type || null,
+            dateSold: record.dateSold ? new Date(record.dateSold) : null,
+            embedding: null // We'll handle embeddings separately
+          });
+        }
+        
+        return {
+          upload,
+          propertyCount: records.length
+        };
+      });
       
       return NextResponse.json({
         message: 'File uploaded successfully',
         upload: {
-          ...upload,
+          ...result.upload,
+          propertyCount: result.propertyCount,
           // Don't expose the uploaderId in the response
           uploaderId: undefined
         }

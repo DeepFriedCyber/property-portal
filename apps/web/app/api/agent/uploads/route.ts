@@ -1,55 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Mock data - would be replaced with database queries
-const mockUploads = [
-  {
-    id: '1',
-    uploaderId: 'user-123',
-    filename: 'london-properties.csv',
-    status: 'approved',
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
-    propertyCount: 42
-  },
-  {
-    id: '2',
-    uploaderId: 'user-123',
-    filename: 'manchester-listings.csv',
-    status: 'pending',
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    propertyCount: 18
-  },
-  {
-    id: '3',
-    uploaderId: 'user-123',
-    filename: 'birmingham-properties.csv',
-    status: 'rejected',
-    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
-    propertyCount: 7
-  }
-];
+import { getUploadRecordsByUploader, countPropertiesByUploadId } from '../../../../../lib/db/queries';
 
 export async function GET(request: NextRequest) {
   try {
-    // In a real implementation, you would:
-    // 1. Get the user ID from the session
-    // 2. Query the database for uploads by this user
-    // 3. Return the results
-    
-    // Mock user ID
+    // In a real implementation, you would get the user ID from the session
+    // For now, we'll use a placeholder
     const userId = 'user-123';
     
-    // Filter uploads by user ID (in a real app, this would be a database query)
-    const userUploads = mockUploads.filter(upload => upload.uploaderId === userId);
+    // Get all uploads for this user from the database
+    const uploads = await getUploadRecordsByUploader(userId);
     
-    // Sort by date (newest first)
-    userUploads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    // For each upload, get the property count
+    const uploadsWithCounts = await Promise.all(
+      uploads.map(async (upload) => {
+        const propertyCount = await countPropertiesByUploadId(upload.id);
+        return {
+          ...upload,
+          propertyCount,
+          // Don't expose the uploaderId in the response
+          uploaderId: undefined
+        };
+      })
+    );
     
     return NextResponse.json({
-      uploads: userUploads.map(upload => ({
-        ...upload,
-        // Don't expose the uploaderId in the response
-        uploaderId: undefined
-      }))
+      uploads: uploadsWithCounts
     });
   } catch (error) {
     console.error('Error fetching uploads:', error);

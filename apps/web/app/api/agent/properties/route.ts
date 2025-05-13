@@ -1,83 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Mock data - would be replaced with database queries
-const mockProperties = [
-  {
-    id: '101',
-    uploadId: '1',
-    address: '123 Oxford Street, London W1D 1DF',
-    price: 750000,
-    bedrooms: 3,
-    type: 'Apartment',
-    dateSold: null
-  },
-  {
-    id: '102',
-    uploadId: '1',
-    address: '45 Baker Street, London NW1 6XE',
-    price: 1250000,
-    bedrooms: 4,
-    type: 'Townhouse',
-    dateSold: null
-  },
-  {
-    id: '103',
-    uploadId: '1',
-    address: '78 Kensington High Street, London W8 5SE',
-    price: 2100000,
-    bedrooms: 5,
-    type: 'Detached',
-    dateSold: null
-  },
-  {
-    id: '104',
-    uploadId: '2',
-    address: '15 Deansgate, Manchester M3 2EY',
-    price: 320000,
-    bedrooms: 2,
-    type: 'Apartment',
-    dateSold: null
-  },
-  {
-    id: '105',
-    uploadId: '2',
-    address: '27 Portland Street, Manchester M1 3LD',
-    price: 450000,
-    bedrooms: 3,
-    type: 'Terraced',
-    dateSold: null
-  },
-  {
-    id: '106',
-    uploadId: '3',
-    address: '8 Broad Street, Birmingham B1 2HG',
-    price: 275000,
-    bedrooms: 2,
-    type: 'Apartment',
-    dateSold: null
-  }
-];
+import { getUploadRecordsByUploader, getPropertiesByUploadId } from '../../../../../lib/db/queries';
+import { db, schema } from '../../../../../lib/db';
+import { inArray } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
-    // In a real implementation, you would:
-    // 1. Get the user ID from the session
-    // 2. Query the database for properties linked to this user's uploads
-    // 3. Return the results
-    
-    // Mock user ID
+    // In a real implementation, you would get the user ID from the session
+    // For now, we'll use a placeholder
     const userId = 'user-123';
     
-    // Mock upload IDs for this user
-    const userUploadIds = ['1', '2', '3'];
+    // Get all uploads for this user
+    const uploads = await getUploadRecordsByUploader(userId);
     
-    // Filter properties by user's upload IDs (in a real app, this would be a database query)
-    const userProperties = mockProperties.filter(property => 
-      userUploadIds.includes(property.uploadId)
-    );
+    // Extract upload IDs
+    const uploadIds = uploads.map(upload => upload.id);
+    
+    if (uploadIds.length === 0) {
+      // If user has no uploads, return empty array
+      return NextResponse.json({ properties: [] });
+    }
+    
+    // Get all properties for these uploads in a single query
+    const properties = await db.select()
+      .from(schema.property)
+      .where(inArray(schema.property.uploadId, uploadIds));
     
     return NextResponse.json({
-      properties: userProperties
+      properties: properties
     });
   } catch (error) {
     console.error('Error fetching properties:', error);

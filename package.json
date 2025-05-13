@@ -12,12 +12,16 @@
     "start": "turbo run start",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "db:migrate": "tsx apps/api/lib/migrate.ts"
+    "db:generate": "tsx lib/db/generate-migrations.ts",
+    "db:migrate": "tsx lib/db/migrate.ts"
   },
   "dependencies": {
+    "@types/uuid": "^10.0.0",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
-    "framer-motion": "^12.11.0"
+    "framer-motion": "^12.11.0",
+    "postgres": "^3.4.5",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.17",
