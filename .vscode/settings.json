@@ -1,3 +1,10 @@
 {
-    "zencoder.enableRepoIndexing": true
+    "zencoder.enableRepoIndexing": true,
+    "json.schemas": [
+        {
+            "fileMatch": ["turbo.json"],
+            "url": "https://turbo.build/schema.json"
+        }
+    ],
+    "typescript.tsdk": "node_modules/typescript/lib"
 }
