@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from 'ui';
+import { Button } from '../../src/ui';
 
 interface HeroProps {
   title?: string;

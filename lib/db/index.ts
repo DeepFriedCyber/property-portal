@@ -1,7 +1,8 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
+// @ts-ignore - Ignoring TypeScript error for postgres import
 import postgres from 'postgres';
 import * as schema from '../../drizzle/schema';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();

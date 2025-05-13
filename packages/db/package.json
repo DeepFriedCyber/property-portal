@@ -1,0 +1,26 @@
+{
+  "name": "@your-org/db",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p .",
+    "dev": "tsc -p . --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.x.x",
+    "pg": "^8.x.x"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.x.x",
+    "typescript": "^5.x.x"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  }
+}

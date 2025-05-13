@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db, schema } from '@/lib/db';
-import { generateEmbedding } from '@/lib/embedding';
+import { db, schema } from '@your-org/db';
+import { generateEmbedding } from '../../../../../../lib/embedding';
 import { sql } from 'drizzle-orm';
 import dotenv from 'dotenv';
 

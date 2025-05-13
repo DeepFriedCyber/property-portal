@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from 'ui';
+import { Button } from '../../../src/ui';
 import UploadZone from '@components/common/UploadZone';
 import { useUser } from '@clerk/nextjs';
 

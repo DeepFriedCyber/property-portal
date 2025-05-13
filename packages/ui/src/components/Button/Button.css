@@ -1,0 +1,91 @@
+.button {
+  font-family: 'Nunito Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  border: 0;
+  border-radius: 0.25em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0.75em 1.5em;
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.button--primary {
+  color: white;
+  background-color: #1ea7fd;
+}
+.button--primary:hover {
+  background-color: #0d8eea;
+}
+.button--primary:active {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px inset;
+}
+
+.button--secondary {
+  color: #333;
+  background-color: transparent;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px inset;
+}
+.button--secondary:hover {
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 0px 1px inset;
+}
+.button--secondary:active {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px inset;
+}
+
+.button--destructive {
+  color: white;
+  background-color: #e53e3e; /* Red for destructive actions */
+}
+.button--destructive:hover {
+  background-color: #c53030;
+}
+
+.button--small {
+  font-size: 12px;
+  padding: 0.6em 1.2em;
+}
+
+.button--medium {
+  font-size: 14px;
+}
+
+.button--large {
+  font-size: 16px;
+  padding: 0.9em 1.8em;
+}
+
+.button--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.button--disabled:hover {
+  /* Keep styles same as non-hovered disabled */
+}
+
+
+.button__loader {
+  width: 1em;
+  height: 1em;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white; /* Or a contrasting color based on button variant */
+  animation: spin 1s ease-infinite;
+  margin: 0 auto; /* Center if button text is hidden */
+}
+.button--secondary .button__loader { /* Loader for secondary button */
+  border-top-color: #333;
+  border-color: rgba(0,0,0,0.1);
+  border-top-color: #333;
+}
+
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

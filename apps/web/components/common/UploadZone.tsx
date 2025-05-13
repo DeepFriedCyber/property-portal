@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, DragEvent, ChangeEvent } from 'react';
-import { Button } from 'ui';
+import { Button } from '../../src/ui';
 
 interface FileValidationResult {
   valid: boolean;
@@ -252,7 +252,7 @@ export default function UploadZone({
               </p>
               <Button 
                 variant="secondary" 
-                size="sm" 
+                size="small" 
                 onClick={() => {
                   if (fileInputRef.current) {
                     setSelectedFile(null);

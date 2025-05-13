@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import { Button } from 'ui';
+import { Button } from '../../src/ui';
 
 interface Property {
   id: string;

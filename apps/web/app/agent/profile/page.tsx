@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { Button } from 'ui';
+import { Button } from '../../../src/ui';
 
 export default function ProfilePage() {
   const { isLoaded, isSignedIn, user } = useUser();

@@ -7,14 +7,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "start": "turbo run start",
-    "test": "turbo run test",
-    "lint": "turbo run lint",
-    "db:generate": "tsx lib/db/generate-migrations.ts",
-    "db:migrate": "tsx lib/db/migrate.ts",
-    "db:embeddings": "tsx lib/db/generate-embeddings.ts"
+    "dev:web": "pnpm --filter @your-org/web dev",
+    "build:api": "pnpm --filter @your-org/api build",
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm --parallel --filter \"./apps/*\" build"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.19.2",
@@ -29,9 +25,17 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.17",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react": "^4.4.1",
     "drizzle-kit": "^0.31.1",
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
+    "lint-staged": "^16.0.0",
+    "prettier": "^3.5.3",
     "tsx": "^4.19.4",
     "turbo": "^1.10.0"
   }

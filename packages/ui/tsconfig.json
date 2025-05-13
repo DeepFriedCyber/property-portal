@@ -1,13 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "declaration": true,
-    "emitDeclarationOnly": false,
-    "declarationMap": true,
-    "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "Node"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["components", "index.ts", "types", "stories"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "stories/**/*.ts", "stories/**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
 }
