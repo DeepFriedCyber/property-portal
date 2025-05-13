@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser, UserButton } from '@clerk/nextjs';
 
 export default function AgentLayout({
   children,
@@ -9,52 +10,21 @@ export default function AgentLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isLoaded, isSignedIn, user } = useUser();
 
   useEffect(() => {
-    // Check if user is authenticated and has agent role
-    const checkAuth = async () => {
-      try {
-        // This would be replaced with your actual auth check
-        // For example, calling an API endpoint to verify the session
-        const response = await fetch('/api/auth/check', {
-          credentials: 'include',
-        });
-        
-        if (!response.ok) {
-          throw new Error('Not authenticated');
-        }
-        
-        const data = await response.json();
-        
-        if (data.role !== 'agent' && data.role !== 'admin') {
-          throw new Error('Not authorized');
-        }
-        
-        setIsAuthenticated(true);
-      } catch (err) {
-        console.error('Auth check failed:', err);
-        // Redirect to login page
-        router.push('/login?redirect=/agent/dashboard');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    if (isLoaded && !isSignedIn) {
+      // Redirect to sign-in page if not signed in
+      router.push('/sign-in?redirect=/agent/dashboard');
+    }
+  }, [isLoaded, isSignedIn, router]);
 
-    checkAuth();
-  }, [router]);
-
-  if (isLoading) {
+  if (!isLoaded || !isSignedIn) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700"></div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect in the useEffect
   }
 
   return (
@@ -73,21 +43,15 @@ export default function AgentLayout({
                 <a href="/agent/properties" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                   My Properties
                 </a>
-                <a href="/agent/profile" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
-                  Profile
-                </a>
               </div>
             </div>
             <div className="flex items-center">
-              <button 
-                onClick={() => {
-                  // This would be replaced with your actual logout logic
-                  router.push('/login');
-                }}
-                className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
-              >
-                Logout
-              </button>
+              <div className="flex items-center">
+                <span className="mr-4 text-sm">
+                  {user.firstName || user.emailAddresses[0].emailAddress}
+                </span>
+                <UserButton afterSignOutUrl="/" />
+              </div>
             </div>
           </div>
         </div>

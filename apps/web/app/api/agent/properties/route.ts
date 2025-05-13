@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUploadRecordsByUploader, getPropertiesByUploadId } from '../../../../../lib/db/queries';
-import { db, schema } from '../../../../../lib/db';
+import { getUploadRecordsByUploader, getPropertiesByUploadId } from '@/lib/db/queries';
+import { db, schema } from '@/lib/db';
 import { inArray } from 'drizzle-orm';
+import { auth } from '@clerk/nextjs/server';
 
 export async function GET(request: NextRequest) {
   try {
-    // In a real implementation, you would get the user ID from the session
-    // For now, we'll use a placeholder
-    const userId = 'user-123';
+    // Get the user ID from Clerk
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
     
     // Get all uploads for this user
     const uploads = await getUploadRecordsByUploader(userId);

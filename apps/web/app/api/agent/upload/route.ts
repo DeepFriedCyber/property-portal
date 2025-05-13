@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import * as csvParse from 'csv-parse/sync';
-import { createUploadRecord, createProperty } from '../../../../../lib/db/queries';
-import { db } from '../../../../../lib/db';
-import { processUploadEmbeddings } from '../../../../../lib/db/property-processor';
+import { createUploadRecord, createProperty } from '@/lib/db/queries';
+import { db } from '@/lib/db';
+import { processUploadEmbeddings } from '@/lib/db/property-processor';
+import { auth } from '@clerk/nextjs/server';
 
 export async function POST(request: NextRequest) {
   try {
+    // Get the user ID from Clerk
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    
     const formData = await request.formData();
     const file = formData.get('file') as File;
     
@@ -24,9 +35,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
-    // Get user ID from session (this would be implemented with your auth system)
-    const userId = 'user-123'; // Mock user ID
     
     // Read and parse CSV file
     const fileBuffer = await file.arrayBuffer();

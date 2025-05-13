@@ -15,7 +15,7 @@ interface Property {
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
-  const query = searchParams.get('query') || '';
+  const query = searchParams?.get('query') || '';
   const [results, setResults] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

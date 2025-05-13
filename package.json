@@ -17,6 +17,7 @@
     "db:embeddings": "tsx lib/db/generate-embeddings.ts"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.19.2",
     "@types/uuid": "^10.0.0",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",

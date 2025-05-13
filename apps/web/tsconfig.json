@@ -3,8 +3,15 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "ui": ["../../packages/ui"],
-      "@components/*": ["components/*"]
+      "ui": [
+        "../../packages/ui"
+      ],
+      "@components/*": [
+        "components/*"
+      ],
+      "@/lib/*": [
+        "../../lib/*"
+      ]
     },
     "plugins": [
       {
@@ -12,7 +19,12 @@
       }
     ],
     "noEmit": true,
-    "strict": true
+    "strict": true,
+    "allowJs": true,
+    "incremental": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve"
   },
   "include": [
     "next-env.d.ts",

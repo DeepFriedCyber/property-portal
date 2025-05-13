@@ -164,13 +164,11 @@ export default function HomePage() {
 
   // Event handlers
   const handleLogin = () => {
-    console.log('Login clicked');
-    alert('Login clicked');
+    window.location.href = '/sign-in';
   };
 
   const handleSignup = () => {
-    console.log('Signup clicked');
-    alert('Signup clicked');
+    window.location.href = '/sign-up';
   };
 
   const handlePrimaryCTA = () => {
