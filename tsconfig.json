@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "esModuleInterop": true,
+    "paths": {
+      "@/*": ["apps/web/src/*"],
+      "@your-org/db": ["packages/db/src"],
+      "@your-org/ui": ["packages/ui"],
+      "@your-org/ui/*": ["packages/ui/src/*"],
+      "@lib/*": ["lib/*"]
+    }
+  },
+  "references": [
+    { "path": "./packages/db" },
+    { "path": "./packages/ui/tsconfig.build.json" },
+    { "path": "./apps/web/tsconfig.build.json" },
+    { "path": "./apps/api/tsconfig.build.json" }
+  ]
+}
