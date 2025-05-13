@@ -1,16 +1,9 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    "esModuleInterop": true,
-    "paths": {
-      "@/*": ["apps/web/src/*"],
-      "@your-org/db": ["packages/db/src"],
-      "@your-org/ui": ["packages/ui"],
-      "@your-org/ui/*": ["packages/ui/src/*"],
-      "@lib/*": ["lib/*"]
-    }
+    "jsxImportSource": "react"
   },
   "references": [
     { "path": "./packages/db" },
