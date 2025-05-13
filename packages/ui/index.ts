@@ -6,3 +6,6 @@
 
 // Export all components
 export * from './components/Button';
+
+// Export component types
+export type { ButtonProps } from './components/Button';

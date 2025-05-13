@@ -10,7 +10,7 @@ export interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
 }
 
-const Button: React.FC<ButtonProps> = ({ 
+export const Button: React.FC<ButtonProps> = ({ 
   children, 
   variant = 'primary', 
   onClick, 
@@ -39,6 +39,3 @@ const Button: React.FC<ButtonProps> = ({
     </button>
   );
 };
-
-export default Button;
-export { Button };

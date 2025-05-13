@@ -9,5 +9,5 @@
     "module": "ESNext",
     "moduleResolution": "Node"
   },
-  "include": ["components", "index.ts"]
+  "include": ["components", "index.ts", "types", "stories"]
 }

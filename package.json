@@ -16,11 +16,14 @@
   },
   "dependencies": {
     "dotenv": "^16.5.0",
-    "drizzle-orm": "^0.43.1"
+    "drizzle-orm": "^0.43.1",
+    "framer-motion": "^12.11.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.17",
+    "@vitejs/plugin-react": "^4.4.1",
     "drizzle-kit": "^0.31.1",
+    "jsdom": "^26.1.0",
     "tsx": "^4.19.4",
     "turbo": "^1.10.0"
   }
