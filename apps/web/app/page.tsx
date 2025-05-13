@@ -1,13 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Hero from '../components/sections/Hero';
 import Features from '../components/sections/Features';
 import CallToAction from '../components/sections/CallToAction';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import SearchResults, { Property } from '../components/sections/SearchResults';
 
 export default function HomePage() {
+  // State for search functionality
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Property[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   // Mock data for the components
   const navLinks = [
     { id: 'buy', label: 'Buy', href: '/buy' },
@@ -96,12 +102,67 @@ export default function HomePage() {
     { id: 'linkedin', icon: '💼', href: 'https://linkedin.com', label: 'LinkedIn' },
   ];
 
-  // Event handlers
-  const handleSearch = (searchTerm: string) => {
-    console.log('Searching for:', searchTerm);
-    alert(`Searching for: ${searchTerm}`);
+  // Mock property search function
+  const performSearch = (query: string) => {
+    setSearchQuery(query);
+    setIsSearching(true);
+    
+    // Simulate API call with a delay
+    setTimeout(() => {
+      // Mock data - in a real app, this would come from an API
+      const mockResults: Property[] = [
+        {
+          id: '1',
+          title: 'Modern Apartment in City Center',
+          price: '£350,000',
+          location: 'Cambridge, UK',
+          bedrooms: 2,
+          bathrooms: 1,
+          area: '850 sq ft',
+          description: 'A beautiful modern apartment in the heart of Cambridge with easy access to shops, restaurants, and public transport.',
+          imageUrl: 'https://placehold.co/600x400/png?text=Apartment',
+        },
+        {
+          id: '2',
+          title: 'Spacious Family Home with Garden',
+          price: '£550,000',
+          location: 'Cambridge, UK',
+          bedrooms: 4,
+          bathrooms: 2,
+          area: '1,800 sq ft',
+          description: 'Perfect family home with a large garden in a quiet neighborhood. Close to excellent schools and parks.',
+          imageUrl: 'https://placehold.co/600x400/png?text=Family+Home',
+        },
+        {
+          id: '3',
+          title: 'Luxury Penthouse with River View',
+          price: '£750,000',
+          location: 'Cambridge, UK',
+          bedrooms: 3,
+          bathrooms: 2,
+          area: '1,200 sq ft',
+          description: 'Stunning penthouse apartment with panoramic views of the river. Features high-end finishes and a private terrace.',
+          imageUrl: 'https://placehold.co/600x400/png?text=Penthouse',
+        },
+      ];
+      
+      setSearchResults(mockResults);
+      setIsSearching(false);
+    }, 1500);
   };
 
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  const handleViewDetails = (propertyId: string) => {
+    console.log('View details for property:', propertyId);
+    alert(`Viewing details for property ID: ${propertyId}`);
+    // In a real app, you would navigate to a property details page
+  };
+
+  // Event handlers
   const handleLogin = () => {
     console.log('Login clicked');
     alert('Login clicked');
@@ -133,14 +194,27 @@ export default function HomePage() {
       <Hero 
         title="Find Your Dream Property"
         subtitle="Discover thousands of properties for sale and rent across the country"
-        ctaText="Explore Properties"
-        onSearch={handleSearch}
+        buttonText="Explore Properties"
+        useInlineSearch={true}
+        onInlineSearch={performSearch}
       />
+      
+      {/* Search Results Section - Only visible when there's a search query */}
+      {searchQuery && (
+        <SearchResults 
+          query={searchQuery}
+          results={searchResults}
+          isLoading={isSearching}
+          onViewDetails={handleViewDetails}
+          onClearSearch={clearSearch}
+        />
+      )}
       
       <Features 
         title="Everything You Need in One Place"
         subtitle="Our platform offers comprehensive tools and resources for buyers, sellers, and renters"
         features={features}
+        className="features-section"
       />
       
       <CallToAction 

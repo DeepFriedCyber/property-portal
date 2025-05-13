@@ -3,7 +3,8 @@ import clsx from 'clsx';
 
 export interface ButtonProps {
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'success' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
   onClick?: () => void;
   className?: string;
   disabled?: boolean;
@@ -13,16 +14,25 @@ export interface ButtonProps {
 export const Button: React.FC<ButtonProps> = ({ 
   children, 
   variant = 'primary', 
+  size = 'md',
   onClick, 
   className = '',
   disabled = false,
   type = 'button'
 }) => {
   const buttonClassName = clsx(
-    'px-4 py-2 rounded font-semibold transition-colors',
+    'rounded font-semibold transition-colors',
     {
+      // Size variations
+      'px-2 py-1 text-sm': size === 'sm',
+      'px-4 py-2': size === 'md',
+      'px-6 py-3 text-lg': size === 'lg',
+      
+      // Variant and state combinations
       'bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50': variant === 'primary' && !disabled,
       'bg-gray-200 text-black hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50': variant === 'secondary' && !disabled,
+      'bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50': variant === 'success' && !disabled,
+      'bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50': variant === 'danger' && !disabled,
       'bg-gray-300 text-gray-500 cursor-not-allowed': disabled,
     },
     className
