@@ -3,8 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "ui": ["../../packages/ui"],
-      "@components/*": ["components/*"]
+      "ui": ["../../packages/ui"]
     },
     "jsx": "preserve",
     "plugins": [
