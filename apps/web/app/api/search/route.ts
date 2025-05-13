@@ -31,8 +31,25 @@ export async function GET(request: NextRequest) {
       model: embeddingModel
     });
     
-    // Perform vector search using PostgreSQL
-    // Note: This requires the pgvector extension to be installed in your database
+    // Perform vector search using PostgreSQL with pgvector
+    // This uses the optimized search_properties_by_vector function if it exists
+    try {
+      // Try to use the optimized function first (if pgvector is set up)
+      const results = await db.execute(sql`
+        SELECT * FROM search_properties_by_vector(${JSON.stringify(embedding)}::vector, ${limit})
+      `);
+      
+      if (results.length > 0) {
+        return NextResponse.json({
+          query,
+          results: results
+        });
+      }
+    } catch (e) {
+      console.log('Optimized vector search not available, falling back to JSONB search');
+    }
+    
+    // Fall back to JSONB-based search if the function doesn't exist
     const properties = await db.select()
       .from(schema.property)
       .where(sql`embedding is not null`)

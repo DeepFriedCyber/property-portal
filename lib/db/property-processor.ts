@@ -49,6 +49,7 @@ export async function processPropertyEmbedding(propertyId: string): Promise<void
   });
   
   // Update property with embedding
+  // The vector column will be updated automatically by the trigger if it exists
   await db.update(schema.property)
     .set({ embedding })
     .where(eq(schema.property.id, propertyId));
@@ -87,6 +88,7 @@ export async function processUploadEmbeddings(uploadId: string): Promise<void> {
   });
   
   // Update each property with its embedding
+  // The vector column will be updated automatically by the trigger if it exists
   for (let i = 0; i < properties.length; i++) {
     await db.update(schema.property)
       .set({ embedding: embeddings[i] })
@@ -127,6 +129,7 @@ export async function processAllMissingEmbeddings(): Promise<void> {
     });
     
     // Update each property with its embedding
+    // The vector column will be updated automatically by the trigger if it exists
     for (let j = 0; j < batch.length; j++) {
       await db.update(schema.property)
         .set({ embedding: embeddings[j] })
