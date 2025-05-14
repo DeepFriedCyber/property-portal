@@ -6,6 +6,10 @@ import { db } from '../../../../../lib/db';
 import { processUploadEmbeddings } from '../../../../../lib/db/property-processor';
 import { auth } from '@clerk/nextjs/server';
 
+// Security constants
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const VALID_FILENAME_REGEX = /^[\w\.-]+$/; // Only allow alphanumeric, underscore, dot, and hyphen
+
 export async function POST(request: NextRequest) {
   try {
     // Get the user ID from Clerk
@@ -28,17 +32,92 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Security check: Validate filename to prevent path traversal attacks
+    const fileName = file.name;
+    if (!fileName.match(VALID_FILENAME_REGEX)) {
+      console.warn(`Rejected file with invalid filename: ${fileName}`);
+      return NextResponse.json(
+        { 
+          message: 'Invalid filename', 
+          details: 'Filename can only contain letters, numbers, underscores, dots, and hyphens'
+        }, 
+        { status: 400 }
+      );
+    }
+    
+    // Security check: Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      console.warn(`Rejected oversized file: ${fileName} (${file.size} bytes)`);
+      return NextResponse.json(
+        { 
+          message: 'File too large',
+          details: `Maximum file size is ${MAX_FILE_SIZE / (1024 * 1024)}MB, received ${(file.size / (1024 * 1024)).toFixed(2)}MB`
+        },
+        { status: 400 }
+      );
+    }
+    
     // Check file type
     if (!file.name.endsWith('.csv')) {
+      console.warn(`Rejected non-CSV file: ${fileName} (${file.type})`);
       return NextResponse.json(
-        { message: 'Only CSV files are allowed' },
+        { 
+          message: 'Only CSV files are allowed',
+          details: 'Please upload a file with .csv extension'
+        },
         { status: 400 }
       );
     }
     
     // Read and parse CSV file
-    const fileBuffer = await file.arrayBuffer();
-    const fileContent = new TextDecoder().decode(fileBuffer);
+    let fileBuffer: ArrayBuffer;
+    let fileContent: string;
+    
+    try {
+      // Read file content with security checks
+      fileBuffer = await file.arrayBuffer();
+      
+      // Security check: Verify the file content is not empty
+      if (fileBuffer.byteLength === 0) {
+        console.warn(`Rejected empty file: ${fileName} (0 bytes)`);
+        return NextResponse.json(
+          { 
+            message: 'File is empty',
+            details: 'The uploaded file contains no data'
+          },
+          { status: 400 }
+        );
+      }
+      
+      // Decode the file content with error handling
+      fileContent = new TextDecoder().decode(fileBuffer);
+      
+      // Security check: Basic content validation
+      if (fileContent.length < 10) { // Arbitrary minimum for a valid CSV with headers
+        console.warn(`Rejected file with insufficient content: ${fileName} (${fileContent.length} chars)`);
+        return NextResponse.json(
+          { 
+            message: 'Invalid CSV content',
+            details: 'The file appears to be too small to be a valid CSV with headers'
+          },
+          { status: 400 }
+        );
+      }
+    } catch (decodeError) {
+      console.error('File decoding error:', {
+        error: decodeError instanceof Error ? decodeError.message : 'Unknown error',
+        fileName: fileName,
+        fileSize: file.size
+      });
+      
+      return NextResponse.json(
+        { 
+          message: 'Failed to read file content',
+          details: 'The file could not be decoded properly'
+        },
+        { status: 400 }
+      );
+    }
     
     try {
       // Parse CSV
