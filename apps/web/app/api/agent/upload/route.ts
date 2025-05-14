@@ -101,16 +101,10 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Read and parse CSV file
-    let fileBuffer: ArrayBuffer;
-    let fileContent: string;
-    
+    // Process and parse CSV file using a more efficient approach
     try {
-      // Read file content with security checks
-      fileBuffer = await file.arrayBuffer();
-      
-      // Security check: Verify the file content is not empty
-      if (fileBuffer.byteLength === 0) {
+      // Security check: Verify the file is not empty
+      if (file.size === 0) {
         console.warn(`Rejected empty file: ${fileName} (0 bytes)`);
         return NextResponse.json(
           { 
@@ -121,12 +115,9 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      // Decode the file content with error handling
-      fileContent = new TextDecoder().decode(fileBuffer);
-      
-      // Security check: Basic content validation
-      if (fileContent.length < 10) { // Arbitrary minimum for a valid CSV with headers
-        console.warn(`Rejected file with insufficient content: ${fileName} (${fileContent.length} chars)`);
+      // Security check: Basic size validation
+      if (file.size < 10) { // Arbitrary minimum for a valid CSV with headers
+        console.warn(`Rejected file with insufficient content: ${fileName} (${file.size} bytes)`);
         return NextResponse.json(
           { 
             message: 'Invalid CSV content',
@@ -135,29 +126,115 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-    } catch (decodeError) {
-      console.error('File decoding error:', {
-        error: decodeError instanceof Error ? decodeError.message : 'Unknown error',
-        fileName: fileName,
-        fileSize: file.size
-      });
       
-      return NextResponse.json(
-        { 
-          message: 'Failed to read file content',
-          details: 'The file could not be decoded properly'
-        },
-        { status: 400 }
-      );
-    }
-    
-    try {
-      // Parse CSV
-      const records = csvParse.parse(fileContent, {
-        columns: true,
-        skip_empty_lines: true,
-        trim: true
-      });
+      console.info(`Starting to process CSV file: ${fileName} (${file.size} bytes)`);
+      
+      // We'll use a hybrid approach based on file size
+      let records: any[] = [];
+      
+      // For files under the threshold, use the direct parsing approach
+      // This is simpler and works well for most uploads
+      const STREAMING_THRESHOLD = 5 * 1024 * 1024; // 5MB threshold for streaming
+      
+      if (file.size < STREAMING_THRESHOLD) {
+        // Use the direct parsing approach for smaller files
+        const fileBuffer = await file.arrayBuffer();
+        const fileContent = new TextDecoder().decode(fileBuffer);
+        
+        // Parse CSV
+        records = csvParse.parse(fileContent, {
+          columns: true,
+          skip_empty_lines: true,
+          trim: true
+        });
+        
+        console.info(`Parsed ${records.length} records from CSV file using direct parsing`);
+      } else {
+        // For larger files, use a chunked processing approach
+        // This processes the file in smaller chunks to avoid memory issues
+        console.info(`Using chunked processing for large file: ${fileName} (${file.size} bytes)`);
+        
+        // Get the file as an ArrayBuffer but process it in chunks
+        const fileBuffer = await file.arrayBuffer();
+        const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+        const decoder = new TextDecoder();
+        
+        let csvContent = '';
+        let headerRow = '';
+        let processedBytes = 0;
+        
+        // Process the first chunk to extract headers
+        const firstChunkSize = Math.min(CHUNK_SIZE, fileBuffer.byteLength);
+        const firstChunk = new Uint8Array(fileBuffer, 0, firstChunkSize);
+        const firstChunkText = decoder.decode(firstChunk, { stream: true });
+        
+        // Extract the header row
+        const headerEndIndex = firstChunkText.indexOf('\n');
+        if (headerEndIndex === -1) {
+          throw new Error('Could not find header row in CSV file');
+        }
+        
+        headerRow = firstChunkText.substring(0, headerEndIndex).trim();
+        csvContent = firstChunkText;
+        processedBytes = firstChunkSize;
+        
+        // Process the rest of the file in chunks
+        while (processedBytes < fileBuffer.byteLength) {
+          const chunkSize = Math.min(CHUNK_SIZE, fileBuffer.byteLength - processedBytes);
+          const chunk = new Uint8Array(fileBuffer, processedBytes, chunkSize);
+          const chunkText = decoder.decode(chunk, { stream: processedBytes + chunkSize < fileBuffer.byteLength });
+          
+          csvContent += chunkText;
+          processedBytes += chunkSize;
+          
+          // Log progress for very large files
+          if (processedBytes % (10 * CHUNK_SIZE) === 0) {
+            console.info(`Processed ${processedBytes} of ${fileBuffer.byteLength} bytes (${Math.round(processedBytes / fileBuffer.byteLength * 100)}%)`);
+          }
+          
+          // If we've accumulated enough data, parse and clear the buffer
+          if (csvContent.length > 5 * CHUNK_SIZE) {
+            // Make sure we break at a newline to avoid splitting records
+            const lastNewlineIndex = csvContent.lastIndexOf('\n');
+            if (lastNewlineIndex !== -1) {
+              const contentToParse = csvContent.substring(0, lastNewlineIndex + 1);
+              csvContent = csvContent.substring(lastNewlineIndex + 1);
+              
+              // Parse this chunk of CSV data
+              try {
+                const chunkRecords = csvParse.parse(contentToParse, {
+                  columns: true,
+                  skip_empty_lines: true,
+                  trim: true
+                });
+                
+                records = records.concat(chunkRecords);
+                console.info(`Parsed ${chunkRecords.length} records from chunk, total: ${records.length}`);
+              } catch (chunkError) {
+                console.error('Error parsing CSV chunk:', chunkError);
+                throw chunkError;
+              }
+            }
+          }
+        }
+        
+        // Parse any remaining content
+        if (csvContent.length > 0) {
+          try {
+            const finalRecords = csvParse.parse(csvContent, {
+              columns: true,
+              skip_empty_lines: true,
+              trim: true
+            });
+            
+            records = records.concat(finalRecords);
+            console.info(`Parsed ${finalRecords.length} records from final chunk, total: ${records.length}`);
+          } catch (finalError) {
+            console.error('Error parsing final CSV chunk:', finalError);
+            throw finalError;
+          }
+        }
+      }
       
       // Log successful parsing
       console.info(`Successfully parsed CSV with ${records.length} records from file: ${file.name}`);
