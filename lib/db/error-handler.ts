@@ -1,10 +1,16 @@
 // db/error-handler.ts
 import { PostgresError } from 'postgres';
+import { createDetailedDbConnectionErrorMessage } from './error-utils';
 
 // Custom database error types
 export class DatabaseConnectionError extends Error {
   constructor(message: string, public cause?: unknown) {
-    super(message);
+    // Use the detailed error message if cause is provided
+    const detailedMessage = cause 
+      ? createDetailedDbConnectionErrorMessage(cause) 
+      : message;
+    
+    super(detailedMessage);
     this.name = 'DatabaseConnectionError';
   }
 }
@@ -55,8 +61,9 @@ export function handleDatabaseError(error: unknown, context?: { query?: string; 
       
       // Connection errors
       if (pgError.code.startsWith('08')) {
+        // Use detailed error message for connection errors
         return new DatabaseConnectionError(
-          `Database connection error: ${pgError.message || 'Unknown connection error'}`,
+          'Database connection error', // This will be replaced with detailed message
           error
         );
       }
@@ -89,8 +96,24 @@ export function handleDatabaseError(error: unknown, context?: { query?: string; 
     }
   }
 
-  // For all other errors, wrap in a generic DatabaseQueryError
-  const errorMessage = error instanceof Error ? error.message : String(error);
+  // For all other errors, wrap in a generic DatabaseQueryError with detailed context
+  let errorMessage = error instanceof Error ? error.message : String(error);
+  
+  // Add query context to the error message if available
+  if (context?.query) {
+    // Truncate long queries for readability
+    const truncatedQuery = context.query.length > 100 
+      ? `${context.query.substring(0, 100)}...` 
+      : context.query;
+    
+    errorMessage += ` | Query: ${truncatedQuery}`;
+    
+    // Add parameter information if available
+    if (context.params && context.params.length > 0) {
+      errorMessage += ` | Params: ${JSON.stringify(context.params)}`;
+    }
+  }
+  
   return new DatabaseQueryError(
     `Database query error: ${errorMessage}`,
     context?.query,

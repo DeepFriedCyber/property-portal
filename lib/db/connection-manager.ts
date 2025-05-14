@@ -86,13 +86,16 @@ class ConnectionManager {
         ? error 
         : new Error(String(error));
       
+      // Use detailed error message for better debugging
       console.error('Failed to initialize database connection:', error);
       
       // Schedule reconnect
       this.scheduleReconnect();
       
+      // The DatabaseConnectionError constructor will use createDetailedDbConnectionErrorMessage
+      // to generate a detailed error message that includes connection details
       throw new DatabaseConnectionError(
-        `Failed to initialize database connection: ${this.connectionError.message}`,
+        'Failed to initialize database connection',
         error
       );
     }
