@@ -1,6 +1,5 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
-// @ts-ignore - Ignoring TypeScript error for postgres import
 import postgres from 'postgres';
 import * as dotenv from 'dotenv';
 

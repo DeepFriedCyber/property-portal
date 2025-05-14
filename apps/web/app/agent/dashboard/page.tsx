@@ -135,7 +135,7 @@ export default function AgentDashboard() {
             </div>
             <Button 
               variant="secondary"
-              size="sm"
+              size="small"
               onClick={() => window.location.href = "/sign-out"}
             >
               Sign Out
@@ -244,7 +244,7 @@ export default function AgentDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Button 
                         variant="secondary"
-                        size="sm"
+                        size="small"
                         onClick={() => viewUploadDetails(upload.id)}
                       >
                         View Details
@@ -328,7 +328,7 @@ export default function AgentDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Button 
                         variant="secondary"
-                        size="sm"
+                        size="small"
                         onClick={() => window.location.href = `/agent/properties/${property.id}`}
                       >
                         Edit

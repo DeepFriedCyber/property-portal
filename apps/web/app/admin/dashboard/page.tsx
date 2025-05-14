@@ -214,7 +214,7 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Button 
                         variant="secondary"
-                        size="sm"
+                        size="small"
                         onClick={() => viewUploadDetails(upload.id)}
                         className="mr-2"
                       >
@@ -224,16 +224,16 @@ export default function AdminDashboard() {
                       {upload.status === 'pending' && (
                         <>
                           <Button 
-                            variant="success"
-                            size="sm"
+                            variant="primary"
+                            size="small"
                             onClick={() => handleApprove(upload.id)}
                             className="mr-2"
                           >
                             Approve
                           </Button>
                           <Button 
-                            variant="danger"
-                            size="sm"
+                            variant="destructive"
+                            size="small"
                             onClick={() => handleReject(upload.id)}
                           >
                             Reject
