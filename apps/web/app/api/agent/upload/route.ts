@@ -281,8 +281,25 @@ export async function POST(request: NextRequest) {
       // Trigger embedding generation in the background
       // We don't await this to avoid blocking the response
       processUploadEmbeddings(result.upload.id).catch(err => {
-        console.error(`Error generating embeddings for upload ${result.upload.id}:`, err);
-        // Consider implementing a notification system or retry mechanism here
+        console.error(`Error generating embeddings for upload ${result.upload.id}:`, {
+          error: err instanceof Error ? err.message : 'Unknown error',
+          stack: err instanceof Error ? err.stack : undefined,
+          uploadId: result.upload.id,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Update the upload status to indicate embedding generation failed
+        db.update('uploads')
+          .set({ status: 'embedding_failed', updatedAt: new Date() })
+          .where('id', '=', result.upload.id)
+          .execute()
+          .catch(updateErr => {
+            console.error(`Failed to update upload status for ${result.upload.id}:`, updateErr);
+          });
+          
+        // TODO: Implement a notification system or retry mechanism
+        // For example, you could add this failed upload to a queue for retry
+        // or send a notification to the user or admin
       });
       
       console.info(`Successfully processed upload ${result.upload.id} with ${result.propertyCount} properties`);
