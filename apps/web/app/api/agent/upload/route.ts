@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import * as csvParse from 'csv-parse/sync';
-import { createUploadRecord, createProperty } from '@/lib/db/queries';
-import { db } from '@/lib/db';
-import { processUploadEmbeddings } from '@/lib/db/property-processor';
+import { createUploadRecord, createProperty } from '../../../../../lib/db/queries';
+import { db } from '../../../../../lib/db';
+import { processUploadEmbeddings } from '../../../../../lib/db/property-processor';
 import { auth } from '@clerk/nextjs/server';
 
 export async function POST(request: NextRequest) {

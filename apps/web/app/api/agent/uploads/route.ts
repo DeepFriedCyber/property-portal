@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUploadRecordsByUploader, countPropertiesByUploadId } from '@/lib/db/queries';
+import { getUploadRecordsByUploader, countPropertiesByUploadId, UploadRecord } from '@/lib/db/queries';
 import { auth } from '@clerk/nextjs/server';
 
 export async function GET(request: NextRequest) {
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     
     // For each upload, get the property count
     const uploadsWithCounts = await Promise.all(
-      uploads.map(async (upload) => {
+      uploads.map(async (upload: UploadRecord) => {
         const propertyCount = await countPropertiesByUploadId(upload.id);
         return {
           ...upload,

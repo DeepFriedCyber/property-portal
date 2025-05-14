@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUploadRecordsByUploader, getPropertiesByUploadId } from '@/lib/db/queries';
-import { db, schema } from '@/lib/db';
+import { getUploadRecordsByUploader, getPropertiesByUploadId } from '../../../../../lib/db/queries';
+import { db, schema } from '../../../../../lib/db';
 import { inArray } from 'drizzle-orm';
 import { auth } from '@clerk/nextjs/server';
 
