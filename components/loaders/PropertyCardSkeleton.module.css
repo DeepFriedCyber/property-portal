@@ -1,0 +1,30 @@
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.image {
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.title {
+  margin-bottom: 12px;
+}
+
+.price {
+  margin-bottom: 16px;
+}
+
+.details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.description > * {
+  margin-bottom: 8px;
+}

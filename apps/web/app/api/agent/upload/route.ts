@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import * as csvParse from 'csv-parse/sync';
-import { createUploadRecord, createProperty, getUploadRecordsByUploader } from '../../../../../lib/db/queries';
-import { db } from '../../../../../lib/db';
-import { processUploadEmbeddings } from '../../../../../lib/db/property-processor';
+import { createUploadRecord, createProperty, getUploadRecordsByUploader } from '@root/lib/db/queries';
+import { db, schema } from '@root/lib/db';
+import { processUploadEmbeddings } from '@root/lib/db/property-processor';
 import { auth } from '@clerk/nextjs/server';
+import { eq } from 'drizzle-orm';
 
 // Security constants
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const VALID_FILENAME_REGEX = /^[\w\.-]+$/; // Only allow alphanumeric, underscore, dot, and hyphen
 
 export async function POST(request: NextRequest) {
+  // Define userId at the function scope level so it's available in all blocks
+  let userId: string | null = null;
+  
   try {
     // Get the user ID and authentication data from Clerk
-    const { userId, sessionClaims } = await auth();
+    const authResult = await auth();
+    userId = authResult.userId;
+    const { sessionClaims } = authResult;
     
     // Check if user is authenticated
     if (!userId) {
@@ -398,9 +404,9 @@ export async function POST(request: NextRequest) {
         });
         
         // Update the upload status to indicate embedding generation failed
-        db.update('uploads')
-          .set({ status: 'embedding_failed', updatedAt: new Date() })
-          .where('id', '=', result.upload.id)
+        db.update(schema.uploadRecord)
+          .set({ status: 'embedding_failed' })
+          .where(eq(schema.uploadRecord.id, result.upload.id))
           .execute()
           .catch(updateErr => {
             console.error(`Failed to update upload status for ${result.upload.id}:`, updateErr);
@@ -436,8 +442,8 @@ export async function POST(request: NextRequest) {
       // Detailed CSV parsing error logging for internal debugging
       console.error('CSV parsing error:', {
         referenceId: errorReferenceId,
-        error: parseError.message,
-        stack: parseError.stack,
+        error: parseError instanceof Error ? parseError.message : String(parseError),
+        stack: parseError instanceof Error ? parseError.stack : 'No stack trace available',
         fileName: file.name,
         fileSize: file.size,
         userId: userId,
@@ -473,8 +479,8 @@ export async function POST(request: NextRequest) {
       userId: userId || 'unknown',
       endpoint: 'POST /api/agent/upload',
       timestamp: new Date().toISOString(),
-      fileName: file?.name || 'unknown',
-      fileSize: file?.size || 'unknown'
+      fileName: 'unknown', // File might not be available in the error context
+      fileSize: 'unknown'  // File might not be available in the error context
     });
     
     // Return a sanitized error response without exposing internal details or sensitive information

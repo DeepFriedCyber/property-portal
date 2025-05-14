@@ -3,9 +3,15 @@ export {
   getUploadRecordsByUploader,
   countPropertiesByUploadId,
   getPropertiesByUploadId,
+  getPropertyById,
   createUploadRecord,
   createProperty,
-  // Export the types as well
+  updateProperty,
+  deleteProperty
+} from '../../../../lib/db/queries';
+
+// Export the types with 'export type' syntax for isolatedModules compatibility
+export type { 
   UploadRecord,
   NewUploadRecord,
   Property,

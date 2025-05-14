@@ -1,43 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUploadRecordsByUploader, countPropertiesByUploadId, UploadRecord } from '@/lib/db/queries';
-import { auth } from '@clerk/nextjs/server';
+import { withAuth, successResponse, errorResponse, HttpStatus } from '@/lib/auth/api-auth';
 
-export async function GET(request: NextRequest) {
-  try {
-    // Get the user ID from Clerk
-    const { userId } = await auth();
-    
-    if (!userId) {
-      return NextResponse.json(
-        { message: 'Unauthorized' },
-        { status: 401 }
+// Enhanced GET handler with proper authentication and error handling
+export const GET = withAuth(
+  async (req: NextRequest, authResult) => {
+    try {
+      const { userId } = authResult;
+      
+      // Get all uploads for this user from the database
+      const uploads = await getUploadRecordsByUploader(userId!);
+      
+      // For each upload, get the property count with error handling
+      const uploadsWithCounts = await Promise.all(
+        uploads.map(async (upload: UploadRecord) => {
+          try {
+            const propertyCount = await countPropertiesByUploadId(upload.id);
+            return {
+              ...upload,
+              propertyCount,
+              // Don't expose the uploaderId in the response
+              uploaderId: undefined
+            };
+          } catch (error) {
+            console.error(`Error getting property count for upload ${upload.id}:`, error);
+            // Return the upload with count 0 if there's an error
+            return {
+              ...upload,
+              propertyCount: 0,
+              countError: true,
+              // Don't expose the uploaderId in the response
+              uploaderId: undefined
+            };
+          }
+        })
+      );
+      
+      return successResponse({
+        uploads: uploadsWithCounts
+      });
+    } catch (error) {
+      console.error('Error fetching uploads:', error);
+      return errorResponse(
+        'Failed to fetch uploads',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'FETCH_ERROR',
+        { message: error instanceof Error ? error.message : 'Unknown error' }
       );
     }
-    
-    // Get all uploads for this user from the database
-    const uploads = await getUploadRecordsByUploader(userId);
-    
-    // For each upload, get the property count
-    const uploadsWithCounts = await Promise.all(
-      uploads.map(async (upload: UploadRecord) => {
-        const propertyCount = await countPropertiesByUploadId(upload.id);
-        return {
-          ...upload,
-          propertyCount,
-          // Don't expose the uploaderId in the response
-          uploaderId: undefined
-        };
-      })
-    );
-    
-    return NextResponse.json({
-      uploads: uploadsWithCounts
-    });
-  } catch (error) {
-    console.error('Error fetching uploads:', error);
-    return NextResponse.json(
-      { message: 'Failed to fetch uploads' },
-      { status: 500 }
-    );
+  },
+  // Authentication options
+  {
+    requireAuth: true,
+    requiredRoles: ['agent', 'admin']
   }
-}
+);
