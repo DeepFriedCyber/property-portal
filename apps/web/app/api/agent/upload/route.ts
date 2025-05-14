@@ -411,53 +411,78 @@ export async function POST(request: NextRequest) {
         // or send a notification to the user or admin
       });
       
-      console.info(`Successfully processed upload ${result.upload.id} with ${result.propertyCount} properties`);
+      // Log the successful upload with user ID for audit purposes
+      console.info(`Successfully processed upload ${result.upload.id} with ${result.propertyCount} properties by user ${userId}`);
+      
+      // Create a sanitized version of the upload record for the response
+      // This ensures we don't accidentally expose sensitive information
+      const sanitizedUpload = {
+        id: result.upload.id,
+        filename: result.upload.filename,
+        status: result.upload.status,
+        createdAt: result.upload.createdAt,
+        propertyCount: result.propertyCount
+        // Explicitly omit uploaderId and any other sensitive fields
+      };
       
       return NextResponse.json({
         message: 'File uploaded successfully',
-        upload: {
-          ...result.upload,
-          propertyCount: result.propertyCount,
-          // Don't expose the uploaderId in the response
-          uploaderId: undefined
-        }
+        upload: sanitizedUpload
       });
     } catch (parseError) {
-      // Detailed CSV parsing error logging
+      // Generate a unique error reference ID
+      const errorReferenceId = uuidv4();
+      
+      // Detailed CSV parsing error logging for internal debugging
       console.error('CSV parsing error:', {
+        referenceId: errorReferenceId,
         error: parseError.message,
         stack: parseError.stack,
         fileName: file.name,
         fileSize: file.size,
-        contentPreview: fileContent.substring(0, 200) + '...' // Log a preview of the content
+        userId: userId,
+        timestamp: new Date().toISOString(),
+        // We don't include content preview in the chunked parsing approach
+        // as fileContent might not be defined, and we want to avoid memory issues
       });
       
+      // Return a helpful but sanitized error response
       return NextResponse.json(
         { 
-          message: `Failed to parse CSV file: ${parseError.message}`,
+          message: 'Failed to parse CSV file',
           details: 'Please check the CSV format and ensure it follows the required structure.',
-          help: 'Make sure the CSV has headers and the data is properly formatted.'
+          help: 'Make sure the CSV has headers and the data is properly formatted.',
+          referenceId: errorReferenceId
         },
         { status: 400 }
       );
     }
   } catch (error) {
-    // Detailed general error logging
+    // Generate a unique error reference ID that can be used to correlate logs with user reports
+    const errorReferenceId = uuidv4();
+    
+    // Detailed general error logging with sensitive information for internal use only
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const errorStack = error instanceof Error ? error.stack : undefined;
     
+    // Log detailed error information for debugging (including sensitive data)
     console.error('Upload error:', {
+      referenceId: errorReferenceId,
       message: errorMessage,
       stack: errorStack,
       userId: userId || 'unknown',
-      endpoint: 'POST /api/agent/upload'
+      endpoint: 'POST /api/agent/upload',
+      timestamp: new Date().toISOString(),
+      fileName: file?.name || 'unknown',
+      fileSize: file?.size || 'unknown'
     });
     
+    // Return a sanitized error response without exposing internal details or sensitive information
     return NextResponse.json(
       { 
         message: 'An error occurred while processing the upload',
-        details: errorMessage,
-        requestId: uuidv4() // Include a request ID that can be referenced in logs
+        details: 'Please try again or contact support if the problem persists',
+        referenceId: errorReferenceId // Include reference ID so users can report issues
       },
       { status: 500 }
     );
