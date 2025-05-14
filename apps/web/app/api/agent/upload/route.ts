@@ -139,13 +139,16 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      // Check required fields
+      // Define required fields
       const requiredFields = ['address', 'price'];
+      
+      // First, check if all required fields exist in the CSV structure (using first record)
       const firstRecord = records[0];
       
-      // Log the first record for debugging (excluding sensitive data)
+      // Log the first record structure for debugging (excluding sensitive data)
       console.info('First record structure:', Object.keys(firstRecord));
       
+      // Check if all required fields exist in the CSV structure
       for (const field of requiredFields) {
         if (!(field in firstRecord)) {
           console.warn(`CSV missing required field: ${field}. Available fields: ${Object.keys(firstRecord).join(', ')}`);
@@ -159,6 +162,43 @@ export async function POST(request: NextRequest) {
           );
         }
       }
+      
+      // Now validate all records to ensure consistency throughout the file
+      console.info(`Validating all ${records.length} records for required fields...`);
+      
+      for (let i = 0; i < records.length; i++) {
+        const record = records[i];
+        
+        for (const field of requiredFields) {
+          if (!(field in record) || record[field] === null || record[field] === undefined || record[field] === '') {
+            console.warn(`Record at index ${i} is missing required field "${field}" or has empty value`);
+            return NextResponse.json(
+              { 
+                message: `Missing or empty required field "${field}" in record ${i + 1}`,
+                details: `All records must contain non-empty values for fields: ${requiredFields.join(', ')}`,
+                recordIndex: i,
+                fieldName: field
+              },
+              { status: 400 }
+            );
+          }
+        }
+        
+        // Validate price field is a valid number
+        if (isNaN(parseInt(record.price, 10))) {
+          console.warn(`Record at index ${i} has invalid price value: "${record.price}"`);
+          return NextResponse.json(
+            { 
+              message: `Invalid price value in record ${i + 1}`,
+              details: `Price must be a valid number, found: "${record.price}"`,
+              recordIndex: i
+            },
+            { status: 400 }
+          );
+        }
+      }
+      
+      console.info('All records successfully validated for required fields');
       
       // Use a transaction to ensure all operations succeed or fail together
       console.info(`Starting database transaction for ${records.length} properties`);
@@ -183,13 +223,15 @@ export async function POST(request: NextRequest) {
           let processedCount = 0;
           for (const record of records) {
             try {
+              // Since we've already validated required fields, we can safely create the property
+              // But we'll still use defensive programming for optional fields
               await createProperty({
                 id: uuidv4(),
                 uploadId: upload.id,
-                address: record.address,
-                price: parseInt(record.price, 10) || 0, // Provide default if parsing fails
+                address: record.address.trim(), // Trim whitespace
+                price: parseInt(record.price, 10), // Already validated as a number
                 bedrooms: record.bedrooms ? parseInt(record.bedrooms, 10) : null,
-                type: record.type || null,
+                type: record.type ? record.type.trim() : null,
                 dateSold: record.dateSold ? new Date(record.dateSold) : null,
                 embedding: null // We'll handle embeddings separately
               });
