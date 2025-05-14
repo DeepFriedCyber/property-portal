@@ -203,8 +203,9 @@ export async function POST(request: NextRequest) {
       // Use a transaction to ensure all operations succeed or fail together
       console.info(`Starting database transaction for ${records.length} properties`);
       
+      let result;
       try {
-        const result = await db.transaction(async (tx) => {
+        result = await db.transaction(async (tx) => {
           // Create upload record in the database
           const uploadId = uuidv4();
           console.info(`Creating upload record with ID: ${uploadId}`);
@@ -259,8 +260,6 @@ export async function POST(request: NextRequest) {
             propertyCount: records.length
           };
         });
-        
-        return result;
       } catch (dbError) {
         console.error('Database transaction failed:', {
           error: dbError instanceof Error ? dbError.message : 'Unknown error',
@@ -269,7 +268,14 @@ export async function POST(request: NextRequest) {
           fileName: file.name
         });
         
-        throw new Error(`Database operation failed: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`);
+        return NextResponse.json(
+          { 
+            message: 'Database operation failed',
+            details: dbError instanceof Error ? dbError.message : 'Unknown error',
+            requestId: uuidv4() // Include a request ID that can be referenced in logs
+          },
+          { status: 500 }
+        );
       }
       
       // Trigger embedding generation in the background
