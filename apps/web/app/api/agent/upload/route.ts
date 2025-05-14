@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import * as csvParse from 'csv-parse/sync';
-import { createUploadRecord, createProperty } from '../../../../../lib/db/queries';
+import { createUploadRecord, createProperty, getUploadRecordsByUploader } from '../../../../../lib/db/queries';
 import { db } from '../../../../../lib/db';
 import { processUploadEmbeddings } from '../../../../../lib/db/property-processor';
 import { auth } from '@clerk/nextjs/server';
@@ -12,14 +12,46 @@ const VALID_FILENAME_REGEX = /^[\w\.-]+$/; // Only allow alphanumeric, underscor
 
 export async function POST(request: NextRequest) {
   try {
-    // Get the user ID from Clerk
-    const { userId } = await auth();
+    // Get the user ID and authentication data from Clerk
+    const { userId, sessionClaims } = await auth();
     
+    // Check if user is authenticated
     if (!userId) {
+      console.warn('Unauthorized access attempt to upload endpoint');
       return NextResponse.json(
-        { message: 'Unauthorized' },
+        { message: 'Unauthorized - Authentication required' },
         { status: 401 }
       );
+    }
+    
+    // Check if user has the required role (agent or admin)
+    // This assumes Clerk is configured with custom roles in session claims
+    const userRoles = sessionClaims?.roles as string[] || [];
+    const hasRequiredRole = userRoles.some(role => ['agent', 'admin'].includes(role));
+    
+    if (!hasRequiredRole) {
+      console.warn(`User ${userId} attempted to upload without required role`);
+      return NextResponse.json(
+        { 
+          message: 'Forbidden - Insufficient permissions',
+          details: 'Only agents and administrators can upload property data'
+        },
+        { status: 403 }
+      );
+    }
+    
+    // Verify the user has uploaded before or has an active account
+    try {
+      const previousUploads = await getUploadRecordsByUploader(userId);
+      
+      // If this is the user's first upload, log it for monitoring
+      if (previousUploads.length === 0) {
+        console.info(`First-time upload from user ${userId}`);
+      }
+    } catch (userCheckError) {
+      console.error(`Error checking user upload history for ${userId}:`, userCheckError);
+      // We'll continue processing even if this check fails
+      // It's just for monitoring purposes
     }
     
     const formData = await request.formData();
