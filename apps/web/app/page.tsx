@@ -13,6 +13,7 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Property[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   // Mock data for the components
   const navLinks = [
@@ -104,56 +105,80 @@ export default function HomePage() {
 
   // Mock property search function
   const performSearch = (query: string) => {
+    // Reset any previous errors
+    setSearchError(null);
     setSearchQuery(query);
     setIsSearching(true);
     
     // Simulate API call with a delay
     setTimeout(() => {
-      // Mock data - in a real app, this would come from an API
-      const mockResults: Property[] = [
-        {
-          id: '1',
-          title: 'Modern Apartment in City Center',
-          price: '£350,000',
-          location: 'Cambridge, UK',
-          bedrooms: 2,
-          bathrooms: 1,
-          area: '850 sq ft',
-          description: 'A beautiful modern apartment in the heart of Cambridge with easy access to shops, restaurants, and public transport.',
-          imageUrl: 'https://placehold.co/600x400/png?text=Apartment',
-        },
-        {
-          id: '2',
-          title: 'Spacious Family Home with Garden',
-          price: '£550,000',
-          location: 'Cambridge, UK',
-          bedrooms: 4,
-          bathrooms: 2,
-          area: '1,800 sq ft',
-          description: 'Perfect family home with a large garden in a quiet neighborhood. Close to excellent schools and parks.',
-          imageUrl: 'https://placehold.co/600x400/png?text=Family+Home',
-        },
-        {
-          id: '3',
-          title: 'Luxury Penthouse with River View',
-          price: '£750,000',
-          location: 'Cambridge, UK',
-          bedrooms: 3,
-          bathrooms: 2,
-          area: '1,200 sq ft',
-          description: 'Stunning penthouse apartment with panoramic views of the river. Features high-end finishes and a private terrace.',
-          imageUrl: 'https://placehold.co/600x400/png?text=Penthouse',
-        },
-      ];
-      
-      setSearchResults(mockResults);
-      setIsSearching(false);
+      try {
+        // Simulate a random error (10% chance) for demonstration purposes
+        if (Math.random() < 0.1) {
+          throw new Error("Unable to connect to search service. Please try again.");
+        }
+        
+        // Mock data - in a real app, this would come from an API
+        const mockResults: Property[] = [
+          {
+            id: '1',
+            title: 'Modern Apartment in City Center',
+            price: '£350,000',
+            location: 'Cambridge, UK',
+            bedrooms: 2,
+            bathrooms: 1,
+            area: '850 sq ft',
+            description: 'A beautiful modern apartment in the heart of Cambridge with easy access to shops, restaurants, and public transport.',
+            imageUrl: 'https://placehold.co/600x400/png?text=Apartment',
+          },
+          {
+            id: '2',
+            title: 'Spacious Family Home with Garden',
+            price: '£550,000',
+            location: 'Cambridge, UK',
+            bedrooms: 4,
+            bathrooms: 2,
+            area: '1,800 sq ft',
+            description: 'Perfect family home with a large garden in a quiet neighborhood. Close to excellent schools and parks.',
+            imageUrl: 'https://placehold.co/600x400/png?text=Family+Home',
+          },
+          {
+            id: '3',
+            title: 'Luxury Penthouse with River View',
+            price: '£750,000',
+            location: 'Cambridge, UK',
+            bedrooms: 3,
+            bathrooms: 2,
+            area: '1,200 sq ft',
+            description: 'Stunning penthouse apartment with panoramic views of the river. Features high-end finishes and a private terrace.',
+            imageUrl: 'https://placehold.co/600x400/png?text=Penthouse',
+          },
+        ];
+        
+        // Filter results based on query for demonstration
+        const filteredResults = query.length > 0 
+          ? mockResults.filter(property => 
+              property.title.toLowerCase().includes(query.toLowerCase()) ||
+              property.location.toLowerCase().includes(query.toLowerCase()) ||
+              property.description.toLowerCase().includes(query.toLowerCase())
+            )
+          : mockResults;
+        
+        setSearchResults(filteredResults);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchError(error instanceof Error ? error.message : 'An unexpected error occurred');
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
     }, 1500);
   };
 
   const clearSearch = () => {
     setSearchQuery('');
     setSearchResults([]);
+    setSearchError(null);
   };
 
   const handleViewDetails = (propertyId: string) => {
@@ -203,6 +228,7 @@ export default function HomePage() {
           query={searchQuery}
           results={searchResults}
           isLoading={isSearching}
+          error={searchError || undefined}
           onViewDetails={handleViewDetails}
           onClearSearch={clearSearch}
         />

@@ -11,9 +11,9 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["apps/web/src/*"],
+      "@/*": ["src/*", "apps/web/src/*"],
       "@components/*": ["apps/web/components/*"],
-      "@lib/*": ["lib/*"],
+      "@lib/*": ["lib/*", "src/lib/*"],
       "@your-org/db": ["packages/db/src"],
       "@your-org/ui": ["packages/ui"],
       "@your-org/ui/*": ["packages/ui/src/*"]
