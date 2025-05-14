@@ -48,10 +48,14 @@ export async function POST(request: NextRequest) {
         trim: true
       });
       
+      // Log successful parsing
+      console.info(`Successfully parsed CSV with ${records.length} records from file: ${file.name}`);
+      
       // Validate CSV structure
       if (records.length === 0) {
+        console.warn(`Rejected empty CSV file: ${file.name}`);
         return NextResponse.json(
-          { message: 'CSV file is empty' },
+          { message: 'CSV file is empty. Please provide a file with at least one record.' },
           { status: 400 }
         );
       }
@@ -60,51 +64,101 @@ export async function POST(request: NextRequest) {
       const requiredFields = ['address', 'price'];
       const firstRecord = records[0];
       
+      // Log the first record for debugging (excluding sensitive data)
+      console.info('First record structure:', Object.keys(firstRecord));
+      
       for (const field of requiredFields) {
         if (!(field in firstRecord)) {
+          console.warn(`CSV missing required field: ${field}. Available fields: ${Object.keys(firstRecord).join(', ')}`);
           return NextResponse.json(
-            { message: `CSV is missing required field: ${field}` },
+            { 
+              message: `CSV is missing required field: ${field}`,
+              availableFields: Object.keys(firstRecord),
+              requiredFields: requiredFields
+            },
             { status: 400 }
           );
         }
       }
       
       // Use a transaction to ensure all operations succeed or fail together
-      const result = await db.transaction(async (tx) => {
-        // Create upload record in the database
-        const upload = await createUploadRecord({
-          id: uuidv4(),
-          uploaderId: userId,
-          filename: file.name,
-          status: 'pending',
-          createdAt: new Date()
+      console.info(`Starting database transaction for ${records.length} properties`);
+      
+      try {
+        const result = await db.transaction(async (tx) => {
+          // Create upload record in the database
+          const uploadId = uuidv4();
+          console.info(`Creating upload record with ID: ${uploadId}`);
+          
+          const upload = await createUploadRecord({
+            id: uploadId,
+            uploaderId: userId,
+            filename: file.name,
+            status: 'pending',
+            createdAt: new Date()
+          });
+          
+          // Process and save each property record
+          console.info(`Processing ${records.length} property records for upload ${upload.id}`);
+          
+          let processedCount = 0;
+          for (const record of records) {
+            try {
+              await createProperty({
+                id: uuidv4(),
+                uploadId: upload.id,
+                address: record.address,
+                price: parseInt(record.price, 10) || 0, // Provide default if parsing fails
+                bedrooms: record.bedrooms ? parseInt(record.bedrooms, 10) : null,
+                type: record.type || null,
+                dateSold: record.dateSold ? new Date(record.dateSold) : null,
+                embedding: null // We'll handle embeddings separately
+              });
+              processedCount++;
+              
+              // Log progress for large uploads
+              if (processedCount % 100 === 0) {
+                console.info(`Processed ${processedCount}/${records.length} properties`);
+              }
+            } catch (recordError) {
+              // Log the specific record that failed
+              console.error('Failed to process property record:', {
+                error: recordError instanceof Error ? recordError.message : 'Unknown error',
+                record: JSON.stringify(record)
+              });
+              // Re-throw to trigger transaction rollback
+              throw recordError;
+            }
+          }
+          
+          console.info(`Successfully processed all ${processedCount} property records`);
+          
+          return {
+            upload,
+            propertyCount: records.length
+          };
         });
         
-        // Process and save each property record
-        for (const record of records) {
-          await createProperty({
-            id: uuidv4(),
-            uploadId: upload.id,
-            address: record.address,
-            price: parseInt(record.price, 10),
-            bedrooms: record.bedrooms ? parseInt(record.bedrooms, 10) : null,
-            type: record.type || null,
-            dateSold: record.dateSold ? new Date(record.dateSold) : null,
-            embedding: null // We'll handle embeddings separately
-          });
-        }
+        return result;
+      } catch (dbError) {
+        console.error('Database transaction failed:', {
+          error: dbError instanceof Error ? dbError.message : 'Unknown error',
+          stack: dbError instanceof Error ? dbError.stack : undefined,
+          recordCount: records.length,
+          fileName: file.name
+        });
         
-        return {
-          upload,
-          propertyCount: records.length
-        };
-      });
+        throw new Error(`Database operation failed: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`);
+      }
       
       // Trigger embedding generation in the background
       // We don't await this to avoid blocking the response
       processUploadEmbeddings(result.upload.id).catch(err => {
-        console.error('Error generating embeddings:', err);
+        console.error(`Error generating embeddings for upload ${result.upload.id}:`, err);
+        // Consider implementing a notification system or retry mechanism here
       });
+      
+      console.info(`Successfully processed upload ${result.upload.id} with ${result.propertyCount} properties`);
       
       return NextResponse.json({
         message: 'File uploaded successfully',
@@ -116,16 +170,42 @@ export async function POST(request: NextRequest) {
         }
       });
     } catch (parseError) {
-      console.error('CSV parsing error:', parseError);
+      // Detailed CSV parsing error logging
+      console.error('CSV parsing error:', {
+        error: parseError.message,
+        stack: parseError.stack,
+        fileName: file.name,
+        fileSize: file.size,
+        contentPreview: fileContent.substring(0, 200) + '...' // Log a preview of the content
+      });
+      
       return NextResponse.json(
-        { message: 'Failed to parse CSV file. Please check the format.' },
+        { 
+          message: `Failed to parse CSV file: ${parseError.message}`,
+          details: 'Please check the CSV format and ensure it follows the required structure.',
+          help: 'Make sure the CSV has headers and the data is properly formatted.'
+        },
         { status: 400 }
       );
     }
   } catch (error) {
-    console.error('Upload error:', error);
+    // Detailed general error logging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    console.error('Upload error:', {
+      message: errorMessage,
+      stack: errorStack,
+      userId: userId || 'unknown',
+      endpoint: 'POST /api/agent/upload'
+    });
+    
     return NextResponse.json(
-      { message: 'An error occurred while processing the upload' },
+      { 
+        message: 'An error occurred while processing the upload',
+        details: errorMessage,
+        requestId: uuidv4() // Include a request ID that can be referenced in logs
+      },
       { status: 500 }
     );
   }
