@@ -183,7 +183,7 @@ export async function updateProperty(id: string, data: Partial<NewProperty>): Pr
     // Add updatedAt if not provided
     const updateData = {
       ...data,
-      updatedAt: data.updatedAt || new Date().toISOString()
+      updatedAt: data.updatedAt ? new Date(data.updatedAt) : new Date()
     };
     
     const results = await db.update(schema.property)

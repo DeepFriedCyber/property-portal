@@ -2,18 +2,23 @@
   "name": "api",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -b tsconfig.build.json",
     "start": "node dist/index.js",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint --config eslint.config.js src"
   },
   "dependencies": {
     "@your-org/db": "workspace:*"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/node": "^18.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^7.0.0"
   }
 }

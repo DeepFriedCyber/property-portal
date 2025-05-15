@@ -10,7 +10,7 @@
     "plugin:import/typescript",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["@typescript-eslint", "react", "react-hooks", "jsx-a11y", "import"],
+  "plugins": ["@typescript-eslint", "react", "react-hooks", "jsx-a11y", "import", "vitest"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module",
@@ -23,7 +23,7 @@
     "browser": true,
     "node": true,
     "es2021": true,
-    "jest": true
+    "vitest": true
   },
   "rules": {
     "camelcase": ["error", { "properties": "always" }],
@@ -82,9 +82,9 @@
     {
       "files": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
       "env": {
-        "jest": true
+        "vitest": true
       },
-      "extends": ["plugin:jest/recommended", "plugin:testing-library/react"]
+      "extends": ["plugin:vitest/recommended"]
     }
   ],
   "ignorePatterns": [
@@ -96,8 +96,6 @@
     "*.config.ts", 
     ".eslintrc.json", 
     "prettier.config.js",
-    "coverage/",
-    "jest.config.js",
-    "jest.setup.js"
+coverage/
   ]
 }

@@ -165,7 +165,7 @@ export const PATCH = withDatabaseHandler(
       const propertyData = {
         ...validatedData,
         updatedBy: user.userId,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date()
       };
       
       // Update the property

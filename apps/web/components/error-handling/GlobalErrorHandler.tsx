@@ -80,8 +80,11 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
     window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
       // Call the original handler if it exists
       if (typeof originalOnUnhandledRejection === 'function') {
-        // The original handler is already bound to the correct context
-        originalOnUnhandledRejection(event);
+        // We need to call it as a method of window to maintain the correct context
+        window.onunhandledrejection = originalOnUnhandledRejection;
+        window.onunhandledrejection(event);
+        // Reset it back to null to avoid duplicate handling
+        window.onunhandledrejection = null;
       }
 
       // Custom rejection handling logic here

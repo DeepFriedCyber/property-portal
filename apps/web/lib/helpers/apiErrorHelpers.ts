@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { HttpStatus } from '../../../../lib/db/nextjs-utils';
+import { HttpStatus } from '../../lib/db/nextjs-utils';
 import { ErrorCode, ErrorMessage } from '../constants/errorCodes';
 
 /**
