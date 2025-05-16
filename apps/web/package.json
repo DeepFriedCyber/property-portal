@@ -2,12 +2,15 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "homepage": "https://deepfriedcyber.github.io/property-portal",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --config ../../eslint.config.js ."
+    "lint": "eslint --config ../../eslint.config.js .",
+    "build:static": "cross-env NODE_ENV=production next build",
+    "export": "cross-env NODE_ENV=production next build && next export",
+    "deploy": "npm run build:static && gh-pages -d out"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.19.2",
