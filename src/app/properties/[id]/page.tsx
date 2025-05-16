@@ -6,6 +6,7 @@ import { getProperty } from '@/app/actions/properties'
 import ErrorBoundary from '@/app/components/ErrorBoundary'
 import PropertyTimestamps from '@/app/components/PropertyTimestamps'
 import { formatCurrency, formatSquareFootage, capitalize } from '@/lib/utils/formatters'
+import { Property } from '@/types/property'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,38 +29,10 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   }
 }
 
-// Define property type interface
-interface PropertyData {
-  id: string
-  address: string
-  city: string
-  state: string
-  zipCode: string
-  country: string
-  price: number
-  bedrooms: number
-  bathrooms: number
-  squareFeet?: number
-  description: string
-  type: string
-  status: string
-  features?: string[]
-  createdAt: string
-  updatedAt?: string
-  metadata?: {
-    title?: string
-    mainImageUrl?: string
-    listingType?: 'sale' | 'rent'
-    addressLine2?: string
-    receptionRooms?: number
-    tenure?: string
-    councilTaxBand?: string
-    epcRating?: string
-  }
-}
+// Using the centralized Property type from @/types/property
 
 // Property detail content component
-function PropertyDetailContent({ property }: { property: PropertyData }) {
+function PropertyDetailContent({ property }: { property: Property }) {
   const metadata = property.metadata || {}
 
   return (
