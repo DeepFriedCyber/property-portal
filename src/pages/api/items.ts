@@ -1,3 +1,13 @@
+/**
+ * @deprecated This API route is deprecated and will be removed in a future version.
+ * Please use the server actions in @/app/actions/items.ts instead.
+ *
+ * Migration steps:
+ * 1. Import the server actions from @/app/actions/items
+ * 2. Use the createItem or getItems functions directly in your components
+ * 3. For forms, use the action attribute with the server action
+ */
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { createItemSchema, CreateItemInput } from '@/lib/schemas/itemSchemas';
