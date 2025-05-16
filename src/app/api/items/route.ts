@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { createItemSchema, CreateItemInput } from '@/lib/schemas/itemSchemas'; // Adjust path if needed
 
 // Dummy database or service
@@ -26,15 +27,24 @@ export async function POST(request: Request) {
     const validatedData: CreateItemInput = validationResult.data;
 
     // Simulate saving to database
-    console.log('Received valid data:', validatedData);
+    // Log data in development only
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log('Received valid data:', validatedData);
+    }
     itemsDb.push(validatedData); // In a real app, you'd interact with Drizzle ORM here
 
-    return NextResponse.json({ message: 'Item created successfully', item: validatedData }, { status: 201 });
-  } catch (error: any) {
+    return NextResponse.json(
+      { message: 'Item created successfully', item: validatedData },
+      { status: 201 }
+    );
+  } catch (error: unknown) {
     // Catch errors from request.json() or other unexpected errors
+    // eslint-disable-next-line no-console
     console.error('Error creating item:', error);
-    if (error instanceof SyntaxError) { // Handle JSON parsing errors specifically
-        return NextResponse.json({ message: 'Invalid JSON payload' }, { status: 400 });
+    if (error instanceof SyntaxError) {
+      // Handle JSON parsing errors specifically
+      return NextResponse.json({ message: 'Invalid JSON payload' }, { status: 400 });
     }
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }

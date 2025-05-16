@@ -1,7 +1,8 @@
 // AccessibleForm.tsx
 import React, { useState } from 'react';
-import AccessibleInput from './AccessibleInput';
+
 import AccessibleButton from './AccessibleButton';
+import AccessibleInput from './AccessibleInput';
 
 interface FormField {
   id: string;
@@ -41,49 +42,52 @@ const AccessibleForm: React.FC<AccessibleFormProps> = ({
   description,
   className = '',
   initialValues = {},
-  loading = false
+  loading = false,
 }) => {
   // Initialize form values from initialValues or empty strings
   const [formValues, setFormValues] = useState<Record<string, string>>(
-    fields.reduce((values, field) => {
-      values[field.id] = initialValues[field.id] || '';
-      return values;
-    }, {} as Record<string, string>)
+    fields.reduce(
+      (values, field) => {
+        values[field.id] = initialValues[field.id] || '';
+        return values;
+      },
+      {} as Record<string, string>
+    )
   );
-  
+
   // Track validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   // Track if form has been submitted
   const [submitted, setSubmitted] = useState(false);
-  
+
   // Handle input changes
   const handleChange = (id: string, value: string) => {
-    setFormValues(prev => ({
+    setFormValues((prev) => ({
       ...prev,
-      [id]: value
+      [id]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[id]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [id]: ''
+        [id]: '',
       }));
     }
   };
-  
+
   // Validate all fields
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
     let isValid = true;
-    
-    fields.forEach(field => {
+
+    fields.forEach((field) => {
       // Check required fields
       if (field.required && !formValues[field.id]) {
         newErrors[field.id] = `${field.label} is required`;
         isValid = false;
-      } 
+      }
       // Run custom validation if provided
       else if (field.validation && formValues[field.id]) {
         const error = field.validation(formValues[field.id]);
@@ -93,31 +97,29 @@ const AccessibleForm: React.FC<AccessibleFormProps> = ({
         }
       }
     });
-    
+
     setErrors(newErrors);
     return isValid;
   };
-  
+
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
-    
+
     if (validateForm()) {
       onSubmit(formValues);
     } else {
       // Focus the first field with an error
-      const firstErrorField = document.getElementById(
-        Object.keys(errors)[0]
-      );
+      const firstErrorField = document.getElementById(Object.keys(errors)[0]);
       firstErrorField?.focus();
-      
+
       // Announce errors to screen readers
       const errorCount = Object.keys(errors).length;
       const errorMessage = `Form contains ${errorCount} error${
         errorCount > 1 ? 's' : ''
       }. Please correct and try again.`;
-      
+
       // Use aria-live region to announce errors
       const liveRegion = document.getElementById('form-errors-live');
       if (liveRegion) {
@@ -125,33 +127,27 @@ const AccessibleForm: React.FC<AccessibleFormProps> = ({
       }
     }
   };
-  
+
   return (
     <div className={`accessible-form-container ${className}`}>
       {/* Hidden live region for announcing errors */}
-      <div 
-        id="form-errors-live" 
-        className="visually-hidden" 
-        aria-live="assertive"
-      ></div>
-      
-      <form 
+      <div id="form-errors-live" className="visually-hidden" aria-live="assertive"></div>
+
+      <form
         onSubmit={handleSubmit}
         className="accessible-form"
         noValidate // Disable browser validation to handle it ourselves
       >
-        {title && (
-          <h2 className="form-title">{title}</h2>
-        )}
-        
+        {title && <h2 className="form-title">{title}</h2>}
+
         {description && (
           <p id="form-description" className="form-description">
             {description}
           </p>
         )}
-        
+
         <div className="form-fields">
-          {fields.map(field => (
+          {fields.map((field) => (
             <AccessibleInput
               key={field.id}
               id={field.id}
@@ -171,7 +167,7 @@ const AccessibleForm: React.FC<AccessibleFormProps> = ({
             />
           ))}
         </div>
-        
+
         <div className="form-actions">
           <AccessibleButton
             type="submit"
@@ -181,7 +177,7 @@ const AccessibleForm: React.FC<AccessibleFormProps> = ({
           >
             {loading ? 'Submitting...' : submitLabel}
           </AccessibleButton>
-          
+
           {onCancel && (
             <AccessibleButton
               type="button"

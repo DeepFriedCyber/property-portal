@@ -14,7 +14,7 @@ export default clerkMiddleware(async (_, request) => {
   if (isPublicRoute(request) || (await auth()).userId) {
     return NextResponse.next();
   }
-  
+
   const signInUrl = new URL('/sign-in', request.url);
   signInUrl.searchParams.set('redirect_url', request.url);
   return NextResponse.redirect(signInUrl);

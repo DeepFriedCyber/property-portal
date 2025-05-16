@@ -9,7 +9,7 @@ const mockUploads = [
     filename: 'london-properties.csv',
     status: 'approved',
     createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
-    propertyCount: 42
+    propertyCount: 42,
   },
   {
     id: '2',
@@ -18,7 +18,7 @@ const mockUploads = [
     filename: 'manchester-listings.csv',
     status: 'pending',
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    propertyCount: 18
+    propertyCount: 18,
   },
   {
     id: '3',
@@ -27,7 +27,7 @@ const mockUploads = [
     filename: 'birmingham-properties.csv',
     status: 'rejected',
     createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
-    propertyCount: 7
+    propertyCount: 7,
   },
   {
     id: '4',
@@ -36,7 +36,7 @@ const mockUploads = [
     filename: 'edinburgh-listings.csv',
     status: 'pending',
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    propertyCount: 23
+    propertyCount: 23,
   },
   {
     id: '5',
@@ -45,8 +45,8 @@ const mockUploads = [
     filename: 'glasgow-properties.csv',
     status: 'approved',
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-    propertyCount: 31
-  }
+    propertyCount: 31,
+  },
 ];
 
 export async function GET(request: NextRequest) {
@@ -56,29 +56,26 @@ export async function GET(request: NextRequest) {
     // 2. Query the database for all uploads
     // 3. Calculate stats
     // 4. Return the results
-    
+
     // Sort by date (newest first)
     const sortedUploads = [...mockUploads].sort(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
     );
-    
+
     // Calculate stats
     const stats = {
       totalProperties: mockUploads.reduce((sum, upload) => sum + upload.propertyCount, 0),
-      pendingUploads: mockUploads.filter(upload => upload.status === 'pending').length,
-      approvedUploads: mockUploads.filter(upload => upload.status === 'approved').length,
-      rejectedUploads: mockUploads.filter(upload => upload.status === 'rejected').length
+      pendingUploads: mockUploads.filter((upload) => upload.status === 'pending').length,
+      approvedUploads: mockUploads.filter((upload) => upload.status === 'approved').length,
+      rejectedUploads: mockUploads.filter((upload) => upload.status === 'rejected').length,
     };
-    
+
     return NextResponse.json({
       uploads: sortedUploads,
-      stats
+      stats,
     });
   } catch (error) {
     console.error('Error fetching admin uploads:', error);
-    return NextResponse.json(
-      { message: 'Failed to fetch uploads' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Failed to fetch uploads' }, { status: 500 });
   }
 }

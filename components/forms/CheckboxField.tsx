@@ -29,7 +29,7 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
   ...props
 }) => {
   const showError = error && touched;
-  
+
   return (
     <div className={`mb-4 ${className}`}>
       <div className="flex items-start">
@@ -48,22 +48,17 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
             {...props}
           />
         </div>
-        
+
         <div className="ml-3 text-sm">
-          <label 
-            htmlFor={id} 
-            className={`font-medium text-gray-700 ${labelClassName}`}
-          >
+          <label htmlFor={id} className={`font-medium text-gray-700 ${labelClassName}`}>
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
-          
-          {helpText && !showError && (
-            <p className="text-gray-500">{helpText}</p>
-          )}
+
+          {helpText && !showError && <p className="text-gray-500">{helpText}</p>}
         </div>
       </div>
-      
+
       {showError && (
         <p className="mt-1 text-sm text-red-600" id={`${id}-error`}>
           {error}

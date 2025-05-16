@@ -5,7 +5,7 @@ export const uploadRecord = pgTable('upload_records', {
   uploaderId: text('uploader_id'),
   filename: text('filename'),
   status: text('status').default('pending'),
-  createdAt: timestamp('created_at').defaultNow()
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
 export const uploads = pgTable('uploads', {
@@ -19,7 +19,7 @@ export const uploads = pgTable('uploads', {
   processingErrors: jsonb('processing_errors').$type<string[]>(),
   metadata: jsonb('metadata').$type<Record<string, any>>(),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at')
+  updatedAt: timestamp('updated_at'),
 });
 
 export const property = pgTable('properties', {
@@ -44,5 +44,5 @@ export const property = pgTable('properties', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at'),
   createdBy: text('created_by'),
-  updatedBy: text('updated_by')
+  updatedBy: text('updated_by'),
 });

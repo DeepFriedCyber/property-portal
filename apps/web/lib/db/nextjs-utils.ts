@@ -10,7 +10,7 @@ export enum HttpStatus {
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
   NOT_FOUND = 404,
-  INTERNAL_SERVER_ERROR = 500
+  INTERNAL_SERVER_ERROR = 500,
 }
 
 /**
@@ -22,7 +22,7 @@ interface ApiResponse<T> {
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
   statusCode: number;
 }
@@ -34,9 +34,9 @@ export function successResponse<T>(data: T, statusCode: HttpStatus = HttpStatus.
   const response: ApiResponse<T> = {
     success: true,
     data,
-    statusCode
+    statusCode,
   };
-  
+
   return NextResponse.json(response, { status: statusCode });
 }
 
@@ -47,33 +47,33 @@ export function errorResponse(
   code: string,
   message: string,
   statusCode: HttpStatus = HttpStatus.BAD_REQUEST,
-  details?: any
+  details?: unknown
 ): NextResponse {
   const response: ApiResponse<null> = {
     success: false,
     error: {
       code,
       message,
-      details
+      details,
     },
-    statusCode
+    statusCode,
   };
-  
+
   return NextResponse.json(response, { status: statusCode });
 }
 
 /**
  * Higher-order function that wraps API handlers with database error handling
  */
-export function withDatabaseHandler<T>(
-  handler: (req: NextRequest, ...args: any[]) => Promise<NextResponse>
+export function withDatabaseHandler<T, Params extends unknown[] = []>(
+  handler: (req: NextRequest, ...args: Params) => Promise<NextResponse>
 ) {
-  return async (req: NextRequest, ...args: any[]): Promise<NextResponse> => {
+  return async (req: NextRequest, ...args: Params): Promise<NextResponse> => {
     try {
       return await handler(req, ...args);
     } catch (error) {
       console.error('Database operation failed:', error);
-      
+
       return errorResponse(
         'DATABASE_ERROR',
         'An error occurred while processing your request',

@@ -1,12 +1,16 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
+
 import { errorResponse, HttpStatus } from './response';
 
 /**
  * Custom error class for JSON parsing errors
  */
 export class JsonParseError extends Error {
-  constructor(message: string, public originalError: Error) {
+  constructor(
+    message: string,
+    public originalError: Error
+  ) {
     super(message);
     this.name = 'JsonParseError';
   }
@@ -17,8 +21,8 @@ export class JsonParseError extends Error {
  */
 export class ValidationError extends Error {
   constructor(
-    message: string, 
-    public code: string, 
+    message: string,
+    public code: string,
     public details?: any
   ) {
     super(message);
@@ -33,14 +37,14 @@ export class ValidationError extends Error {
  */
 export function formatZodError(error: z.ZodError): Record<string, string> {
   const formattedErrors: Record<string, string> = {};
-  
+
   error.errors.forEach((err) => {
     const path = err.path.join('.');
     const fieldName = path || 'value';
-    
+
     // Create more specific error messages based on error code
     let message = err.message;
-    
+
     switch (err.code) {
       case 'invalid_type':
         if (err.expected === 'string' && err.received === 'undefined') {
@@ -81,16 +85,16 @@ export function formatZodError(error: z.ZodError): Record<string, string> {
         }
         break;
       case 'invalid_enum_value':
-        message = `Must be one of: ${err.options.map(o => `'${o}'`).join(', ')}`;
+        message = `Must be one of: ${err.options.map((o) => `'${o}'`).join(', ')}`;
         break;
       case 'invalid_date':
         message = 'Must be a valid date';
         break;
     }
-    
+
     formattedErrors[fieldName] = message;
   });
-  
+
   return formattedErrors;
 }
 
@@ -117,10 +121,7 @@ export async function validateQuery<T extends z.ZodType>(
         formattedErrors
       );
     }
-    throw new ValidationError(
-      'Failed to process query parameters',
-      'QUERY_PROCESSING_ERROR'
-    );
+    throw new ValidationError('Failed to process query parameters', 'QUERY_PROCESSING_ERROR');
   }
 }
 
@@ -137,16 +138,16 @@ export async function validateBody<T extends z.ZodType>(
   schema: T
 ): Promise<z.infer<T>> {
   let body: any;
-  
+
   try {
     body = await request.json();
   } catch (error) {
     // Handle JSON parsing errors specifically
     const originalError = error instanceof Error ? error : new Error('Unknown error');
-    
+
     // Check for common JSON parsing error patterns
     const errorMessage = originalError.message || '';
-    
+
     if (errorMessage.includes('Unexpected end of JSON input')) {
       throw new JsonParseError(
         'Incomplete JSON data received. Please check that your request body is complete.',
@@ -164,22 +165,15 @@ export async function validateBody<T extends z.ZodType>(
       );
     }
   }
-  
+
   try {
     return schema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const formattedErrors = formatZodError(error);
-      throw new ValidationError(
-        'Invalid request data',
-        'VALIDATION_ERROR',
-        formattedErrors
-      );
+      throw new ValidationError('Invalid request data', 'VALIDATION_ERROR', formattedErrors);
     }
-    throw new ValidationError(
-      'Failed to validate request data',
-      'VALIDATION_PROCESSING_ERROR'
-    );
+    throw new ValidationError('Failed to validate request data', 'VALIDATION_PROCESSING_ERROR');
   }
 }
 
@@ -197,28 +191,27 @@ export async function validateFormData<T extends z.ZodType>(
   try {
     const formData = await request.formData();
     const data = Object.fromEntries(formData.entries());
-    
+
     // Convert numeric strings to numbers if they look like numbers
-    const processedData = Object.entries(data).reduce((acc, [key, value]) => {
-      if (typeof value === 'string' && /^-?\d+(\.\d+)?$/.test(value.trim())) {
-        acc[key] = Number(value);
-      } else {
-        acc[key] = value;
-      }
-      return acc;
-    }, {} as Record<string, any>);
-    
+    const processedData = Object.entries(data).reduce(
+      (acc, [key, value]) => {
+        if (typeof value === 'string' && /^-?\d+(\.\d+)?$/.test(value.trim())) {
+          acc[key] = Number(value);
+        } else {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as Record<string, any>
+    );
+
     return schema.parse(processedData);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const formattedErrors = formatZodError(error);
-      throw new ValidationError(
-        'Invalid form data',
-        'FORM_VALIDATION_ERROR',
-        formattedErrors
-      );
+      throw new ValidationError('Invalid form data', 'FORM_VALIDATION_ERROR', formattedErrors);
     }
-    
+
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     throw new ValidationError(
       `Failed to process form data: ${errorMessage}`,
@@ -232,9 +225,7 @@ export async function validateFormData<T extends z.ZodType>(
  * @param handler The API route handler function
  * @returns A wrapped handler that handles validation errors
  */
-export function withValidation(
-  handler: (request: NextRequest) => Promise<Response>
-) {
+export function withValidation(handler: (request: NextRequest) => Promise<Response>) {
   return async (request: NextRequest) => {
     try {
       return await handler(request);
@@ -249,7 +240,7 @@ export function withValidation(
           formattedErrors
         );
       }
-      
+
       // Handle custom validation errors
       if (error instanceof ValidationError) {
         return errorResponse(
@@ -259,17 +250,14 @@ export function withValidation(
           error.details
         );
       }
-      
+
       // Handle JSON parsing errors
       if (error instanceof JsonParseError) {
-        return errorResponse(
-          error.message,
-          HttpStatus.BAD_REQUEST,
-          'INVALID_JSON',
-          { originalError: error.originalError.message }
-        );
+        return errorResponse(error.message, HttpStatus.BAD_REQUEST, 'INVALID_JSON', {
+          originalError: error.originalError.message,
+        });
       }
-      
+
       // Handle other errors
       console.error('API error:', error);
       return errorResponse(

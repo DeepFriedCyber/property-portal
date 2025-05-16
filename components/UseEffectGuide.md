@@ -7,7 +7,7 @@ The `useEffect` hook allows you to perform side effects in function components. 
 ```jsx
 useEffect(() => {
   // Side effect code
-  
+
   // Optional cleanup function
   return () => {
     // Cleanup code
@@ -33,7 +33,7 @@ useEffect(() => {
       setLoading(false);
     }
   };
-  
+
   fetchData();
 }, []); // Empty array means this runs once on mount
 ```
@@ -45,9 +45,9 @@ useEffect(() => {
   const handleResize = () => {
     setWindowWidth(window.innerWidth);
   };
-  
+
   window.addEventListener('resize', handleResize);
-  
+
   // Cleanup: remove the event listener when component unmounts
   return () => {
     window.removeEventListener('resize', handleResize);
@@ -60,13 +60,13 @@ useEffect(() => {
 ```jsx
 useEffect(() => {
   if (!userId) return; // Skip if no userId
-  
+
   const fetchUserData = async () => {
     const response = await fetch(`https://api.example.com/users/${userId}`);
     const userData = await response.json();
     setUser(userData);
   };
-  
+
   fetchUserData();
 }, [userId]); // Re-run when userId changes
 ```
@@ -76,9 +76,9 @@ useEffect(() => {
 ```jsx
 useEffect(() => {
   const timer = setInterval(() => {
-    setCount(c => c + 1);
+    setCount((c) => c + 1);
   }, 1000);
-  
+
   // Cleanup: clear the interval when component unmounts
   return () => {
     clearInterval(timer);
@@ -89,6 +89,7 @@ useEffect(() => {
 ## Dependency Array Behaviors
 
 - **No dependency array**: Effect runs after every render
+
   ```jsx
   useEffect(() => {
     // Runs after every render
@@ -96,6 +97,7 @@ useEffect(() => {
   ```
 
 - **Empty dependency array `[]`**: Effect runs once after initial render
+
   ```jsx
   useEffect(() => {
     // Runs once after initial render
@@ -117,7 +119,7 @@ The cleanup function runs before the component unmounts and before the effect ru
 useEffect(() => {
   // Subscribe to something
   const subscription = someAPI.subscribe();
-  
+
   // Cleanup function
   return () => {
     // Unsubscribe when component unmounts or before effect runs again
@@ -141,18 +143,18 @@ useEffect(() => {
    ```jsx
    useEffect(() => {
      let isMounted = true;
-     
+
      const fetchData = async () => {
        const response = await fetch('/api/data');
        const data = await response.json();
-       
+
        if (isMounted) {
          setData(data); // Only update state if component is still mounted
        }
      };
-     
+
      fetchData();
-     
+
      return () => {
        isMounted = false; // Set flag when component unmounts
      };

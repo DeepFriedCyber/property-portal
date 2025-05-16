@@ -77,7 +77,7 @@ try {
 } catch (err) {
   // Log the detailed technical error
   console.error(createDetailedDbConnectionErrorMessage(err));
-  
+
   // Return a user-friendly message
   const userFriendlyMessage = getUserFriendlyDbErrorMessage(err);
   throw new Error(userFriendlyMessage);
@@ -86,14 +86,14 @@ try {
 
 ## Common Database Error Types
 
-| Error Code | Description | Possible Causes |
-|------------|-------------|----------------|
-| `ECONNREFUSED` | Connection refused | Database server not running, firewall blocking |
-| `ETIMEDOUT` | Connection timeout | Network issues, server overloaded |
-| `ENOTFOUND` | Host not found | Invalid hostname, DNS issues |
-| `AUTHENTICATION_FAILED` | Authentication failed | Invalid username/password |
-| `PERMISSION_DENIED` | Permission denied | Insufficient privileges |
-| `DATABASE_NOT_FOUND` | Database not found | Database doesn't exist |
+| Error Code              | Description           | Possible Causes                                |
+| ----------------------- | --------------------- | ---------------------------------------------- |
+| `ECONNREFUSED`          | Connection refused    | Database server not running, firewall blocking |
+| `ETIMEDOUT`             | Connection timeout    | Network issues, server overloaded              |
+| `ENOTFOUND`             | Host not found        | Invalid hostname, DNS issues                   |
+| `AUTHENTICATION_FAILED` | Authentication failed | Invalid username/password                      |
+| `PERMISSION_DENIED`     | Permission denied     | Insufficient privileges                        |
+| `DATABASE_NOT_FOUND`    | Database not found    | Database doesn't exist                         |
 
 ## Best Practices for Database Error Handling
 
@@ -116,11 +116,11 @@ async function connectToDatabase(config) {
     // Log detailed technical error for developers/operations
     const detailedError = createDetailedDbConnectionErrorMessage(err);
     logger.error(detailedError);
-    
+
     // For monitoring/analytics systems
     const errorObject = createDbConnectionErrorObject(err);
     errorTracker.captureException(errorObject);
-    
+
     // For user-facing applications
     const userMessage = getUserFriendlyDbErrorMessage(err);
     throw new Error(userMessage);

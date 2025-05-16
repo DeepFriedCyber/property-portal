@@ -1,0 +1,17 @@
+# Node modules
+node_modules/
+
+# Build directories
+dist/
+build/
+.turbo/
+coverage/
+
+# Config files
+*.config.js
+*.config.ts
+.eslintrc.json
+prettier.config.js
+
+# Generated files
+packages/db/src/*.js

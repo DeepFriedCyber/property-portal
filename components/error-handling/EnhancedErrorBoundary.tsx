@@ -1,5 +1,6 @@
 // components/error-handling/EnhancedErrorBoundary.tsx
 import React, { Component, ErrorInfo, ReactNode, useState, useEffect } from 'react';
+
 import logger from '@/lib/logging/logger';
 
 interface ErrorBoundaryProps {
@@ -20,16 +21,16 @@ interface ErrorBoundaryState {
 class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { 
+    this.state = {
       hasError: false,
-      error: null
+      error: null,
     };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { 
+    return {
       hasError: true,
-      error
+      error,
     };
   }
 
@@ -41,11 +42,11 @@ class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState
       {
         componentStack: errorInfo.componentStack,
         errorName: error.name,
-        errorMessage: error.message
+        errorMessage: error.message,
       },
       ['error-boundary', 'render-error']
     );
-    
+
     // Call the optional onError callback
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
@@ -53,9 +54,9 @@ class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState
   }
 
   resetError = () => {
-    this.setState({ 
+    this.setState({
       hasError: false,
-      error: null
+      error: null,
     });
   };
 
@@ -86,9 +87,11 @@ class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState
             Please try again later or contact support if the problem persists.
           </p>
           <div className="mb-4 p-3 bg-white rounded border border-red-100 text-sm text-gray-700 overflow-auto max-h-32">
-            <p className="font-semibold">{error.name}: {error.message}</p>
+            <p className="font-semibold">
+              {error.name}: {error.message}
+            </p>
           </div>
-          <button 
+          <button
             onClick={this.resetError}
             className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
@@ -105,41 +108,38 @@ class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState
 /**
  * Hook to catch and handle async errors
  */
-function useAsyncErrorHandler(
-  onError?: (error: Error) => void,
-  errorTypes?: Array<string>
-) {
+function useAsyncErrorHandler(onError?: (error: Error) => void, errorTypes?: Array<string>) {
   const [asyncError, setAsyncError] = useState<Error | null>(null);
 
   // Set up global error handler for unhandled promise rejections
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       const error = event.reason;
-      
+
       // Check if we should handle this type of error
       if (errorTypes && error.name && !errorTypes.includes(error.name)) {
         return;
       }
-      
+
       // Log the error
       logger.error(
         'Unhandled promise rejection',
         error,
         {
           errorName: error.name,
-          errorMessage: error.message
+          errorMessage: error.message,
         },
         ['error-boundary', 'async-error', 'unhandled-rejection']
       );
-      
+
       // Set the error state
       setAsyncError(error);
-      
+
       // Call the optional onError callback
       if (onError) {
         onError(error);
       }
-      
+
       // Prevent the default handler
       event.preventDefault();
     };
@@ -168,14 +168,11 @@ const EnhancedErrorBoundary: React.FC<ErrorBoundaryProps> = (props) => {
   const { children, fallback, onError, errorTypes } = props;
 
   // Use the async error handler hook
-  const { asyncError, resetAsyncError } = useAsyncErrorHandler(
-    (error) => {
-      if (onError) {
-        onError(error, { componentStack: '' });
-      }
-    },
-    errorTypes
-  );
+  const { asyncError, resetAsyncError } = useAsyncErrorHandler((error) => {
+    if (onError) {
+      onError(error, { componentStack: '' });
+    }
+  }, errorTypes);
 
   // If there's an async error, render the fallback
   if (asyncError) {
@@ -194,9 +191,11 @@ const EnhancedErrorBoundary: React.FC<ErrorBoundaryProps> = (props) => {
           An error occurred while processing your request. Please try again.
         </p>
         <div className="mb-4 p-3 bg-white rounded border border-red-100 text-sm text-gray-700 overflow-auto max-h-32">
-          <p className="font-semibold">{asyncError.name}: {asyncError.message}</p>
+          <p className="font-semibold">
+            {asyncError.name}: {asyncError.message}
+          </p>
         </div>
-        <button 
+        <button
           onClick={resetAsyncError}
           className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
         >

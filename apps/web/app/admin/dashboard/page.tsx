@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { Button } from '../../../src/ui';
 
 interface UploadRecord {
@@ -21,7 +22,7 @@ export default function AdminDashboard() {
     totalProperties: 0,
     pendingUploads: 0,
     approvedUploads: 0,
-    rejectedUploads: 0
+    rejectedUploads: 0,
   });
 
   useEffect(() => {
@@ -31,11 +32,11 @@ export default function AdminDashboard() {
         setLoading(true);
         // This would be replaced with an actual API call
         const response = await fetch('/api/admin/uploads');
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch uploads');
         }
-        
+
         const data = await response.json();
         setUploads(data.uploads);
         setStats(data.stats);
@@ -55,23 +56,23 @@ export default function AdminDashboard() {
       const response = await fetch(`/api/admin/uploads/${uploadId}/approve`, {
         method: 'POST',
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to approve upload');
       }
-      
+
       // Update local state to reflect the change
-      setUploads(uploads.map(upload => 
-        upload.id === uploadId 
-          ? { ...upload, status: 'approved' as const } 
-          : upload
-      ));
-      
+      setUploads(
+        uploads.map((upload) =>
+          upload.id === uploadId ? { ...upload, status: 'approved' as const } : upload
+        )
+      );
+
       // Update stats
       setStats({
         ...stats,
         pendingUploads: stats.pendingUploads - 1,
-        approvedUploads: stats.approvedUploads + 1
+        approvedUploads: stats.approvedUploads + 1,
       });
     } catch (err) {
       console.error('Error approving upload:', err);
@@ -84,23 +85,23 @@ export default function AdminDashboard() {
       const response = await fetch(`/api/admin/uploads/${uploadId}/reject`, {
         method: 'POST',
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to reject upload');
       }
-      
+
       // Update local state to reflect the change
-      setUploads(uploads.map(upload => 
-        upload.id === uploadId 
-          ? { ...upload, status: 'rejected' as const } 
-          : upload
-      ));
-      
+      setUploads(
+        uploads.map((upload) =>
+          upload.id === uploadId ? { ...upload, status: 'rejected' as const } : upload
+        )
+      );
+
       // Update stats
       setStats({
         ...stats,
         pendingUploads: stats.pendingUploads - 1,
-        rejectedUploads: stats.rejectedUploads + 1
+        rejectedUploads: stats.rejectedUploads + 1,
       });
     } catch (err) {
       console.error('Error rejecting upload:', err);
@@ -116,7 +117,7 @@ export default function AdminDashboard() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-      
+
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white p-4 rounded shadow">
@@ -136,29 +137,27 @@ export default function AdminDashboard() {
           <p className="text-3xl font-bold text-red-500">{stats.rejectedUploads}</p>
         </div>
       </div>
-      
+
       {/* Uploads Table */}
       <div className="bg-white rounded shadow overflow-hidden">
         <h2 className="text-xl font-semibold p-4 border-b">Recent Uploads</h2>
-        
+
         {loading && (
           <div className="flex justify-center items-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-700"></div>
           </div>
         )}
-        
+
         {error && (
           <div className="p-4 text-red-600" role="alert">
             {error}
           </div>
         )}
-        
+
         {!loading && !error && uploads.length === 0 && (
-          <div className="p-4 text-gray-600">
-            No uploads found.
-          </div>
+          <div className="p-4 text-gray-600">No uploads found.</div>
         )}
-        
+
         {!loading && !error && uploads.length > 0 && (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -188,9 +187,7 @@ export default function AdminDashboard() {
                 {uploads.map((upload) => (
                   <tr key={upload.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {upload.filename}
-                      </div>
+                      <div className="text-sm font-medium text-gray-900">{upload.filename}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{upload.uploaderName}</div>
@@ -204,15 +201,21 @@ export default function AdminDashboard() {
                       <div className="text-sm text-gray-900">{upload.propertyCount}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${upload.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                          upload.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                          'bg-red-100 text-red-800'}`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        ${
+                          upload.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : upload.status === 'approved'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}
+                      >
                         {upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Button 
+                      <Button
                         variant="secondary"
                         size="small"
                         onClick={() => viewUploadDetails(upload.id)}
@@ -220,10 +223,10 @@ export default function AdminDashboard() {
                       >
                         View
                       </Button>
-                      
+
                       {upload.status === 'pending' && (
                         <>
-                          <Button 
+                          <Button
                             variant="primary"
                             size="small"
                             onClick={() => handleApprove(upload.id)}
@@ -231,7 +234,7 @@ export default function AdminDashboard() {
                           >
                             Approve
                           </Button>
-                          <Button 
+                          <Button
                             variant="destructive"
                             size="small"
                             onClick={() => handleReject(upload.id)}

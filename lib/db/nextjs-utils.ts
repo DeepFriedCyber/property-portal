@@ -1,12 +1,14 @@
 // db/nextjs-utils.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { isDatabaseHealthy, getDatabaseStatus, withDatabase } from './index';
-import { 
-  DatabaseConnectionError, 
-  DatabaseQueryError, 
-  DatabaseConstraintError, 
-  DatabaseTimeoutError 
+
+import {
+  DatabaseConnectionError,
+  DatabaseQueryError,
+  DatabaseConstraintError,
+  DatabaseTimeoutError,
 } from './error-handler';
+
+import { isDatabaseHealthy, getDatabaseStatus, withDatabase } from './index';
 
 /**
  * Type for API response
@@ -29,7 +31,7 @@ type ApiResponse<T = any> = {
 export function successResponse<T>(data: T): NextResponse<ApiResponse<T>> {
   return NextResponse.json({
     success: true,
-    data
+    data,
   });
 }
 
@@ -53,8 +55,8 @@ export function errorResponse(
       error: {
         message,
         ...(code && { code }),
-        ...(details && { details })
-      }
+        ...(details && { details }),
+      },
     },
     { status }
   );
@@ -76,7 +78,7 @@ export const HttpStatus = {
   UNPROCESSABLE_ENTITY: 422,
   INTERNAL_SERVER_ERROR: 500,
   SERVICE_UNAVAILABLE: 503,
-  GATEWAY_TIMEOUT: 504
+  GATEWAY_TIMEOUT: 504,
 } as const;
 
 /**
@@ -89,10 +91,10 @@ export function checkDatabaseHealth(req: NextRequest): NextResponse | null {
   if (req.nextUrl.pathname === '/api/health' || req.nextUrl.pathname.startsWith('/api/health/')) {
     return null;
   }
-  
+
   if (!isDatabaseHealthy()) {
     const status = getDatabaseStatus();
-    
+
     // Return 503 Service Unavailable
     return errorResponse(
       'Database service is currently unavailable',
@@ -100,11 +102,11 @@ export function checkDatabaseHealth(req: NextRequest): NextResponse | null {
       'DATABASE_UNAVAILABLE',
       {
         status: status.status,
-        error: status.error ? status.error.message : null
+        error: status.error ? status.error.message : null,
       }
     );
   }
-  
+
   return null;
 }
 
@@ -123,7 +125,7 @@ export function handleDatabaseError(error: unknown): NextResponse {
       'DATABASE_CONNECTION_ERROR'
     );
   }
-  
+
   // Handle database constraint errors
   if (error instanceof DatabaseConstraintError) {
     console.error('Database constraint error:', error);
@@ -132,11 +134,11 @@ export function handleDatabaseError(error: unknown): NextResponse {
       HttpStatus.BAD_REQUEST,
       'DATABASE_CONSTRAINT_ERROR',
       {
-        constraint: error.constraint
+        constraint: error.constraint,
       }
     );
   }
-  
+
   // Handle database timeout errors
   if (error instanceof DatabaseTimeoutError) {
     console.error('Database timeout error:', error);
@@ -146,7 +148,7 @@ export function handleDatabaseError(error: unknown): NextResponse {
       'DATABASE_TIMEOUT_ERROR'
     );
   }
-  
+
   // Handle database query errors
   if (error instanceof DatabaseQueryError) {
     console.error('Database query error:', error);
@@ -156,7 +158,7 @@ export function handleDatabaseError(error: unknown): NextResponse {
       'DATABASE_QUERY_ERROR'
     );
   }
-  
+
   // Handle other errors
   console.error('Unhandled error:', error);
   return errorResponse(
@@ -171,16 +173,14 @@ export function handleDatabaseError(error: unknown): NextResponse {
  * @param handler The API route handler
  * @returns A wrapped handler with database error handling
  */
-export function withDatabaseHandler(
-  handler: (req: NextRequest) => Promise<NextResponse>
-) {
+export function withDatabaseHandler(handler: (req: NextRequest) => Promise<NextResponse>) {
   return async (req: NextRequest) => {
     // Check database health
     const healthCheck = checkDatabaseHealth(req);
     if (healthCheck) {
       return healthCheck;
     }
-    
+
     try {
       // Execute the handler with database connection
       return await withDatabase(async () => {

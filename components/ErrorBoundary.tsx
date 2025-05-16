@@ -24,7 +24,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error('Error caught by boundary:', error, errorInfo);
-    
+
     // Call the optional onError callback
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
@@ -37,15 +37,12 @@ class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      
+
       return (
         <div className="error-boundary-fallback">
           <h2>Something went wrong</h2>
           <p>Please try again later or contact support if the problem persists.</p>
-          <button 
-            onClick={() => this.setState({ hasError: false })}
-            className="retry-button"
-          >
+          <button onClick={() => this.setState({ hasError: false })} className="retry-button">
             Try again
           </button>
         </div>

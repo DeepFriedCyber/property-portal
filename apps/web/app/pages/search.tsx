@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
+
 import { Button } from '../../src/ui';
 
 interface Property {
@@ -31,25 +32,25 @@ export default function SearchPage() {
 
     // Debounce API calls by 300ms
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-    
+
     debounceTimeout.current = setTimeout(() => {
       const runSearch = async () => {
         setLoading(true);
         setError(null);
-        
+
         try {
           const res = await fetch('/api/search', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({ query }),
           });
-          
+
           if (!res.ok) {
             throw new Error(`API error: ${res.status}`);
           }
-          
+
           const data = await res.json();
           setResults(data?.properties || []);
         } catch (err: any) {
@@ -60,7 +61,7 @@ export default function SearchPage() {
           setLoading(false);
         }
       };
-      
+
       runSearch();
     }, 300);
 
@@ -73,16 +74,11 @@ export default function SearchPage() {
   return (
     <div className="max-w-5xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">
-        Search results for:{' '}
-        <span className="text-purple-600">{query || '...'}</span>
+        Search results for: <span className="text-purple-600">{query || '...'}</span>
       </h1>
-      
-      {!query && (
-        <p className="text-gray-600">
-          Please enter a search term to find properties.
-        </p>
-      )}
-      
+
+      {!query && <p className="text-gray-600">Please enter a search term to find properties.</p>}
+
       {loading && (
         <div className="flex justify-center my-6">
           <svg
@@ -108,36 +104,28 @@ export default function SearchPage() {
           </svg>
         </div>
       )}
-      
+
       {error && (
         <p className="text-red-600 font-semibold my-4" role="alert">
           {error}
         </p>
       )}
-      
+
       {!loading && !error && results.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {results.map((p) => (
             <div key={p.id} className="border rounded shadow-sm p-4">
-              <img
-                src={p.imageUrl}
-                alt={p.title}
-                className="rounded w-full h-40 object-cover"
-              />
+              <img src={p.imageUrl} alt={p.title} className="rounded w-full h-40 object-cover" />
               <h2 className="text-xl font-bold mt-2">{p.title}</h2>
               <p className="text-sm text-gray-500">{p.location}</p>
-              <p className="text-lg font-semibold text-blue-600">
-                £{p.price.toLocaleString()}
-              </p>
+              <p className="text-lg font-semibold text-blue-600">£{p.price.toLocaleString()}</p>
               <p className="mt-2 text-sm">{p.description}</p>
             </div>
           ))}
         </div>
       )}
-      
-      {!loading && !error && query && results.length === 0 && (
-        <p>No matching properties found.</p>
-      )}
+
+      {!loading && !error && query && results.length === 0 && <p>No matching properties found.</p>}
     </div>
   );
 }

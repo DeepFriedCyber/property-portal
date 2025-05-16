@@ -54,7 +54,10 @@
   border-radius: 0.25rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
 }
 
 .btn:disabled {
@@ -148,7 +151,7 @@ label {
 }
 
 .required-label::after {
-  content: " *";
+  content: ' *';
   color: #e53e3e;
 }
 
@@ -359,7 +362,9 @@ th {
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .property-card:hover {

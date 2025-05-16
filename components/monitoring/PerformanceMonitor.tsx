@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+
 import { initPerformanceMonitoring } from '@/lib/monitoring/performance';
 
 interface PerformanceMonitorProps {
@@ -15,7 +16,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => 
     // Initialize performance monitoring
     initPerformanceMonitoring();
   }, []);
-  
+
   return <>{children}</>;
 };
 

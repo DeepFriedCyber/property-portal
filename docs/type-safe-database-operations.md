@@ -15,7 +15,7 @@ Using type-safe database operations provides several important benefits:
 ### ✅ DO: Import schema objects directly
 
 ```typescript
-import { users, posts } from "~/db/schema";
+import { users, posts } from '~/db/schema';
 ```
 
 ### ✅ DO: Use schema objects for queries
@@ -23,51 +23,41 @@ import { users, posts } from "~/db/schema";
 ```typescript
 // Type-safe query
 const user = await db.query.users.findFirst({
-  where: eq(users.id, userId)
+  where: eq(users.id, userId),
 });
 ```
 
 ### ✅ DO: Use type-safe conditions
 
 ```typescript
-import { eq, and, or, like } from "drizzle-orm";
+import { eq, and, or, like } from 'drizzle-orm';
 
 // Type-safe filtering
-const results = await db.select()
+const results = await db
+  .select()
   .from(users)
-  .where(
-    and(
-      eq(users.isActive, true),
-      like(users.email, "%@example.com")
-    )
-  );
+  .where(and(eq(users.isActive, true), like(users.email, '%@example.com')));
 ```
 
 ### ✅ DO: Use type-safe updates
 
 ```typescript
 // Type-safe update
-await db.update(users)
-  .set({ name: "Alice", role: "admin" })
-  .where(eq(users.id, userId));
+await db.update(users).set({ name: 'Alice', role: 'admin' }).where(eq(users.id, userId));
 ```
 
 ### ❌ DON'T: Use string literals for table or column names
 
 ```typescript
 // Avoid this - no type safety!
-await db.execute(
-  sql`UPDATE "users" SET name = ${newName} WHERE id = ${userId}`
-);
+await db.execute(sql`UPDATE "users" SET name = ${newName} WHERE id = ${userId}`);
 ```
 
 ### ❌ DON'T: Use raw SQL strings
 
 ```typescript
 // Avoid this - SQL injection risk and no type safety!
-await db.execute(
-  `UPDATE users SET role = 'admin' WHERE id = '${userId}'`
-);
+await db.execute(`UPDATE users SET role = 'admin' WHERE id = '${userId}'`);
 ```
 
 ## Examples
@@ -75,51 +65,45 @@ await db.execute(
 ### Select Query
 
 ```typescript
-import { users } from "~/db/schema";
-import { eq } from "drizzle-orm";
+import { users } from '~/db/schema';
+import { eq } from 'drizzle-orm';
 
 // Type-safe select
-const user = await db.select()
-  .from(users)
-  .where(eq(users.id, userId));
+const user = await db.select().from(users).where(eq(users.id, userId));
 ```
 
 ### Insert Operation
 
 ```typescript
-import { users } from "~/db/schema";
+import { users } from '~/db/schema';
 
 // Type-safe insert
-await db.insert(users)
-  .values({
-    id: crypto.randomUUID(),
-    name: "New User",
-    email: "user@example.com",
-    createdAt: new Date()
-  });
+await db.insert(users).values({
+  id: crypto.randomUUID(),
+  name: 'New User',
+  email: 'user@example.com',
+  createdAt: new Date(),
+});
 ```
 
 ### Update Operation
 
 ```typescript
-import { users } from "~/db/schema";
-import { eq } from "drizzle-orm";
+import { users } from '~/db/schema';
+import { eq } from 'drizzle-orm';
 
 // Type-safe update
-await db.update(users)
-  .set({ name: "Updated Name" })
-  .where(eq(users.id, userId));
+await db.update(users).set({ name: 'Updated Name' }).where(eq(users.id, userId));
 ```
 
 ### Delete Operation
 
 ```typescript
-import { users } from "~/db/schema";
-import { eq } from "drizzle-orm";
+import { users } from '~/db/schema';
+import { eq } from 'drizzle-orm';
 
 // Type-safe delete
-await db.delete(users)
-  .where(eq(users.id, userId));
+await db.delete(users).where(eq(users.id, userId));
 ```
 
 ## Benefits of Using Drizzle's Type Safety

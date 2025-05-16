@@ -18,7 +18,7 @@ export type ApiResponse<T = any> = {
 export function successResponse<T>(data: T): NextResponse<ApiResponse<T>> {
   return NextResponse.json({
     success: true,
-    data
+    data,
   });
 }
 
@@ -42,8 +42,8 @@ export function errorResponse(
       error: {
         message,
         ...(code && { code }),
-        ...(details && { details })
-      }
+        ...(details && { details }),
+      },
     },
     { status }
   );
@@ -64,5 +64,5 @@ export const HttpStatus = {
   CONFLICT: 409,
   UNPROCESSABLE_ENTITY: 422,
   INTERNAL_SERVER_ERROR: 500,
-  SERVICE_UNAVAILABLE: 503
+  SERVICE_UNAVAILABLE: 503,
 } as const;

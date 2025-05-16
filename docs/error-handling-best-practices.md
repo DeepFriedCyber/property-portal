@@ -18,8 +18,8 @@ try {
   parseCSV(data);
 } catch (parseError) {
   // This will fail if parseError is not an Error object
-  console.error("CSV Parse Error:", parseError.message);
-  console.error("Stack:", parseError.stack);
+  console.error('CSV Parse Error:', parseError.message);
+  console.error('Stack:', parseError.stack);
 }
 ```
 
@@ -33,7 +33,7 @@ try {
   parseCSV(data);
 } catch (parseError) {
   // Works with any error type
-  console.error("CSV Parse Error:", String(parseError));
+  console.error('CSV Parse Error:', String(parseError));
 }
 ```
 
@@ -47,10 +47,10 @@ try {
   parseCSV(data);
 } catch (parseError) {
   if (parseError instanceof Error) {
-    console.error("Error message:", parseError.message);
-    console.error("Stack trace:", parseError.stack);
+    console.error('Error message:', parseError.message);
+    console.error('Stack trace:', parseError.stack);
   } else {
-    console.error("Unknown error:", String(parseError));
+    console.error('Unknown error:', String(parseError));
   }
 }
 ```
@@ -63,7 +63,7 @@ try {
   parseCSV(data);
 } catch (parseError) {
   // Simple and effective for logging
-  console.error("CSV Parse Error:", String(parseError));
+  console.error('CSV Parse Error:', String(parseError));
 }
 ```
 
@@ -79,28 +79,28 @@ function normalizeError(error: unknown): string {
 try {
   // Some code that might throw
 } catch (error) {
-  console.error("Error occurred:", normalizeError(error));
+  console.error('Error occurred:', normalizeError(error));
 }
 ```
 
 ### Detailed Error Information
 
 ```typescript
-function getErrorDetails(error: unknown): { 
-  message: string; 
-  stack?: string; 
+function getErrorDetails(error: unknown): {
+  message: string;
+  stack?: string;
   code?: string;
 } {
   if (error instanceof Error) {
     return {
       message: error.message,
       stack: error.stack,
-      code: 'code' in error ? String((error as any).code) : undefined
+      code: 'code' in error ? String((error as any).code) : undefined,
     };
   }
-  
+
   return {
-    message: String(error)
+    message: String(error),
   };
 }
 
@@ -108,7 +108,7 @@ try {
   // Some code that might throw
 } catch (error) {
   const details = getErrorDetails(error);
-  console.error("Error details:", details);
+  console.error('Error details:', details);
 }
 ```
 
@@ -130,8 +130,8 @@ async function processCSV(filePath: string) {
     return results;
   } catch (parseError) {
     // Safe error handling
-    console.error("CSV Parse Error:", String(parseError));
-    
+    console.error('CSV Parse Error:', String(parseError));
+
     // Re-throw with normalized message
     throw new Error(`Failed to process CSV: ${String(parseError)}`);
   }

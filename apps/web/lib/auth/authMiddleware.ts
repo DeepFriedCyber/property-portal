@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { ApiErrors } from '../helpers/apiErrorHelpers';
-import { ErrorCode } from '../constants/errorCodes';
-import { HttpStatus } from '../../../../lib/db/nextjs-utils';
 
 /**
  * User role types
@@ -9,7 +8,7 @@ import { HttpStatus } from '../../../../lib/db/nextjs-utils';
 export enum UserRole {
   VIEWER = 'viewer',
   EDITOR = 'editor',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
 }
 
 /**
@@ -19,7 +18,7 @@ export enum PermissionLevel {
   READ = 'read',
   WRITE = 'write',
   DELETE = 'delete',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
 }
 
 /**
@@ -28,7 +27,12 @@ export enum PermissionLevel {
 const rolePermissions: Record<UserRole, PermissionLevel[]> = {
   [UserRole.VIEWER]: [PermissionLevel.READ],
   [UserRole.EDITOR]: [PermissionLevel.READ, PermissionLevel.WRITE],
-  [UserRole.ADMIN]: [PermissionLevel.READ, PermissionLevel.WRITE, PermissionLevel.DELETE, PermissionLevel.ADMIN]
+  [UserRole.ADMIN]: [
+    PermissionLevel.READ,
+    PermissionLevel.WRITE,
+    PermissionLevel.DELETE,
+    PermissionLevel.ADMIN,
+  ],
 };
 
 /**
@@ -39,7 +43,7 @@ const methodPermissions: Record<string, PermissionLevel> = {
   POST: PermissionLevel.WRITE,
   PATCH: PermissionLevel.WRITE,
   PUT: PermissionLevel.WRITE,
-  DELETE: PermissionLevel.DELETE
+  DELETE: PermissionLevel.DELETE,
 };
 
 /**
@@ -47,16 +51,18 @@ const methodPermissions: Record<string, PermissionLevel> = {
  * @param req The Next.js request
  * @returns The user information if authenticated, null otherwise
  */
-async function verifyAuthToken(req: NextRequest): Promise<{ userId: string; role: UserRole } | null> {
+async function verifyAuthToken(
+  req: NextRequest
+): Promise<{ userId: string; role: UserRole } | null> {
   // Get the authorization header
   const authHeader = req.headers.get('authorization');
-  
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;
   }
-  
+
   const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-  
+
   // TODO: Implement actual token verification with your auth provider
   // This is a placeholder implementation
   if (token === 'test-admin-token') {
@@ -66,7 +72,7 @@ async function verifyAuthToken(req: NextRequest): Promise<{ userId: string; role
   } else if (token === 'test-viewer-token') {
     return { userId: 'viewer-user-id', role: UserRole.VIEWER };
   }
-  
+
   return null;
 }
 
@@ -88,7 +94,7 @@ function hasPermission(userRole: UserRole, requiredPermission: PermissionLevel):
  */
 export function withAuth(
   handler: (req: NextRequest, user: { userId: string; role: UserRole }) => Promise<NextResponse>,
-  options: { 
+  options: {
     requiredPermission?: PermissionLevel;
     bypassAuth?: boolean;
   } = {}
@@ -99,23 +105,24 @@ export function withAuth(
       // Use a default admin user for bypassed auth
       return handler(req, { userId: 'system', role: UserRole.ADMIN });
     }
-    
+
     // Verify the authentication token
     const user = await verifyAuthToken(req);
-    
+
     // If no user is found, return unauthorized
     if (!user) {
       return ApiErrors.unauthorized('Authentication required');
     }
-    
+
     // Determine the required permission based on the HTTP method or options
-    const requiredPermission = options.requiredPermission || methodPermissions[req.method] || PermissionLevel.READ;
-    
+    const requiredPermission =
+      options.requiredPermission || methodPermissions[req.method] || PermissionLevel.READ;
+
     // Check if the user has the required permission
     if (!hasPermission(user.role, requiredPermission)) {
       return ApiErrors.forbidden('You do not have permission to perform this action');
     }
-    
+
     // Call the handler with the authenticated user
     return handler(req, user);
   };

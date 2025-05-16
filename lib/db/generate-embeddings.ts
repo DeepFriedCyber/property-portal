@@ -1,5 +1,6 @@
-import { processAllMissingEmbeddings } from './property-processor';
 import dotenv from 'dotenv';
+
+import { processAllMissingEmbeddings } from './property-processor';
 
 // Load environment variables
 dotenv.config();

@@ -2,7 +2,11 @@
  * Example of detailed database error handling
  */
 
-import { createDetailedDbConnectionErrorMessage, createDbConnectionErrorObject, getUserFriendlyDbErrorMessage } from '../lib/db/error-utils';
+import {
+  createDetailedDbConnectionErrorMessage,
+  createDbConnectionErrorObject,
+  getUserFriendlyDbErrorMessage,
+} from '../lib/db/error-utils';
 
 /**
  * Example database connection function with improved error handling
@@ -53,15 +57,15 @@ async function executeQuery(query: string, params: any[]) {
     // ✅ GOOD: Detailed error message with query information
     const errorObj = err as Record<string, any>;
     const detailedErrorMessage = `Database query error: ${errorObj.message || 'Unknown error'} | Query: ${query} | Parameters: ${JSON.stringify(params)}`;
-    
+
     if (errorObj.code) {
       detailedErrorMessage += ` | Error Code: ${errorObj.code}`;
     }
-    
+
     if (errorObj.position) {
       detailedErrorMessage += ` | Position: ${errorObj.position}`;
     }
-    
+
     console.error(detailedErrorMessage);
     throw new Error(detailedErrorMessage);
   }
@@ -72,18 +76,18 @@ async function executeQuery(query: string, params: any[]) {
  */
 async function executeTransaction(queries: { sql: string; params: any[] }[]) {
   let transaction: any = null;
-  
+
   try {
     // Simulated transaction start
     transaction = await simulateTransactionStart();
-    
+
     for (const { sql, params } of queries) {
       await simulateQueryExecution(sql, params, transaction);
     }
-    
+
     // Simulated transaction commit
     await simulateTransactionCommit(transaction);
-    
+
     return { success: true };
   } catch (err) {
     // Rollback transaction if it exists
@@ -93,28 +97,30 @@ async function executeTransaction(queries: { sql: string; params: any[] }[]) {
       } catch (rollbackErr) {
         // ❌ BAD: Generic rollback error message
         // console.error('Transaction rollback error:', rollbackErr.message);
-        
+
         // ✅ GOOD: Detailed rollback error message
-        console.error(`Transaction rollback error: ${String(rollbackErr)} | Original error: ${String(err)}`);
+        console.error(
+          `Transaction rollback error: ${String(rollbackErr)} | Original error: ${String(err)}`
+        );
       }
     }
-    
+
     // ❌ BAD: Generic error message
     // console.error('Transaction error:', err.message);
     // throw new Error(`Transaction error: ${err.message}`);
-    
+
     // ✅ GOOD: Detailed error message with transaction information
     const errorObj = err as Record<string, any>;
     const detailedErrorMessage = `Database transaction error: ${errorObj.message || 'Unknown error'} | Queries: ${queries.length}`;
-    
+
     if (errorObj.code) {
       detailedErrorMessage += ` | Error Code: ${errorObj.code}`;
     }
-    
+
     if (errorObj.query) {
       detailedErrorMessage += ` | Failed Query: ${errorObj.query}`;
     }
-    
+
     console.error(detailedErrorMessage);
     throw new Error(detailedErrorMessage);
   }
@@ -126,33 +132,33 @@ async function simulateDatabaseConnection(config: any) {
   if (config.host === 'localhost' && config.port === 5432) {
     return { connected: true };
   } else if (config.host === 'invalid-host') {
-    throw { 
+    throw {
       message: 'getaddrinfo ENOTFOUND invalid-host',
       code: 'ENOTFOUND',
       host: 'invalid-host',
-      port: config.port
+      port: config.port,
     };
   } else if (config.port === 1234) {
-    throw { 
+    throw {
       message: 'connect ECONNREFUSED 127.0.0.1:1234',
       code: 'ECONNREFUSED',
       address: '127.0.0.1',
-      port: 1234
+      port: 1234,
     };
   } else if (config.user === 'invalid-user') {
-    throw { 
+    throw {
       message: 'password authentication failed for user "invalid-user"',
       code: 'AUTHENTICATION_FAILED',
       host: config.host,
       port: config.port,
-      user: 'invalid-user'
+      user: 'invalid-user',
     };
   } else {
-    throw { 
+    throw {
       message: 'connection timeout',
       code: 'ETIMEDOUT',
       host: config.host,
-      port: config.port
+      port: config.port,
     };
   }
 }
@@ -191,7 +197,7 @@ async function main() {
       port: 5432,
       database: 'mydb',
       user: 'postgres',
-      password: 'password'
+      password: 'password',
     });
     console.log('Connected successfully');
   } catch (err) {
@@ -205,15 +211,11 @@ async function main() {
       port: 5432,
       database: 'mydb',
       user: 'postgres',
-      password: 'password'
+      password: 'password',
     });
   } catch (err) {
     console.error('Main error handler:', err.message);
   }
 }
 
-export {
-  connectToDatabase,
-  executeQuery,
-  executeTransaction
-};
+export { connectToDatabase, executeQuery, executeTransaction };

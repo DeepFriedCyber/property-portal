@@ -1,4 +1,5 @@
 import { exec } from 'child_process';
+
 import * as dotenv from 'dotenv';
 
 // Load environment variables
@@ -17,11 +18,11 @@ exec('npx drizzle-kit generate:pg', (error, stdout, stderr) => {
     console.error(`Error: ${error.message}`);
     return;
   }
-  
+
   if (stderr) {
     console.error(`Stderr: ${stderr}`);
     return;
   }
-  
+
   console.log(`Migration files generated:\n${stdout}`);
 });

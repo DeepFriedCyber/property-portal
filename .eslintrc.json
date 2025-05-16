@@ -55,6 +55,12 @@
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "jsx-a11y/anchor-is-valid": "warn",
+    "import/no-unresolved": [
+      "error",
+      {
+        "ignore": ["^@/", "^@root/", "^@lib/", "^@components/", "^@your-org/"]
+      }
+    ],
     "import/order": [
       "error",
       {
@@ -71,7 +77,7 @@
     "import/resolver": {
       "typescript": {
         "alwaysTryTypes": true,
-        "projectService": true
+        "project": "./tsconfig.eslint.json"
       },
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
@@ -88,14 +94,15 @@
     }
   ],
   "ignorePatterns": [
-    "node_modules/", 
-    "dist/", 
-    "build/", 
-    ".turbo/", 
-    "*.config.js", 
-    "*.config.ts", 
-    ".eslintrc.json", 
+    "node_modules/",
+    "dist/",
+    "build/",
+    ".turbo/",
+    "*.config.js",
+    "*.config.ts",
+    ".eslintrc.json",
     "prettier.config.js",
-coverage/
+    "coverage/",
+    "packages/db/src/*.js"
   ]
 }

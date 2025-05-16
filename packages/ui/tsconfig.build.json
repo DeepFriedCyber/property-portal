@@ -12,6 +12,21 @@
     "module": "ESNext",
     "target": "ES2020"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "components/**/*.ts", "components/**/*.tsx", "*.ts", "src/**/*.stories.ts", "src/**/*.stories.tsx"],
-  "exclude": ["node_modules", "dist", "**/*.test.tsx", "**/*.test.ts", "vitest.config.ts", "vitest.setup.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "*.ts",
+    "src/**/*.stories.ts",
+    "src/**/*.stories.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.tsx",
+    "**/*.test.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts"
+  ]
 }

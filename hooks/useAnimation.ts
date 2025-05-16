@@ -1,6 +1,6 @@
 // hooks/useAnimation.ts
-import { useEffect, useRef, useState } from 'react';
 import { useAnimation, AnimationControls, Variants } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 
 interface UseAnimationOptions {
   variants?: Variants;
@@ -28,45 +28,45 @@ export function useAnimationWithCleanup(options: UseAnimationOptions = {}) {
     onComplete,
     onStart,
     autoPlay = true,
-    delay = 0
+    delay = 0,
   } = options;
-  
+
   const controls = useAnimation();
   const [isAnimating, setIsAnimating] = useState(false);
-  
+
   // Use a ref to track mounted state to prevent memory leaks
   const isMounted = useRef(false);
-  
+
   // Initialize animation state
   useEffect(() => {
     isMounted.current = true;
-    
+
     return () => {
       isMounted.current = false;
       controls.stop();
     };
   }, [controls]);
-  
+
   // Function to play animation
   const play = async (animationName?: string) => {
     if (!isMounted.current) return;
-    
+
     setIsAnimating(true);
-    
+
     if (onStart) {
       onStart();
     }
-    
+
     try {
       if (delay > 0) {
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         if (!isMounted.current) return;
       }
-      
+
       await controls.start(animationName || animate, { custom });
-      
+
       if (!isMounted.current) return;
-      
+
       if (onComplete) {
         onComplete();
       }
@@ -81,26 +81,26 @@ export function useAnimationWithCleanup(options: UseAnimationOptions = {}) {
       }
     }
   };
-  
+
   // Function to stop animation
   const stop = () => {
     if (!isMounted.current) return;
-    
+
     controls.stop();
     setIsAnimating(false);
   };
-  
+
   // Auto-play animation if enabled
   useEffect(() => {
     if (autoPlay) {
       play();
     }
-    
+
     return () => {
       stop();
     };
   }, [autoPlay]); // eslint-disable-line react-hooks/exhaustive-deps
-  
+
   return {
     controls,
     isAnimating,
@@ -110,57 +110,55 @@ export function useAnimationWithCleanup(options: UseAnimationOptions = {}) {
     animate: controls,
     exit,
     variants,
-    custom
+    custom,
   };
 }
 
 /**
  * Custom hook for scroll-triggered animations with proper cleanup
  */
-export function useScrollAnimation(options: UseAnimationOptions & {
-  threshold?: number;
-  rootMargin?: string;
-} = {}) {
-  const {
-    threshold = 0.1,
-    rootMargin = '0px',
-    ...animationOptions
-  } = options;
-  
+export function useScrollAnimation(
+  options: UseAnimationOptions & {
+    threshold?: number;
+    rootMargin?: string;
+  } = {}
+) {
+  const { threshold = 0.1, rootMargin = '0px', ...animationOptions } = options;
+
   const animation = useAnimationWithCleanup({
     ...animationOptions,
-    autoPlay: false
+    autoPlay: false,
   });
-  
+
   const ref = useRef<HTMLElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  
+
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    
+
     // Cleanup previous observer
     if (observerRef.current) {
       observerRef.current.disconnect();
     }
-    
+
     // Create new observer
     observerRef.current = new IntersectionObserver(
-      entries => {
+      (entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
           animation.play();
-          
+
           // Optionally unobserve after animation is triggered
           // observerRef.current?.unobserve(element);
         }
       },
       { threshold, rootMargin }
     );
-    
+
     // Start observing
     observerRef.current.observe(element);
-    
+
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
@@ -168,10 +166,10 @@ export function useScrollAnimation(options: UseAnimationOptions & {
       }
     };
   }, [threshold, rootMargin, animation]);
-  
+
   return {
     ...animation,
-    ref
+    ref,
   };
 }
 

@@ -1,10 +1,11 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+
 import * as schema from './schema'; // Import the schema
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-  throw new Error("DATABASE_URL environment variable is not set.");
+  throw new Error('DATABASE_URL environment variable is not set.');
 }
 
 const pool = new Pool({
@@ -45,17 +46,17 @@ export async function getDatabaseStatus(): Promise<{
   try {
     // Check if the database is healthy
     const healthy = await isDatabaseHealthy();
-    
+
     // Get pool statistics
     const poolStats = {
       poolSize: pool.totalCount,
       idleConnections: pool.idleCount,
-      waitingClients: pool.waitingCount
+      waitingClients: pool.waitingCount,
     };
-    
+
     return {
       healthy,
-      ...poolStats
+      ...poolStats,
     };
   } catch (error) {
     return {
@@ -63,7 +64,7 @@ export async function getDatabaseStatus(): Promise<{
       poolSize: 0,
       idleConnections: 0,
       waitingClients: 0,
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
     };
   }
 }

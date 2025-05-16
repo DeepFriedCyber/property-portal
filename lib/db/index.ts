@@ -1,11 +1,13 @@
-import * as schema from '../../drizzle/schema';
 import * as dotenv from 'dotenv';
-import { 
-  connectionManager, 
-  getDb, 
-  initializeDatabase, 
-  closeDatabase, 
-  getDatabaseStatus 
+
+import * as schema from '../../drizzle/schema';
+
+import {
+  connectionManager,
+  getDb,
+  initializeDatabase,
+  closeDatabase,
+  getDatabaseStatus,
 } from './connection-manager';
 import { DatabaseConnectionError } from './error-handler';
 
@@ -24,7 +26,7 @@ try {
         idle_timeout: 30, // 30 seconds
         connect_timeout: 10, // 10 seconds
         max_lifetime: 60 * 60, // 1 hour
-        healthCheckIntervalMs: 30000 // 30 seconds
+        healthCheckIntervalMs: 30000, // 30 seconds
       });
     } catch (error) {
       console.error('Database initialization error:', error);
@@ -45,11 +47,7 @@ export const db = getDb();
 export { schema };
 
 // Export connection management functions
-export { 
-  initializeDatabase, 
-  closeDatabase, 
-  getDatabaseStatus 
-};
+export { initializeDatabase, closeDatabase, getDatabaseStatus };
 
 /**
  * Check if the database connection is healthy
@@ -82,32 +80,37 @@ export function getDatabase(throwOnError = true) {
  * @param retries Number of retries if the connection fails
  * @returns Result of the function
  */
-export async function withDatabase<T>(fn: (db: ReturnType<typeof getDb>) => Promise<T>, retries = 3): Promise<T> {
+export async function withDatabase<T>(
+  fn: (db: ReturnType<typeof getDb>) => Promise<T>,
+  retries = 3
+): Promise<T> {
   let lastError: Error | null = null;
-  
+
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const database = getDb();
       return await fn(database);
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       // If it's not a connection error, just throw it
       if (!(error instanceof DatabaseConnectionError)) {
         throw error;
       }
-      
+
       // Don't retry if we've reached max retries
       if (attempt === retries) {
         break;
       }
-      
+
       // Wait before retrying
       const delay = 1000 * Math.pow(2, attempt);
       console.log(`Database connection failed, retrying in ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
-  
-  throw lastError || new DatabaseConnectionError('Failed to execute database operation after retries');
+
+  throw (
+    lastError || new DatabaseConnectionError('Failed to execute database operation after retries')
+  );
 }

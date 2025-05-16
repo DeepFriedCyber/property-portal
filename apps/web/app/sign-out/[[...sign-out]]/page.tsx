@@ -1,5 +1,5 @@
-import { SignOutButton } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { SignOutButton } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 export default function SignOutPage() {
   return (

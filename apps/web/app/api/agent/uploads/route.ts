@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUploadRecordsByUploader, countPropertiesByUploadId, UploadRecord } from '@/lib/db/queries';
+
 import { withAuth, successResponse, errorResponse, HttpStatus } from '@/lib/auth/api-auth';
+import {
+  getUploadRecordsByUploader,
+  countPropertiesByUploadId,
+  UploadRecord,
+} from '@/lib/db/queries';
 
 // Enhanced GET handler with proper authentication and error handling
 export const GET = withAuth(
-  async (req: NextRequest, authResult) => {
+  async (req: NextRequest, authResult: { userId: string | null }) => {
     try {
       const { userId } = authResult;
-      
+
       // Get all uploads for this user from the database
       const uploads = await getUploadRecordsByUploader(userId!);
-      
+
       // For each upload, get the property count with error handling
       const uploadsWithCounts = await Promise.all(
         uploads.map(async (upload: UploadRecord) => {
@@ -20,7 +25,7 @@ export const GET = withAuth(
               ...upload,
               propertyCount,
               // Don't expose the uploaderId in the response
-              uploaderId: undefined
+              uploaderId: undefined,
             };
           } catch (error) {
             console.error(`Error getting property count for upload ${upload.id}:`, error);
@@ -30,14 +35,14 @@ export const GET = withAuth(
               propertyCount: 0,
               countError: true,
               // Don't expose the uploaderId in the response
-              uploaderId: undefined
+              uploaderId: undefined,
             };
           }
         })
       );
-      
+
       return successResponse({
-        uploads: uploadsWithCounts
+        uploads: uploadsWithCounts,
       });
     } catch (error) {
       console.error('Error fetching uploads:', error);
@@ -52,6 +57,6 @@ export const GET = withAuth(
   // Authentication options
   {
     requireAuth: true,
-    requiredRoles: ['agent', 'admin']
+    requiredRoles: ['agent', 'admin'],
   }
 );

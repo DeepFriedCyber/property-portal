@@ -1,16 +1,22 @@
 import type { StoryObj } from '@storybook/react';
 declare const meta: {
-    title: string;
-    component: ({ primary, size, backgroundColor, label, ...props }: import("./Button").ButtonProps) => import("react/jsx-runtime").JSX.Element;
-    parameters: {
-        layout: string;
+  title: string;
+  component: ({
+    primary,
+    size,
+    backgroundColor,
+    label,
+    ...props
+  }: import('./Button').ButtonProps) => import('react/jsx-runtime').JSX.Element;
+  parameters: {
+    layout: string;
+  };
+  tags: string[];
+  argTypes: {
+    backgroundColor: {
+      control: 'color';
     };
-    tags: string[];
-    argTypes: {
-        backgroundColor: {
-            control: "color";
-        };
-    };
+  };
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

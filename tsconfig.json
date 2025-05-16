@@ -8,7 +8,7 @@
   "references": [
     { "path": "./packages/db" },
     { "path": "./packages/ui/tsconfig.build.json" },
-    { "path": "./apps/web/tsconfig.build.json" },
     { "path": "./apps/api/tsconfig.build.json" }
-  ]
+  ],
+  "exclude": ["apps/web/src/components/MyPageComponent.tsx", "apps/web/src/ui/Button.tsx", "apps/web/src/ui/index.ts"]
 }

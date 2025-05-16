@@ -1,6 +1,6 @@
 // lib/auth/api-auth.ts
-import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // HTTP status codes
 export const HttpStatus = {
@@ -11,7 +11,7 @@ export const HttpStatus = {
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
-  SERVICE_UNAVAILABLE: 503
+  SERVICE_UNAVAILABLE: 503,
 };
 
 // Error response type
@@ -36,12 +36,12 @@ export function errorResponse(
   details?: any
 ): NextResponse {
   const error: ErrorResponse = {
-    message
+    message,
   };
-  
+
   if (code) error.code = code;
   if (details) error.details = details;
-  
+
   return NextResponse.json({ error }, { status });
 }
 
@@ -81,23 +81,20 @@ interface AuthResult {
  * @param options Authentication options
  * @returns Authentication result
  */
-export async function checkAuth(
-  req: NextRequest,
-  options: AuthOptions = {}
-): Promise<AuthResult> {
+export async function checkAuth(req: NextRequest, options: AuthOptions = {}): Promise<AuthResult> {
   const { requireAuth = true, requiredRoles = [] } = options;
-  
+
   try {
     // Get authentication data from Clerk
     const authResult = await auth();
     const { userId, sessionClaims } = authResult;
-    
+
     // Extract roles from session claims
     const roles = (sessionClaims?.roles as string[]) || [];
-    
+
     // Check if user is authenticated
     const isAuthenticated = !!userId;
-    
+
     // If authentication is required but user is not authenticated
     if (requireAuth && !isAuthenticated) {
       return {
@@ -106,18 +103,14 @@ export async function checkAuth(
         roles,
         isAuthenticated,
         isAuthorized: false,
-        error: errorResponse(
-          'Authentication required',
-          HttpStatus.UNAUTHORIZED,
-          'UNAUTHORIZED'
-        )
+        error: errorResponse('Authentication required', HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED'),
       };
     }
-    
+
     // Check if user has required roles
-    const isAuthorized = !requiredRoles.length || 
-      roles.some(role => requiredRoles.includes(role));
-    
+    const isAuthorized =
+      !requiredRoles.length || roles.some((role) => requiredRoles.includes(role));
+
     // If user doesn't have required roles
     if (requireAuth && isAuthenticated && !isAuthorized) {
       return {
@@ -126,26 +119,23 @@ export async function checkAuth(
         roles,
         isAuthenticated,
         isAuthorized,
-        error: errorResponse(
-          'Insufficient permissions',
-          HttpStatus.FORBIDDEN,
-          'FORBIDDEN',
-          { requiredRoles }
-        )
+        error: errorResponse('Insufficient permissions', HttpStatus.FORBIDDEN, 'FORBIDDEN', {
+          requiredRoles,
+        }),
       };
     }
-    
+
     // Authentication and authorization successful
     return {
       userId,
       sessionClaims,
       roles,
       isAuthenticated,
-      isAuthorized
+      isAuthorized,
     };
   } catch (error) {
     console.error('Authentication error:', error);
-    
+
     // Return authentication error
     return {
       userId: null,
@@ -157,7 +147,7 @@ export async function checkAuth(
         'Authentication service error',
         HttpStatus.SERVICE_UNAVAILABLE,
         'AUTH_SERVICE_ERROR'
-      )
+      ),
     };
   }
 }
@@ -176,17 +166,17 @@ export function withAuth(
     try {
       // Check authentication
       const authResult = await checkAuth(req, options);
-      
+
       // If authentication failed, return error response
       if (authResult.error) {
         return authResult.error;
       }
-      
+
       // Call handler with authentication result
       return await handler(req, authResult);
     } catch (error) {
       console.error('API route error:', error);
-      
+
       // Return generic error response
       return errorResponse(
         'An unexpected error occurred',

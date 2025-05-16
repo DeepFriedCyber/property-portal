@@ -17,19 +17,22 @@ interface EnhancedErrorBoundaryState {
 /**
  * Enhanced error boundary component with customizable fallback UI and error handling
  */
-class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps, EnhancedErrorBoundaryState> {
+class EnhancedErrorBoundary extends Component<
+  EnhancedErrorBoundaryProps,
+  EnhancedErrorBoundaryState
+> {
   constructor(props: EnhancedErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
-      error: null
+      error: null,
     };
   }
 
   static getDerivedStateFromError(error: Error): EnhancedErrorBoundaryState {
     return {
       hasError: true,
-      error
+      error,
     };
   }
 
@@ -43,7 +46,7 @@ class EnhancedErrorBoundary extends Component<EnhancedErrorBoundaryProps, Enhanc
   resetError = (): void => {
     this.setState({
       hasError: false,
-      error: null
+      error: null,
     });
   };
 

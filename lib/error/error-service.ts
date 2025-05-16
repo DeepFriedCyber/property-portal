@@ -1,7 +1,7 @@
 // lib/error/error-service.ts
-import logger from '@/lib/logging/logger';
 import { ApiError } from '@/lib/api/error-handling';
 import { ValidationError } from '@/lib/api/validation';
+import logger from '@/lib/logging/logger';
 
 /**
  * Error types for categorization
@@ -15,7 +15,7 @@ export enum ErrorType {
   AUTHORIZATION = 'authorization',
   INTERNAL = 'internal',
   EXTERNAL = 'external',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 /**
@@ -25,7 +25,7 @@ export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 /**
@@ -49,7 +49,7 @@ export interface ErrorContext {
 export class ErrorService {
   private static instance: ErrorService;
   private errorHandlers: Array<(error: Error, context?: ErrorContext) => void> = [];
-  
+
   /**
    * Get the singleton instance of the error service
    */
@@ -59,7 +59,7 @@ export class ErrorService {
     }
     return ErrorService.instance;
   }
-  
+
   /**
    * Private constructor to enforce singleton pattern
    */
@@ -67,17 +67,15 @@ export class ErrorService {
     // Initialize default error handlers
     this.registerErrorHandler(this.logError);
   }
-  
+
   /**
    * Register an error handler
    * @param handler Error handler function
    */
-  public registerErrorHandler(
-    handler: (error: Error, context?: ErrorContext) => void
-  ): void {
+  public registerErrorHandler(handler: (error: Error, context?: ErrorContext) => void): void {
     this.errorHandlers.push(handler);
   }
-  
+
   /**
    * Handle an error
    * @param error Error to handle
@@ -86,17 +84,17 @@ export class ErrorService {
   public handleError(error: Error, context?: ErrorContext): void {
     // Determine error type if not provided
     const errorType = context?.type || this.determineErrorType(error);
-    
+
     // Determine error severity if not provided
     const errorSeverity = context?.severity || this.determineErrorSeverity(error, errorType);
-    
+
     // Create complete context
     const completeContext: ErrorContext = {
       ...context,
       type: errorType,
-      severity: errorSeverity
+      severity: errorSeverity,
     };
-    
+
     // Execute all registered error handlers
     for (const handler of this.errorHandlers) {
       try {
@@ -107,7 +105,7 @@ export class ErrorService {
       }
     }
   }
-  
+
   /**
    * Create an error handler function for use in components
    * @param defaultContext Default context to include with all errors
@@ -117,11 +115,11 @@ export class ErrorService {
     return (error: Error, additionalContext?: ErrorContext) => {
       this.handleError(error, {
         ...defaultContext,
-        ...additionalContext
+        ...additionalContext,
       });
     };
   }
-  
+
   /**
    * Create a try/catch wrapper for a function
    * @param fn Function to wrap
@@ -136,15 +134,12 @@ export class ErrorService {
       try {
         return fn(...args);
       } catch (error) {
-        this.handleError(
-          error instanceof Error ? error : new Error(String(error)),
-          context
-        );
+        this.handleError(error instanceof Error ? error : new Error(String(error)), context);
         return undefined;
       }
     };
   }
-  
+
   /**
    * Create a try/catch wrapper for an async function
    * @param fn Async function to wrap
@@ -159,23 +154,21 @@ export class ErrorService {
       try {
         return await fn(...args);
       } catch (error) {
-        this.handleError(
-          error instanceof Error ? error : new Error(String(error)),
-          context
-        );
+        this.handleError(error instanceof Error ? error : new Error(String(error)), context);
         return undefined;
       }
     };
   }
-  
+
   /**
    * Default error handler that logs errors
    * @param error Error to log
    * @param context Error context
    */
   private logError(error: Error, context?: ErrorContext): void {
-    const { type, severity, userId, requestId, url, component, action, metadata, tags } = context || {};
-    
+    const { type, severity, userId, requestId, url, component, action, metadata, tags } =
+      context || {};
+
     // Create log context
     const logContext: Record<string, unknown> = {
       errorType: type,
@@ -186,22 +179,22 @@ export class ErrorService {
       requestId,
       url,
       component,
-      action
+      action,
     };
-    
+
     // Add metadata if available
     if (metadata) {
       Object.entries(metadata).forEach(([key, value]) => {
         logContext[key] = value;
       });
     }
-    
+
     // Create log tags
     const logTags = ['error', type || 'unknown'];
     if (tags) {
       logTags.push(...tags);
     }
-    
+
     // Log with appropriate level based on severity
     switch (severity) {
       case ErrorSeverity.CRITICAL:
@@ -219,7 +212,7 @@ export class ErrorService {
         break;
     }
   }
-  
+
   /**
    * Determine the type of an error
    * @param error Error to analyze
@@ -233,36 +226,36 @@ export class ErrorService {
     } else if (error.name === 'DatabaseError' || error.message.includes('database')) {
       return ErrorType.DATABASE;
     } else if (
-      error.name === 'AuthenticationError' || 
+      error.name === 'AuthenticationError' ||
       error.message.toLowerCase().includes('authentication') ||
       error.message.toLowerCase().includes('unauthenticated')
     ) {
       return ErrorType.AUTHENTICATION;
     } else if (
-      error.name === 'AuthorizationError' || 
+      error.name === 'AuthorizationError' ||
       error.message.toLowerCase().includes('authorization') ||
       error.message.toLowerCase().includes('unauthorized') ||
       error.message.toLowerCase().includes('forbidden')
     ) {
       return ErrorType.AUTHORIZATION;
     } else if (
-      error.name === 'NetworkError' || 
+      error.name === 'NetworkError' ||
       error.message.toLowerCase().includes('network') ||
       error.message.toLowerCase().includes('fetch') ||
       error.message.toLowerCase().includes('connection')
     ) {
       return ErrorType.NETWORK;
     } else if (
-      error.name === 'ExternalServiceError' || 
+      error.name === 'ExternalServiceError' ||
       error.message.toLowerCase().includes('external') ||
       error.message.toLowerCase().includes('service')
     ) {
       return ErrorType.EXTERNAL;
     }
-    
+
     return ErrorType.UNKNOWN;
   }
-  
+
   /**
    * Determine the severity of an error
    * @param error Error to analyze
@@ -279,18 +272,21 @@ export class ErrorService {
     ) {
       return ErrorSeverity.CRITICAL;
     }
-    
+
     // High severity errors
     if (
       type === ErrorType.AUTHENTICATION ||
       type === ErrorType.AUTHORIZATION ||
-      (type === ErrorType.API && error instanceof ApiError && error.status >= 400 && error.status < 500) ||
+      (type === ErrorType.API &&
+        error instanceof ApiError &&
+        error.status >= 400 &&
+        error.status < 500) ||
       error.message.toLowerCase().includes('security') ||
       error.message.toLowerCase().includes('breach')
     ) {
       return ErrorSeverity.HIGH;
     }
-    
+
     // Medium severity errors
     if (
       type === ErrorType.VALIDATION ||
@@ -299,7 +295,7 @@ export class ErrorService {
     ) {
       return ErrorSeverity.MEDIUM;
     }
-    
+
     // Default to low severity
     return ErrorSeverity.LOW;
   }
@@ -359,5 +355,5 @@ export default {
   withErrorHandling,
   withAsyncErrorHandling,
   ErrorType,
-  ErrorSeverity
+  ErrorSeverity,
 };

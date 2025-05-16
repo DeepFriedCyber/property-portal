@@ -81,7 +81,7 @@ export function getErrorDetails(error: unknown): {
  */
 export function logError(context: string, error: unknown): void {
   console.error(`[ERROR] ${context}:`, String(error));
-  
+
   // Log additional details if available
   if (error instanceof Error && error.stack) {
     console.error(`[STACK] ${context}:`, error.stack);
@@ -96,16 +96,16 @@ export function logError(context: string, error: unknown): void {
  */
 export function createErrorWithCause(message: string, originalError: unknown): Error {
   const newError = new Error(`${message}: ${String(originalError)}`);
-  
+
   // Preserve the original stack if possible
   if (originalError instanceof Error && originalError.stack) {
     // Append original stack to the new error
     newError.stack = `${newError.stack}\nCaused by: ${originalError.stack}`;
   }
-  
+
   // Add a cause property (supported in newer JS environments)
   (newError as any).cause = originalError;
-  
+
   return newError;
 }
 

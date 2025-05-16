@@ -15,7 +15,7 @@ import Spinner from './loaders/Spinner';
 <Spinner />
 
 // With customization
-<Spinner 
+<Spinner
   size="large"     // 'small', 'medium', or 'large'
   color="#3b82f6"  // Any valid CSS color
   className="my-custom-class"
@@ -33,7 +33,7 @@ import Skeleton from './loaders/Skeleton';
 <Skeleton />
 
 // With customization
-<Skeleton 
+<Skeleton
   width={200}           // Number (px) or string (e.g., '50%')
   height={24}           // Number (px) or string
   borderRadius={4}      // Number (px) or string

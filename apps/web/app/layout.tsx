@@ -1,20 +1,17 @@
 import React from 'react';
+
 import './globals.css';
-import { EnhancedClerkProvider } from '@/lib/auth/clerk-wrapper';
 import GlobalErrorHandler from '@/components/error-handling/GlobalErrorHandler';
 import RouteErrorBoundary from '@/components/error-handling/RouteErrorBoundary';
 import PerformanceMonitor from '@/components/monitoring/PerformanceMonitor';
+import { EnhancedClerkProvider } from '@/lib/auth/clerk-wrapper';
 
 export const metadata = {
   title: 'Property Portal',
   description: 'A modern property listing and management portal',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <EnhancedClerkProvider
       appearance={{
@@ -33,9 +30,7 @@ export default function RootLayout({
             release={process.env.NEXT_PUBLIC_APP_VERSION}
           >
             <PerformanceMonitor>
-              <RouteErrorBoundary>
-                {children}
-              </RouteErrorBoundary>
+              <RouteErrorBoundary>{children}</RouteErrorBoundary>
             </PerformanceMonitor>
           </GlobalErrorHandler>
         </body>

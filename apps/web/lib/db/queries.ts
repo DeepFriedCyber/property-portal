@@ -1,5 +1,5 @@
 // Re-export the functions from the root lib/db/queries.ts
-export { 
+export {
   getUploadRecordsByUploader,
   countPropertiesByUploadId,
   getPropertiesByUploadId,
@@ -7,13 +7,13 @@ export {
   createUploadRecord,
   createProperty,
   updateProperty,
-  deleteProperty
+  deleteProperty,
 } from '../../../../lib/db/queries';
 
 // Export the types with 'export type' syntax for isolatedModules compatibility
-export type { 
+export type {
   UploadRecord,
   NewUploadRecord,
   Property,
-  NewProperty
+  NewProperty,
 } from '../../../../lib/db/queries';

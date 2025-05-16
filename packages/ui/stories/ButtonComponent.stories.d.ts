@@ -1,27 +1,27 @@
 import type { StoryObj } from '@storybook/react';
 declare const meta: {
-    title: string;
-    component: import("react").FC<import("../components/Button").ButtonProps>;
-    parameters: {
-        layout: string;
+  title: string;
+  component: import('react').FC<import('../components/Button').ButtonProps>;
+  parameters: {
+    layout: string;
+  };
+  tags: string[];
+  argTypes: {
+    variant: {
+      control: {
+        type: 'select';
+      };
+      options: string[];
     };
-    tags: string[];
-    argTypes: {
-        variant: {
-            control: {
-                type: "select";
-            };
-            options: string[];
-        };
-        disabled: {
-            control: {
-                type: "boolean";
-            };
-        };
-        onClick: {
-            action: string;
-        };
+    disabled: {
+      control: {
+        type: 'boolean';
+      };
     };
+    onClick: {
+      action: string;
+    };
+  };
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

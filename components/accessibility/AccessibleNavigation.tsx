@@ -1,5 +1,6 @@
 // AccessibleNavigation.tsx
 import React, { useState, useRef, useEffect } from 'react';
+
 import AccessibleButton from './AccessibleButton';
 
 interface NavItem {
@@ -23,30 +24,29 @@ const AccessibleNavigation: React.FC<AccessibleNavigationProps> = ({
   currentPath,
   ariaLabel = 'Main Navigation',
   className = '',
-  onNavItemClick
+  onNavItemClick,
 }) => {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const navRef = useRef<HTMLElement>(null);
-  
+
   // Handle keyboard navigation
   useEffect(() => {
     if (!navRef.current) return;
-    
+
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
-      
+
       // Only handle keyboard events for nav items
-      if (!target.classList.contains('nav-link') && 
-          !target.classList.contains('nav-button')) {
+      if (!target.classList.contains('nav-link') && !target.classList.contains('nav-button')) {
         return;
       }
-      
+
       const navItems = Array.from(
         navRef.current?.querySelectorAll('.nav-link, .nav-button') || []
       ) as HTMLElement[];
-      
+
       const currentIndex = navItems.indexOf(target);
-      
+
       switch (event.key) {
         case 'ArrowDown':
           event.preventDefault();
@@ -54,44 +54,44 @@ const AccessibleNavigation: React.FC<AccessibleNavigationProps> = ({
             navItems[currentIndex + 1].focus();
           }
           break;
-          
+
         case 'ArrowUp':
           event.preventDefault();
           if (currentIndex > 0) {
             navItems[currentIndex - 1].focus();
           }
           break;
-          
+
         case 'Home':
           event.preventDefault();
           navItems[0].focus();
           break;
-          
+
         case 'End':
           event.preventDefault();
           navItems[navItems.length - 1].focus();
           break;
-          
+
         default:
           break;
       }
     };
-    
+
     navRef.current.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
       navRef.current?.removeEventListener('keydown', handleKeyDown);
     };
   }, [items]);
-  
+
   // Toggle submenu
   const toggleSubmenu = (itemId: string) => {
-    setExpandedItems(prev => ({
+    setExpandedItems((prev) => ({
       ...prev,
-      [itemId]: !prev[itemId]
+      [itemId]: !prev[itemId],
     }));
   };
-  
+
   // Handle nav item click
   const handleItemClick = (item: NavItem, event: React.MouseEvent) => {
     // If the item has children, toggle the submenu
@@ -99,19 +99,19 @@ const AccessibleNavigation: React.FC<AccessibleNavigationProps> = ({
       event.preventDefault();
       toggleSubmenu(item.id);
     }
-    
+
     // Call the custom click handler if provided
     if (onNavItemClick) {
       onNavItemClick(item);
     }
   };
-  
+
   // Render a nav item
   const renderNavItem = (item: NavItem, level: number = 0) => {
     const isActive = currentPath === item.href;
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems[item.id] || false;
-    
+
     return (
       <li key={item.id} className={`nav-item level-${level}`}>
         {hasChildren ? (
@@ -129,7 +129,7 @@ const AccessibleNavigation: React.FC<AccessibleNavigationProps> = ({
                 {isExpanded ? '▼' : '▶'}
               </span>
             </AccessibleButton>
-            
+
             {isExpanded && (
               <ul
                 id={`submenu-${item.id}`}
@@ -137,7 +137,7 @@ const AccessibleNavigation: React.FC<AccessibleNavigationProps> = ({
                 role="menu"
                 aria-label={`${item.label} submenu`}
               >
-                {item.children.map(child => renderNavItem(child, level + 1))}
+                {item.children.map((child) => renderNavItem(child, level + 1))}
               </ul>
             )}
           </>
@@ -159,15 +159,11 @@ const AccessibleNavigation: React.FC<AccessibleNavigationProps> = ({
       </li>
     );
   };
-  
+
   return (
-    <nav
-      ref={navRef}
-      aria-label={ariaLabel}
-      className={`accessible-nav ${className}`}
-    >
+    <nav ref={navRef} aria-label={ariaLabel} className={`accessible-nav ${className}`}>
       <ul className="nav-list" role="menubar">
-        {items.map(item => renderNavItem(item))}
+        {items.map((item) => renderNavItem(item))}
       </ul>
     </nav>
   );

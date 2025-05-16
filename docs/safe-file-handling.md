@@ -11,7 +11,7 @@ When working with files in JavaScript/TypeScript, it's common to encounter situa
 logger.error({
   fileName: file.name,
   fileSize: file.size,
-  error: error.message
+  error: error.message,
 });
 ```
 
@@ -26,7 +26,7 @@ If `file` is undefined, this code will throw a runtime error, potentially causin
 logger.error({
   fileName: file?.name ?? 'unknown',
   fileSize: file?.size ?? 'unknown',
-  error: error.message
+  error: error.message,
 });
 ```
 
@@ -44,21 +44,25 @@ logger.error(createFileErrorLog('Error processing file', file, error));
 ## Best Practices for File Handling
 
 1. **Always use optional chaining (`?.`) when accessing file properties**
+
    ```typescript
    const fileName = file?.name ?? 'unknown';
    ```
 
 2. **Provide fallback values with nullish coalescing (`??`)**
+
    ```typescript
    const fileSize = file?.size ?? 'unknown';
    ```
 
 3. **Use utility functions for consistent handling**
+
    ```typescript
    const fileInfo = getSafeFileInfo(file);
    ```
 
 4. **Validate file existence before operations**
+
    ```typescript
    if (!file) {
      throw new Error('No file provided');
@@ -79,7 +83,7 @@ import { isAllowedFileType } from '../lib/utils/file-utils';
 
 function validateFileType(file: File | undefined) {
   const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-  
+
   if (!isAllowedFileType(file, allowedTypes)) {
     throw new Error('Unsupported file type');
   }
@@ -93,7 +97,7 @@ import { isFileSizeValid, formatFileSize } from '../lib/utils/file-utils';
 
 function validateFileSize(file: File | undefined) {
   const maxSize = 5 * 1024 * 1024; // 5MB
-  
+
   if (!isFileSizeValid(file, maxSize)) {
     const formattedSize = formatFileSize(file?.size ?? 0);
     const formattedMax = formatFileSize(maxSize);
@@ -113,19 +117,19 @@ async function handleFileUpload(file: File | undefined) {
     if (!file) {
       throw new Error('No file provided');
     }
-    
+
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
     if (!isAllowedFileType(file, allowedTypes)) {
       throw new Error('Unsupported file type');
     }
-    
+
     // Validate file size
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (!isFileSizeValid(file, maxSize)) {
       throw new Error('File too large');
     }
-    
+
     // Process file upload
     const result = await uploadFile(file);
     return result;
@@ -134,9 +138,9 @@ async function handleFileUpload(file: File | undefined) {
     logger.error({
       message: 'File upload failed',
       ...getSafeFileInfo(file),
-      error: String(error)
+      error: String(error),
     });
-    
+
     // Re-throw or handle as needed
     throw error;
   }

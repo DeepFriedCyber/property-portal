@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuthentication, AuthRequired } from '@/lib/auth/clerk-wrapper';
+
 import { Button } from '../../../src/ui';
+
+import { useAuthentication, AuthRequired } from '@/lib/auth/clerk-wrapper';
 
 // Profile editor component
 const ProfileEditor = () => {
@@ -26,19 +28,19 @@ const ProfileEditor = () => {
   // Save profile with error handling and retry logic
   const handleSaveProfile = async () => {
     if (!user) return;
-    
+
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
       await user.update({
         firstName,
         lastName,
       });
-      
+
       setIsEditing(false);
       setSuccessMessage('Profile updated successfully!');
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccessMessage(null);
@@ -61,7 +63,7 @@ const ProfileEditor = () => {
     setIsEditing(false);
     setError(null);
   };
-  
+
   if (!user) return null;
 
   return (
@@ -75,12 +77,12 @@ const ProfileEditor = () => {
             {successMessage}
           </div>
         )}
-        
+
         {/* Show error message if present */}
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md flex justify-between items-center">
             <span>{error}</span>
-            <button 
+            <button
               onClick={handleRetry}
               className="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-md transition-colors"
             >
@@ -88,7 +90,7 @@ const ProfileEditor = () => {
             </button>
           </div>
         )}
-        
+
         {isEditing ? (
           <div className="space-y-4">
             <div>
@@ -118,18 +120,10 @@ const ProfileEditor = () => {
               />
             </div>
             <div className="flex space-x-4 mt-6">
-              <Button 
-                variant="primary" 
-                onClick={handleSaveProfile}
-                disabled={isSubmitting}
-              >
+              <Button variant="primary" onClick={handleSaveProfile} disabled={isSubmitting}>
                 {isSubmitting ? 'Saving...' : 'Save Changes'}
               </Button>
-              <Button 
-                variant="secondary" 
-                onClick={handleCancelEdit}
-                disabled={isSubmitting}
-              >
+              <Button variant="secondary" onClick={handleCancelEdit} disabled={isSubmitting}>
                 Cancel
               </Button>
             </div>

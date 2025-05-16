@@ -1,6 +1,6 @@
 // health.ts
-import { Router } from 'express';
 import { isDatabaseHealthy, getDatabaseStatus } from '@your-org/db';
+import { Router } from 'express';
 
 const router = Router();
 
@@ -11,7 +11,7 @@ const router = Router();
 router.get('/', (req, res) => {
   const dbStatus = getDatabaseStatus();
   const isDbHealthy = isDatabaseHealthy();
-  
+
   const health = {
     status: isDbHealthy ? 'healthy' : 'unhealthy',
     timestamp: new Date().toISOString(),
@@ -19,18 +19,18 @@ router.get('/', (req, res) => {
       database: {
         status: dbStatus.status,
         healthy: isDbHealthy,
-        error: dbStatus.error ? dbStatus.error.message : null
+        error: dbStatus.error ? dbStatus.error.message : null,
       },
       api: {
         status: 'RUNNING',
-        healthy: true
-      }
-    }
+        healthy: true,
+      },
+    },
   };
-  
+
   // Return 503 if any service is unhealthy
   const statusCode = isDbHealthy ? 200 : 503;
-  
+
   res.status(statusCode).json(health);
 });
 
@@ -41,7 +41,7 @@ router.get('/', (req, res) => {
 router.get('/details', (req, res) => {
   const dbStatus = getDatabaseStatus();
   const isDbHealthy = isDatabaseHealthy();
-  
+
   const health = {
     status: isDbHealthy ? 'healthy' : 'unhealthy',
     timestamp: new Date().toISOString(),
@@ -50,23 +50,25 @@ router.get('/details', (req, res) => {
       database: {
         status: dbStatus.status,
         healthy: isDbHealthy,
-        error: dbStatus.error ? {
-          message: dbStatus.error.message,
-          stack: process.env.NODE_ENV === 'development' ? dbStatus.error.stack : undefined
-        } : null
+        error: dbStatus.error
+          ? {
+              message: dbStatus.error.message,
+              stack: process.env.NODE_ENV === 'development' ? dbStatus.error.stack : undefined,
+            }
+          : null,
       },
       api: {
         status: 'RUNNING',
         healthy: true,
         memory: process.memoryUsage(),
-        environment: process.env.NODE_ENV
-      }
-    }
+        environment: process.env.NODE_ENV,
+      },
+    },
   };
-  
+
   // Return 503 if any service is unhealthy
   const statusCode = isDbHealthy ? 200 : 503;
-  
+
   res.status(statusCode).json(health);
 });
 

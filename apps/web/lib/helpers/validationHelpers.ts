@@ -38,8 +38,6 @@ export function isValidPositiveInteger(value: string): boolean {
  */
 export function isValidId(id: string | null, format: 'uuid' | 'integer' = 'uuid'): boolean {
   if (!id) return false;
-  
-  return format === 'uuid' 
-    ? isValidUuid(id) 
-    : isValidInteger(id);
+
+  return format === 'uuid' ? isValidUuid(id) : isValidInteger(id);
 }

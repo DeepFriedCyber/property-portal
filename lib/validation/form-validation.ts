@@ -22,14 +22,14 @@ export type ValidationResult<T> = {
  */
 export function formatZodFormErrors<T>(error: z.ZodError): FormErrors<T> {
   const formattedErrors: Record<string, string> = {};
-  
+
   error.errors.forEach((err) => {
     const path = err.path.join('.');
     const fieldName = path || 'value';
-    
+
     // Create more specific error messages based on error code
     let message = err.message;
-    
+
     switch (err.code) {
       case 'invalid_type':
         if (err.expected === 'string' && err.received === 'undefined') {
@@ -70,16 +70,16 @@ export function formatZodFormErrors<T>(error: z.ZodError): FormErrors<T> {
         }
         break;
       case 'invalid_enum_value':
-        message = `Must be one of: ${err.options.map(o => `'${o}'`).join(', ')}`;
+        message = `Must be one of: ${err.options.map((o) => `'${o}'`).join(', ')}`;
         break;
       case 'invalid_date':
         message = 'Must be a valid date';
         break;
     }
-    
+
     formattedErrors[fieldName] = message;
   });
-  
+
   return formattedErrors as FormErrors<T>;
 }
 
@@ -89,28 +89,25 @@ export function formatZodFormErrors<T>(error: z.ZodError): FormErrors<T> {
  * @param data Form data to validate
  * @returns Validation result with success flag, data, and errors
  */
-export function validateForm<T>(
-  schema: z.ZodType<T>,
-  data: unknown
-): ValidationResult<T> {
+export function validateForm<T>(schema: z.ZodType<T>, data: unknown): ValidationResult<T> {
   try {
     const validData = schema.parse(data);
     return {
       success: true,
-      data: validData
+      data: validData,
     };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        errors: formatZodFormErrors<T>(error)
+        errors: formatZodFormErrors<T>(error),
       };
     }
-    
+
     // For other errors, return a generic error
     return {
       success: false,
-      errors: { _form: 'An unexpected error occurred during validation' } as FormErrors<T>
+      errors: { _form: 'An unexpected error occurred during validation' } as FormErrors<T>,
     };
   }
 }
@@ -130,10 +127,7 @@ export function createFormValidator<T>(schema: z.ZodType<T>) {
  * @param value Field value to validate
  * @returns Validation error message or undefined if valid
  */
-export function validateField<T>(
-  schema: z.ZodType<T>,
-  value: unknown
-): string | undefined {
+export function validateField<T>(schema: z.ZodType<T>, value: unknown): string | undefined {
   try {
     schema.parse(value);
     return undefined;
@@ -151,7 +145,8 @@ export function validateField<T>(
  */
 export const ValidationSchemas = {
   email: z.string().email('Please enter a valid email address'),
-  password: z.string()
+  password: z
+    .string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
@@ -162,6 +157,9 @@ export const ValidationSchemas = {
   price: z.number().positive('Price must be a positive number'),
   integer: z.number().int('Must be a whole number'),
   positiveInteger: z.number().int('Must be a whole number').positive('Must be a positive number'),
-  nonNegativeInteger: z.number().int('Must be a whole number').nonnegative('Must be zero or positive'),
-  uuid: z.string().uuid('Invalid ID format')
+  nonNegativeInteger: z
+    .number()
+    .int('Must be a whole number')
+    .nonnegative('Must be zero or positive'),
+  uuid: z.string().uuid('Invalid ID format'),
 };

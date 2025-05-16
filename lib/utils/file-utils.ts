@@ -39,14 +39,12 @@ export function getSafeFileInfo(file: FileInfo | File | null | undefined): SafeF
       fileSize: 'unknown',
       fileType: 'unknown',
       lastModified: 'unknown',
-      extension: 'unknown'
+      extension: 'unknown',
     };
   }
 
   // Extract file extension from name
-  const extension = file.name.includes('.') 
-    ? file.name.split('.').pop()?.toLowerCase() 
-    : 'unknown';
+  const extension = file.name.includes('.') ? file.name.split('.').pop()?.toLowerCase() : 'unknown';
 
   return {
     fileName: file.name,
@@ -55,7 +53,7 @@ export function getSafeFileInfo(file: FileInfo | File | null | undefined): SafeF
     lastModified: file.lastModified ? new Date(file.lastModified) : 'unknown',
     filePath: 'path' in file ? file.path : undefined,
     relativePath: 'webkitRelativePath' in file ? file.webkitRelativePath : undefined,
-    extension
+    extension,
   };
 }
 
@@ -75,7 +73,7 @@ export function createFileErrorLog(
     message,
     ...getSafeFileInfo(file),
     error: error ? String(error) : undefined,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 
@@ -86,31 +84,33 @@ export function createFileErrorLog(
  * @returns Boolean indicating if the file is of an allowed type
  */
 export function isAllowedFileType(
-  file: FileInfo | File | null | undefined, 
+  file: FileInfo | File | null | undefined,
   allowedTypes: string[]
 ): boolean {
   if (!file) return false;
-  
+
   const fileInfo = getSafeFileInfo(file);
-  
+
   // Check MIME type
   if (fileInfo.fileType !== 'unknown') {
-    if (allowedTypes.some(type => fileInfo.fileType.includes(type))) {
+    if (allowedTypes.some((type) => fileInfo.fileType.includes(type))) {
       return true;
     }
   }
-  
+
   // Check extension
   if (fileInfo.extension !== 'unknown') {
-    if (allowedTypes.some(type => 
-      type.startsWith('.') 
-        ? fileInfo.extension === type.substring(1) 
-        : fileInfo.extension === type
-    )) {
+    if (
+      allowedTypes.some((type) =>
+        type.startsWith('.')
+          ? fileInfo.extension === type.substring(1)
+          : fileInfo.extension === type
+      )
+    ) {
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -121,11 +121,11 @@ export function isAllowedFileType(
  * @returns Boolean indicating if the file is within size limits
  */
 export function isFileSizeValid(
-  file: FileInfo | File | null | undefined, 
+  file: FileInfo | File | null | undefined,
   maxSizeBytes: number
 ): boolean {
   if (!file) return false;
-  
+
   return typeof file.size === 'number' && file.size <= maxSizeBytes;
 }
 
@@ -136,7 +136,7 @@ export function isFileSizeValid(
  */
 export function formatFileSize(sizeInBytes: number | string): string {
   if (typeof sizeInBytes !== 'number') return 'unknown';
-  
+
   if (sizeInBytes < 1024) return `${sizeInBytes} B`;
   if (sizeInBytes < 1024 * 1024) return `${(sizeInBytes / 1024).toFixed(1)} KB`;
   if (sizeInBytes < 1024 * 1024 * 1024) return `${(sizeInBytes / (1024 * 1024)).toFixed(1)} MB`;

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Hero from '../components/sections/Hero';
-import Features from '../components/sections/Features';
-import CallToAction from '../components/sections/CallToAction';
-import Header from '../components/layout/Header';
+
 import Footer from '../components/layout/Footer';
+import Header from '../components/layout/Header';
+import CallToAction from '../components/sections/CallToAction';
+import Features from '../components/sections/Features';
+import Hero from '../components/sections/Hero';
 import SearchResults, { Property } from '../components/sections/SearchResults';
 
 export default function HomePage() {
@@ -40,19 +41,22 @@ export default function HomePage() {
     {
       id: 'alerts',
       title: 'Property Alerts',
-      description: 'Get notified instantly when new properties matching your criteria become available.',
+      description:
+        'Get notified instantly when new properties matching your criteria become available.',
       icon: '🔔',
     },
     {
       id: 'mortgage',
       title: 'Mortgage Calculator',
-      description: 'Plan your finances with our easy-to-use mortgage calculator and affordability tools.',
+      description:
+        'Plan your finances with our easy-to-use mortgage calculator and affordability tools.',
       icon: '💰',
     },
     {
       id: 'agents',
       title: 'Expert Agents',
-      description: 'Connect with experienced real estate agents who can guide you through the process.',
+      description:
+        'Connect with experienced real estate agents who can guide you through the process.',
       icon: '👤',
     },
     {
@@ -109,15 +113,15 @@ export default function HomePage() {
     setSearchError(null);
     setSearchQuery(query);
     setIsSearching(true);
-    
+
     // Simulate API call with a delay
     setTimeout(() => {
       try {
         // Simulate a random error (10% chance) for demonstration purposes
         if (Math.random() < 0.1) {
-          throw new Error("Unable to connect to search service. Please try again.");
+          throw new Error('Unable to connect to search service. Please try again.');
         }
-        
+
         // Mock data - in a real app, this would come from an API
         const mockResults: Property[] = [
           {
@@ -128,7 +132,8 @@ export default function HomePage() {
             bedrooms: 2,
             bathrooms: 1,
             area: '850 sq ft',
-            description: 'A beautiful modern apartment in the heart of Cambridge with easy access to shops, restaurants, and public transport.',
+            description:
+              'A beautiful modern apartment in the heart of Cambridge with easy access to shops, restaurants, and public transport.',
             imageUrl: 'https://placehold.co/600x400/png?text=Apartment',
           },
           {
@@ -139,7 +144,8 @@ export default function HomePage() {
             bedrooms: 4,
             bathrooms: 2,
             area: '1,800 sq ft',
-            description: 'Perfect family home with a large garden in a quiet neighborhood. Close to excellent schools and parks.',
+            description:
+              'Perfect family home with a large garden in a quiet neighborhood. Close to excellent schools and parks.',
             imageUrl: 'https://placehold.co/600x400/png?text=Family+Home',
           },
           {
@@ -150,20 +156,23 @@ export default function HomePage() {
             bedrooms: 3,
             bathrooms: 2,
             area: '1,200 sq ft',
-            description: 'Stunning penthouse apartment with panoramic views of the river. Features high-end finishes and a private terrace.',
+            description:
+              'Stunning penthouse apartment with panoramic views of the river. Features high-end finishes and a private terrace.',
             imageUrl: 'https://placehold.co/600x400/png?text=Penthouse',
           },
         ];
-        
+
         // Filter results based on query for demonstration
-        const filteredResults = query.length > 0 
-          ? mockResults.filter(property => 
-              property.title.toLowerCase().includes(query.toLowerCase()) ||
-              property.location.toLowerCase().includes(query.toLowerCase()) ||
-              property.description.toLowerCase().includes(query.toLowerCase())
-            )
-          : mockResults;
-        
+        const filteredResults =
+          query.length > 0
+            ? mockResults.filter(
+                (property) =>
+                  property.title.toLowerCase().includes(query.toLowerCase()) ||
+                  property.location.toLowerCase().includes(query.toLowerCase()) ||
+                  property.description.toLowerCase().includes(query.toLowerCase())
+              )
+            : mockResults;
+
         setSearchResults(filteredResults);
       } catch (error) {
         console.error('Search error:', error);
@@ -208,23 +217,19 @@ export default function HomePage() {
 
   return (
     <main>
-      <Header 
-        navLinks={navLinks} 
-        onLogin={handleLogin} 
-        onSignup={handleSignup} 
-      />
-      
-      <Hero 
+      <Header navLinks={navLinks} onLogin={handleLogin} onSignup={handleSignup} />
+
+      <Hero
         title="Find Your Dream Property"
         subtitle="Discover thousands of properties for sale and rent across the country"
         buttonText="Explore Properties"
         useInlineSearch={true}
         onInlineSearch={performSearch}
       />
-      
+
       {/* Search Results Section - Only visible when there's a search query */}
       {searchQuery && (
-        <SearchResults 
+        <SearchResults
           query={searchQuery}
           results={searchResults}
           isLoading={isSearching}
@@ -233,15 +238,15 @@ export default function HomePage() {
           onClearSearch={clearSearch}
         />
       )}
-      
-      <Features 
+
+      <Features
         title="Everything You Need in One Place"
         subtitle="Our platform offers comprehensive tools and resources for buyers, sellers, and renters"
         features={features}
         className="features-section"
       />
-      
-      <CallToAction 
+
+      <CallToAction
         title="Ready to Start Your Property Journey?"
         description="Whether you're buying, selling, or renting, we're here to help every step of the way."
         primaryButtonText="Get Started"
@@ -249,8 +254,8 @@ export default function HomePage() {
         onPrimaryClick={handlePrimaryCTA}
         onSecondaryClick={handleSecondaryCTA}
       />
-      
-      <Footer 
+
+      <Footer
         columns={footerColumns}
         copyrightText="© 2023 Property Portal. All rights reserved."
         socialLinks={socialLinks}

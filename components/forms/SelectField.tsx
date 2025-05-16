@@ -1,5 +1,6 @@
 // components/forms/SelectField.tsx
 import React from 'react';
+
 import FormField from './FormField';
 
 interface SelectOption {
@@ -39,7 +40,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   ...props
 }) => {
   const showError = error && touched;
-  
+
   return (
     <FormField
       id={id}
@@ -69,7 +70,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
             {placeholder}
           </option>
         )}
-        
+
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

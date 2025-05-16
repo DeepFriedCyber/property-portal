@@ -51,7 +51,9 @@ export type CreatePropertyInput = Omit<Property, 'id' | 'createdAt' | 'images'> 
 /**
  * Input for updating an existing property
  */
-export type UpdatePropertyInput = Partial<Omit<Property, 'id' | 'createdAt' | 'createdBy' | 'images'>> & {
+export type UpdatePropertyInput = Partial<
+  Omit<Property, 'id' | 'createdAt' | 'createdBy' | 'images'>
+> & {
   images?: Omit<PropertyImage, 'id' | 'propertyId' | 'createdAt'>[];
 };
 

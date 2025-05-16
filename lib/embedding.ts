@@ -1,6 +1,6 @@
-import OpenAI from 'openai';
-import dotenv from 'dotenv';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import dotenv from 'dotenv';
+import OpenAI from 'openai';
 
 // Load environment variables
 dotenv.config();
@@ -29,7 +29,7 @@ const defaultOptions: EmbeddingOptions = {
   timeout: 10000, // 10 seconds
   maxRetries: 3,
   backoffFactor: 2,
-  fallbackProvider: 'lmstudio'
+  fallbackProvider: 'lmstudio',
 };
 
 // Circuit breaker state
@@ -43,13 +43,13 @@ const circuitBreakers: Record<EmbeddingProvider, CircuitBreakerState> = {
   openai: {
     failures: 0,
     lastFailure: null,
-    status: 'CLOSED'
+    status: 'CLOSED',
   },
   lmstudio: {
     failures: 0,
     lastFailure: null,
-    status: 'CLOSED'
-  }
+    status: 'CLOSED',
+  },
 };
 
 // Circuit breaker configuration
@@ -63,12 +63,12 @@ const RESET_TIMEOUT = 30000; // 30 seconds
  */
 function canMakeRequest(provider: EmbeddingProvider): boolean {
   const breaker = circuitBreakers[provider];
-  
+
   // If circuit is closed, allow the request
   if (breaker.status === 'CLOSED') {
     return true;
   }
-  
+
   // If circuit is open, check if it's time to try again
   if (breaker.status === 'OPEN') {
     const now = Date.now();
@@ -80,7 +80,7 @@ function canMakeRequest(provider: EmbeddingProvider): boolean {
     }
     return false;
   }
-  
+
   // If circuit is half-open, allow one test request
   return true;
 }
@@ -91,7 +91,7 @@ function canMakeRequest(provider: EmbeddingProvider): boolean {
  */
 function recordSuccess(provider: EmbeddingProvider): void {
   const breaker = circuitBreakers[provider];
-  
+
   if (breaker.status === 'HALF_OPEN') {
     // Reset the circuit breaker
     breaker.failures = 0;
@@ -107,10 +107,10 @@ function recordSuccess(provider: EmbeddingProvider): void {
  */
 function recordFailure(provider: EmbeddingProvider): void {
   const breaker = circuitBreakers[provider];
-  
+
   breaker.failures += 1;
   breaker.lastFailure = Date.now();
-  
+
   if (breaker.status === 'CLOSED' && breaker.failures >= FAILURE_THRESHOLD) {
     breaker.status = 'OPEN';
     console.log(`Circuit breaker for ${provider} is now OPEN`);
@@ -133,32 +133,31 @@ async function withRetry<T>(
   backoffFactor: number
 ): Promise<T> {
   let lastError: Error;
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error as Error;
-      
+
       // Don't retry if we've reached max retries
       if (attempt === maxRetries) break;
-      
+
       // Don't retry for certain errors
       if (error instanceof Error) {
         // Don't retry for authentication errors
-        if (error.message.includes('authentication') || 
-            error.message.includes('API key')) {
+        if (error.message.includes('authentication') || error.message.includes('API key')) {
           break;
         }
       }
-      
+
       // Wait with exponential backoff before retrying
       const delay = 1000 * Math.pow(backoffFactor, attempt);
       console.log(`Retrying (${attempt + 1}/${maxRetries}) after ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
-  
+
   throw lastError;
 }
 
@@ -174,7 +173,7 @@ export async function generateEmbedding(
 ): Promise<number[]> {
   // Merge default options with provided options
   const config = { ...defaultOptions, ...options };
-  
+
   // Validate input
   if (!text || text.trim() === '') {
     throw new Error('Text cannot be empty');
@@ -182,23 +181,23 @@ export async function generateEmbedding(
 
   // Try primary provider
   const primaryProvider = config.provider || 'openai';
-  
+
   try {
     // Check if circuit breaker allows the request
     if (!canMakeRequest(primaryProvider)) {
       console.log(`Circuit breaker for ${primaryProvider} is OPEN, using fallback provider`);
-      
+
       // If fallback provider is specified and different from primary, try it
       if (config.fallbackProvider && config.fallbackProvider !== primaryProvider) {
         return await generateEmbeddingWithProvider(text, {
           ...config,
-          provider: config.fallbackProvider
+          provider: config.fallbackProvider,
         });
       }
-      
+
       throw new Error(`${primaryProvider} service is unavailable and no fallback is available`);
     }
-    
+
     // Try with primary provider
     const result = await generateEmbeddingWithProvider(text, config);
     recordSuccess(primaryProvider);
@@ -206,16 +205,16 @@ export async function generateEmbedding(
   } catch (error) {
     console.error(`Error with primary provider ${primaryProvider}:`, error);
     recordFailure(primaryProvider);
-    
+
     // If fallback provider is specified and different from primary, try it
     if (config.fallbackProvider && config.fallbackProvider !== primaryProvider) {
       console.log(`Trying fallback provider: ${config.fallbackProvider}`);
-      
+
       try {
         if (canMakeRequest(config.fallbackProvider)) {
           const result = await generateEmbeddingWithProvider(text, {
             ...config,
-            provider: config.fallbackProvider
+            provider: config.fallbackProvider,
           });
           recordSuccess(config.fallbackProvider);
           return result;
@@ -225,7 +224,7 @@ export async function generateEmbedding(
         recordFailure(config.fallbackProvider);
       }
     }
-    
+
     // If we get here, both primary and fallback failed
     throw new Error(`Failed to generate embedding: ${(error as Error).message}`);
   }
@@ -253,8 +252,7 @@ async function generateEmbeddingWithProvider(
       options.maxRetries || 3,
       options.backoffFactor || 2
     );
-  }
-  else {
+  } else {
     throw new Error(`Unsupported provider: ${options.provider}`);
   }
 }
@@ -262,10 +260,7 @@ async function generateEmbeddingWithProvider(
 /**
  * Generate embeddings using OpenAI API
  */
-async function generateOpenAIEmbedding(
-  text: string,
-  options: EmbeddingOptions
-): Promise<number[]> {
+async function generateOpenAIEmbedding(text: string, options: EmbeddingOptions): Promise<number[]> {
   if (!options.apiKey) {
     throw new Error('OpenAI API key is required');
   }
@@ -273,14 +268,14 @@ async function generateOpenAIEmbedding(
   const openai = new OpenAI({
     apiKey: options.apiKey,
     timeout: options.timeout || 10000,
-    maxRetries: 0 // We handle retries ourselves
+    maxRetries: 0, // We handle retries ourselves
   });
 
   try {
     const response = await openai.embeddings.create({
       model: options.model || 'text-embedding-3-small',
       input: text,
-      encoding_format: 'float'
+      encoding_format: 'float',
     });
 
     return response.data[0].embedding;
@@ -312,9 +307,9 @@ async function generateLMStudioEmbedding(
 
   const axiosConfig: AxiosRequestConfig = {
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    timeout: options.timeout || 10000
+    timeout: options.timeout || 10000,
   };
 
   try {
@@ -322,7 +317,7 @@ async function generateLMStudioEmbedding(
       options.apiUrl,
       {
         model: options.model || 'bge-base-en',
-        prompt: text
+        prompt: text,
       },
       axiosConfig
     );
@@ -339,7 +334,9 @@ async function generateLMStudioEmbedding(
       if (axiosError.code === 'ECONNABORTED') {
         throw new Error(`LM Studio request timed out after ${options.timeout}ms`);
       } else if (axiosError.response) {
-        throw new Error(`LM Studio API error: ${axiosError.response.status} - ${axiosError.message}`);
+        throw new Error(
+          `LM Studio API error: ${axiosError.response.status} - ${axiosError.message}`
+        );
       } else if (axiosError.request) {
         throw new Error(`LM Studio API no response: ${axiosError.message}`);
       }
@@ -365,12 +362,12 @@ export async function generateEmbeddingBatch(
 
   for (let i = 0; i < texts.length; i += batchSize) {
     const batch = texts.slice(i, i + batchSize);
-    
+
     try {
       // Process batch with Promise.allSettled to handle partial failures
-      const batchPromises = batch.map(text => generateEmbedding(text, options));
+      const batchPromises = batch.map((text) => generateEmbedding(text, options));
       const batchResults = await Promise.allSettled(batchPromises);
-      
+
       // Process results and collect errors
       batchResults.forEach((result, index) => {
         if (result.status === 'fulfilled') {
@@ -382,10 +379,10 @@ export async function generateEmbeddingBatch(
           results.push([]);
         }
       });
-      
+
       // Add a small delay between batches to avoid rate limits
       if (i + batchSize < texts.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     } catch (error) {
       console.error(`Error processing batch starting at index ${i}:`, error);
@@ -397,7 +394,7 @@ export async function generateEmbeddingBatch(
   }
 
   // If all embeddings failed, throw an error
-  if (results.every(arr => arr.length === 0)) {
+  if (results.every((arr) => arr.length === 0)) {
     throw new Error(`Failed to generate any embeddings: ${errors[0]?.message || 'Unknown error'}`);
   }
 
@@ -415,11 +412,11 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   if (!Array.isArray(a) || !Array.isArray(b)) {
     throw new TypeError('Both arguments must be arrays');
   }
-  
+
   if (a.length === 0 || b.length === 0) {
     throw new Error('Vectors cannot be empty');
   }
-  
+
   if (a.length !== b.length) {
     throw new Error(`Vectors must have the same length: ${a.length} vs ${b.length}`);
   }
@@ -449,12 +446,14 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   }
 
   const similarity = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-  
+
   // Ensure the result is within the valid range
   if (similarity < -1 || similarity > 1) {
-    console.warn(`Cosine similarity calculation resulted in an out-of-range value: ${similarity}. Clamping to [-1, 1].`);
+    console.warn(
+      `Cosine similarity calculation resulted in an out-of-range value: ${similarity}. Clamping to [-1, 1].`
+    );
     return Math.max(-1, Math.min(1, similarity));
   }
-  
+
   return similarity;
 }

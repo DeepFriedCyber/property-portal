@@ -36,35 +36,27 @@ const AccessibleInput: React.FC<AccessibleInputProps> = ({
   maxLength,
   min,
   max,
-  pattern
+  pattern,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  
+
   // Generate unique IDs for associated elements
   const helpTextId = helpText ? `${id}-help` : undefined;
   const errorId = errorMessage ? `${id}-error` : undefined;
-  
+
   // Combine IDs for aria-describedby
-  const ariaDescribedby = [
-    helpTextId,
-    errorId
-  ].filter(Boolean).join(' ') || undefined;
-  
+  const ariaDescribedby = [helpTextId, errorId].filter(Boolean).join(' ') || undefined;
+
   // Determine if the input is in an error state
   const hasError = !!errorMessage;
-  
+
   return (
     <div className={`form-field ${className} ${hasError ? 'has-error' : ''}`}>
-      <label 
-        htmlFor={id}
-        className={required ? 'required-label' : ''}
-      >
+      <label htmlFor={id} className={required ? 'required-label' : ''}>
         {label}
-        {required && (
-          <span className="visually-hidden"> (required)</span>
-        )}
+        {required && <span className="visually-hidden"> (required)</span>}
       </label>
-      
+
       <input
         id={id}
         type={type}
@@ -85,20 +77,15 @@ const AccessibleInput: React.FC<AccessibleInputProps> = ({
         max={max}
         pattern={pattern}
       />
-      
+
       {helpText && (
         <div id={helpTextId} className="help-text">
           {helpText}
         </div>
       )}
-      
+
       {errorMessage && (
-        <div 
-          id={errorId} 
-          className="error-message" 
-          role="alert"
-          aria-live="assertive"
-        >
+        <div id={errorId} className="error-message" role="alert" aria-live="assertive">
           {errorMessage}
         </div>
       )}

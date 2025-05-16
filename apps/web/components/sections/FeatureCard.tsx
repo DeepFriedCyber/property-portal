@@ -1,5 +1,6 @@
-import React from 'react';
 import Image from 'next/image';
+import React from 'react';
+
 import { FeatureItem } from './Features';
 
 interface FeatureCardProps {
@@ -12,14 +13,18 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({ feature, className = '
     if (React.isValidElement(icon)) {
       return icon;
     } else if (typeof icon === 'string') {
-      return <span className="text-blue-600 text-2xl" aria-hidden="true">{icon}</span>;
+      return (
+        <span className="text-blue-600 text-2xl" aria-hidden="true">
+          {icon}
+        </span>
+      );
     } else if (icon && typeof icon === 'object' && 'src' in icon) {
       return (
-        <Image 
-          src={icon.src} 
-          alt={icon.alt || feature.title} 
-          width={24} 
-          height={24} 
+        <Image
+          src={icon.src}
+          alt={icon.alt || feature.title}
+          width={24}
+          height={24}
           className="w-6 h-6"
         />
       );
@@ -28,7 +33,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({ feature, className = '
   };
 
   return (
-    <div 
+    <div
       className={`bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 h-full flex flex-col ${className}`}
       tabIndex={0}
     >

@@ -1,6 +1,6 @@
 /**
  * Safe File Handling Examples
- * 
+ *
  * This file demonstrates best practices for safely accessing file properties
  * in error contexts and other situations where files might be undefined.
  */
@@ -28,7 +28,7 @@ export function getSafeFileInfo(file: FileInfo | null | undefined): {
     fileName: file?.name ?? 'unknown',
     fileSize: file?.size ?? 'unknown',
     fileType: file?.type ?? 'unknown',
-    lastModified: file?.lastModified ? new Date(file.lastModified) : 'unknown'
+    lastModified: file?.lastModified ? new Date(file.lastModified) : 'unknown',
   };
 }
 
@@ -48,7 +48,7 @@ export function createFileErrorLog(
     message,
     ...getSafeFileInfo(file),
     error: error ? String(error) : undefined,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 
@@ -58,12 +58,12 @@ export function createFileErrorLog(
 function unsafeFileLogging(file: FileInfo | undefined, error: Error) {
   // This will throw if file is undefined
   console.error(`Error processing file ${file.name} of size ${file.size}:`, error.message);
-  
+
   // This structured log will fail if file is undefined
   const logData = {
     fileName: file.name,
     fileSize: file.size,
-    error: error.message
+    error: error.message,
   };
   console.error(logData);
 }
@@ -72,15 +72,15 @@ function unsafeFileLogging(file: FileInfo | undefined, error: Error) {
 function betterFileLogging(file: FileInfo | undefined, error: Error) {
   // Safe access with optional chaining and fallbacks
   console.error(
-    `Error processing file ${file?.name ?? 'unknown'} of size ${file?.size ?? 'unknown'}:`, 
+    `Error processing file ${file?.name ?? 'unknown'} of size ${file?.size ?? 'unknown'}:`,
     error.message
   );
-  
+
   // Safe structured logging
   const logData = {
     fileName: file?.name ?? 'unknown',
     fileSize: file?.size ?? 'unknown',
-    error: error.message
+    error: error.message,
   };
   console.error(logData);
 }
@@ -90,7 +90,7 @@ function bestFileLogging(file: FileInfo | undefined, error: unknown) {
   // Using the utility function for consistent handling
   const logData = createFileErrorLog('Error processing file', file, error);
   console.error(logData);
-  
+
   // Could also use a logger library
   // logger.error(createFileErrorLog('Error processing file', file, error));
 }
@@ -101,21 +101,21 @@ async function handleFileUpload(file: FileInfo | undefined) {
     if (!file) {
       throw new Error('No file provided');
     }
-    
+
     // Simulate file upload
     await simulateFileUpload(file);
-    
+
     return { success: true };
   } catch (error) {
     // ✅ GOOD: Safe error logging with file context
     const logData = createFileErrorLog('File upload failed', file, error);
     console.error(logData);
-    
+
     // Return structured error response
     return {
       success: false,
       error: String(error),
-      fileName: file?.name ?? 'unknown'
+      fileName: file?.name ?? 'unknown',
     };
   }
 }
@@ -137,9 +137,4 @@ async function simulateFileUpload(file: FileInfo): Promise<void> {
   return Promise.resolve();
 }
 
-export {
-  unsafeFileLogging,
-  betterFileLogging,
-  bestFileLogging,
-  handleFileUpload
-};
+export { unsafeFileLogging, betterFileLogging, bestFileLogging, handleFileUpload };

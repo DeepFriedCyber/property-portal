@@ -38,11 +38,13 @@ apps/web/
 ## Getting Started
 
 1. Install dependencies:
+
    ```
    pnpm install
    ```
 
 2. Run the development server:
+
    ```
    pnpm dev
    ```

@@ -88,7 +88,9 @@ export function createDetailedDbConnectionErrorMessage(err: unknown): string {
  * @param err The original error object
  * @returns A structured error object with detailed information
  */
-export function createDbConnectionErrorObject(err: unknown): DbErrorDetails & { originalError: unknown } {
+export function createDbConnectionErrorObject(
+  err: unknown
+): DbErrorDetails & { originalError: unknown } {
   // Handle case where err is not an object
   if (!err || typeof err !== 'object') {
     return {

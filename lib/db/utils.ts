@@ -7,7 +7,10 @@ import { sql } from 'drizzle-orm';
  */
 export function bindVector(array: number[]) {
   // Use SQL parameter binding instead of JSON.stringify
-  return sql`array[${sql.join(array.map(value => sql`${value}`), sql`, `)}]::vector`;
+  return sql`array[${sql.join(
+    array.map((value) => sql`${value}`),
+    sql`, `
+  )}]::vector`;
 }
 
 /**
@@ -17,5 +20,8 @@ export function bindVector(array: number[]) {
  */
 export function bindJsonbArray(array: number[]) {
   // Use SQL parameter binding instead of JSON.stringify
-  return sql`array[${sql.join(array.map(value => sql`${value}`), sql`, `)}]::jsonb`;
+  return sql`array[${sql.join(
+    array.map((value) => sql`${value}`),
+    sql`, `
+  )}]::jsonb`;
 }

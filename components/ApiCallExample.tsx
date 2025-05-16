@@ -1,14 +1,16 @@
 // ApiCallExample.tsx
 import React, { useState, useEffect } from 'react';
-import ErrorBoundary from './ErrorBoundary';
-import { 
-  fetchWithRetry, 
-  NetworkError, 
-  TimeoutError, 
+
+import {
+  fetchWithRetry,
+  NetworkError,
+  TimeoutError,
   ApiError,
   createCircuitBreaker,
-  withCircuitBreaker
+  withCircuitBreaker,
 } from '../lib/api/fetchUtils';
+
+import ErrorBoundary from './ErrorBoundary';
 
 interface Property {
   id: string;
@@ -22,7 +24,7 @@ interface Property {
 const propertiesCircuitBreaker = createCircuitBreaker({
   name: 'properties-api',
   failureThreshold: 3,
-  resetTimeout: 15000 // 15 seconds
+  resetTimeout: 15000, // 15 seconds
 });
 
 const PropertyList = () => {
@@ -42,36 +44,37 @@ const PropertyList = () => {
     const fetchProperties = async () => {
       try {
         setLoading(true);
-        
+
         // Check circuit breaker status and update UI
         const currentStatus = propertiesCircuitBreaker.getStatus();
         setCircuitStatus(currentStatus);
-        
+
         if (currentStatus === 'OPEN') {
           setError('Service is temporarily unavailable. Please try again later.');
           setLoading(false);
           return;
         }
-        
+
         // Using circuit breaker pattern with our fetch utility
         const data = await withCircuitBreaker(
           // Primary function
-          () => fetchWithRetry<Property[]>(
-            '/api/properties',
-            { signal },
-            3,  // 3 retries
-            300, // 300ms initial backoff
-            5000 // 5 second timeout
-          ),
+          () =>
+            fetchWithRetry<Property[]>(
+              '/api/properties',
+              { signal },
+              3, // 3 retries
+              300, // 300ms initial backoff
+              5000 // 5 second timeout
+            ),
           // Circuit breaker
           propertiesCircuitBreaker,
           // Fallback function (optional - returns empty array if API is down)
           () => Promise.resolve([])
         );
-        
+
         setProperties(data);
         setError(null);
-        
+
         // Update circuit status after successful request
         setCircuitStatus(propertiesCircuitBreaker.getStatus());
       } catch (err) {
@@ -96,14 +99,14 @@ const PropertyList = () => {
             console.log('Fetch aborted');
             return;
           }
-          
+
           setError(`Error: ${err.message}`);
           console.error('Error fetching properties:', err);
         } else {
           setError('An unknown error occurred. Please try again later.');
           console.error('Unknown error:', err);
         }
-        
+
         // Update circuit status after failed request
         setCircuitStatus(propertiesCircuitBreaker.getStatus());
       } finally {
@@ -123,28 +126,28 @@ const PropertyList = () => {
   // Function to retry loading data with proper error handling
   const handleRetry = () => {
     setError(null);
-    
+
     // If circuit is OPEN, try to reset it after the timeout period
     if (circuitStatus === 'OPEN') {
       const now = Date.now();
       const lastFailure = propertiesCircuitBreaker['lastFailure'] as unknown as number;
       const resetTimeout = 15000; // Same as in circuit breaker creation
-      
+
       if (lastFailure && now - lastFailure > resetTimeout) {
         // Manually reset the circuit breaker for demonstration purposes
         propertiesCircuitBreaker.reset();
         setCircuitStatus(propertiesCircuitBreaker.getStatus());
       }
     }
-    
-    setRetryCount(prev => prev + 1); // Increment retry count to trigger useEffect
+
+    setRetryCount((prev) => prev + 1); // Increment retry count to trigger useEffect
   };
 
   // Helper function to get circuit status badge
   const getCircuitStatusBadge = () => {
     let className = 'circuit-status';
     let label = '';
-    
+
     switch (circuitStatus) {
       case 'CLOSED':
         className += ' closed';
@@ -159,7 +162,7 @@ const PropertyList = () => {
         label = 'API: Down';
         break;
     }
-    
+
     return <div className={className}>{label}</div>;
   };
 
@@ -179,11 +182,7 @@ const PropertyList = () => {
         {getCircuitStatusBadge()}
         <h3>Error</h3>
         <p>{error}</p>
-        <button 
-          onClick={handleRetry} 
-          className="retry-button"
-          disabled={circuitStatus === 'OPEN'}
-        >
+        <button onClick={handleRetry} className="retry-button" disabled={circuitStatus === 'OPEN'}>
           {circuitStatus === 'OPEN' ? 'Service Unavailable' : 'Try Again'}
         </button>
         {circuitStatus === 'OPEN' && (
@@ -201,7 +200,7 @@ const PropertyList = () => {
         <h2>Available Properties</h2>
         {getCircuitStatusBadge()}
       </div>
-      
+
       {properties.length === 0 ? (
         <div className="empty-state">
           <p>No properties found.</p>
@@ -211,7 +210,7 @@ const PropertyList = () => {
         </div>
       ) : (
         <ul>
-          {properties.map(property => (
+          {properties.map((property) => (
             <li key={property.id} className="property-card">
               <h3>{property.address}</h3>
               <p>Price: ${property.price.toLocaleString()}</p>
@@ -231,33 +230,30 @@ const ApiCallExample = () => {
   const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
     // Log to monitoring service or analytics in a real app
     console.error('Error caught by boundary in ApiCallExample:', error, errorInfo);
-    
+
     // You could also reset the circuit breaker here if needed
     if (propertiesCircuitBreaker.getStatus() !== 'CLOSED') {
       console.log('Resetting circuit breaker due to React error');
       propertiesCircuitBreaker.reset();
     }
   };
-  
+
   return (
     <div className="api-call-example">
       <h1>Property Listings</h1>
       <div className="api-description">
         <p>
-          This component demonstrates robust API calls with timeout handling, 
-          retry logic, and circuit breaker pattern.
+          This component demonstrates robust API calls with timeout handling, retry logic, and
+          circuit breaker pattern.
         </p>
       </div>
-      <ErrorBoundary 
+      <ErrorBoundary
         onError={handleError}
         fallback={
           <div className="error-fallback">
             <h3>Something went wrong</h3>
             <p>The property listing component encountered an error.</p>
-            <button 
-              onClick={() => window.location.reload()}
-              className="reload-button"
-            >
+            <button onClick={() => window.location.reload()} className="reload-button">
               Reload Page
             </button>
           </div>

@@ -3,16 +3,19 @@
 ## Critical Issues
 
 1. **Database Schema and Type Mismatch**
+
    - The database schema in `drizzle/schema.ts` is missing fields that are referenced in the code:
      - `createdAt` and `updatedAt` fields are missing in the property table
      - Fields like `city`, `state`, `zipCode`, etc. are in the TypeScript types but not in the schema
    - Fix: ✅ Updated the database schema to include all required fields
 
 2. **Missing `uploads` Table in Schema**
+
    - The `property-processor.ts` file references an `uploads` table that wasn't defined in the schema
    - Fix: ✅ Added the `uploads` table to the schema
 
 3. **Type Errors in Database Queries**
+
    - The queries in `lib/db/queries.ts` are trying to access properties that don't exist in the database schema
    - Fix: ✅ Updated the schema to include all fields referenced in queries
 
@@ -23,18 +26,22 @@
 ## Other Issues
 
 1. **Missing Test Type Definitions**
+
    - Test files are missing proper type definitions for Jest
    - Fix: Install `@types/jest` or update the test configuration
 
 2. **Missing Component Files**
+
    - Several component imports in example pages can't be found
    - Fix: Create the missing components or update the imports
 
 3. **API Authentication Issues**
+
    - The API auth module can't be found
    - Fix: Create or fix the path to the auth module
 
 4. **Error in GlobalErrorHandler.tsx**
+
    - There's a `this` context issue in the event handler
    - Fix: Update the event handler to use proper binding
 
@@ -45,6 +52,7 @@
 ## Completed Fixes
 
 1. ✅ Updated the database schema in `drizzle/schema.ts` to include all fields used in the application:
+
    ```typescript
    export const property = pgTable('properties', {
      id: uuid('id').defaultRandom().primaryKey(),
@@ -68,11 +76,12 @@
      createdAt: timestamp('created_at').defaultNow(),
      updatedAt: timestamp('updated_at'),
      createdBy: text('created_by'),
-     updatedBy: text('updated_by')
+     updatedBy: text('updated_by'),
    });
    ```
 
 2. ✅ Added the missing `uploads` table to the schema:
+
    ```typescript
    export const uploads = pgTable('uploads', {
      id: uuid('id').defaultRandom().primaryKey(),
@@ -85,7 +94,7 @@
      processingErrors: jsonb('processing_errors').$type<string[]>(),
      metadata: jsonb('metadata').$type<Record<string, any>>(),
      createdAt: timestamp('created_at').defaultNow(),
-     updatedAt: timestamp('updated_at')
+     updatedAt: timestamp('updated_at'),
    });
    ```
 
@@ -94,6 +103,7 @@
 4. ✅ Fixed the `this` context issue in GlobalErrorHandler.tsx by properly handling the original event handler
 
 5. ✅ Added the missing database health functions to the DB package:
+
    ```typescript
    /**
     * Check if the database is healthy by performing a simple query
@@ -124,17 +134,17 @@
      try {
        // Check if the database is healthy
        const healthy = await isDatabaseHealthy();
-       
+
        // Get pool statistics
        const poolStats = {
          poolSize: pool.totalCount,
          idleConnections: pool.idleCount,
-         waitingClients: pool.waitingCount
+         waitingClients: pool.waitingCount,
        };
-       
+
        return {
          healthy,
-         ...poolStats
+         ...poolStats,
        };
      } catch (error) {
        return {
@@ -142,31 +152,33 @@
          poolSize: 0,
          idleConnections: 0,
          waitingClients: 0,
-         error: error instanceof Error ? error.message : String(error)
+         error: error instanceof Error ? error.message : String(error),
        };
      }
    }
    ```
 
 6. ✅ Fixed date handling in the updateProperty function and properties route:
+
    ```typescript
    // In lib/db/queries.ts - Changed from string to Date object
    const updateData = {
      ...data,
-     updatedAt: data.updatedAt ? new Date(data.updatedAt) : new Date()
+     updatedAt: data.updatedAt ? new Date(data.updatedAt) : new Date(),
    };
 
    // In apps/web/app/api/properties/route.ts - Changed from string to Date object
    const propertyData = {
      ...validatedData,
      updatedBy: user.userId,
-     updatedAt: new Date()
+     updatedAt: new Date(),
    };
    ```
 
 ## Remaining Fixes Needed
 
 1. ✅ Installed missing type definitions for testing:
+
    ```
    pnpm install --save-dev @types/jest -w
    ```

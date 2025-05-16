@@ -1,5 +1,6 @@
 // PropertySearchForm.tsx
 import React, { useState } from 'react';
+
 import AccessibleForm from './AccessibleForm';
 
 interface PropertySearchFormProps {
@@ -11,7 +12,7 @@ interface PropertySearchFormProps {
 const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
   onSearch,
   loading = false,
-  className = ''
+  className = '',
 }) => {
   // Define form fields with validation
   const searchFields = [
@@ -28,7 +29,7 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
         }
         return undefined;
       },
-      autoComplete: 'address-level2'
+      autoComplete: 'address-level2',
     },
     {
       id: 'minPrice',
@@ -42,7 +43,7 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
         }
         return undefined;
       },
-      min: 0
+      min: 0,
     },
     {
       id: 'maxPrice',
@@ -56,7 +57,7 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
         }
         return undefined;
       },
-      min: 0
+      min: 0,
     },
     {
       id: 'bedrooms',
@@ -65,7 +66,7 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
       placeholder: 'Min bedrooms',
       helpText: 'Select the minimum number of bedrooms',
       min: 0,
-      max: 10
+      max: 10,
     },
     {
       id: 'bathrooms',
@@ -74,27 +75,30 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
       placeholder: 'Min bathrooms',
       helpText: 'Select the minimum number of bathrooms',
       min: 0,
-      max: 10
+      max: 10,
     },
     {
       id: 'propertyType',
       label: 'Property Type',
       type: 'text',
       placeholder: 'Any property type',
-      helpText: 'Enter the type of property you are looking for (e.g., house, apartment, condo)'
-    }
+      helpText: 'Enter the type of property you are looking for (e.g., house, apartment, condo)',
+    },
   ];
 
   // Handle form submission
   const handleSubmit = (formData: Record<string, string>) => {
     // Filter out empty values
-    const filteredData = Object.entries(formData).reduce((acc, [key, value]) => {
-      if (value) {
-        acc[key] = value;
-      }
-      return acc;
-    }, {} as Record<string, string>);
-    
+    const filteredData = Object.entries(formData).reduce(
+      (acc, [key, value]) => {
+        if (value) {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as Record<string, string>
+    );
+
     onSearch(filteredData);
   };
 

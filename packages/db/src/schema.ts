@@ -1,4 +1,13 @@
-import { pgTable, serial, text, varchar, timestamp, integer, uuid, jsonb } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  text,
+  varchar,
+  timestamp,
+  integer,
+  uuid,
+  jsonb,
+} from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -19,7 +28,9 @@ export const posts = pgTable('posts', {
 export const apiTokens = pgTable('api_tokens', {
   id: serial('id').primaryKey(),
   token: varchar('token', { length: 256 }).unique().notNull(),
-  userId: integer('user_id').notNull().references(() => users.id),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id),
   expiresAt: timestamp('expires_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -38,7 +49,7 @@ export const property = pgTable('properties', {
   title: text('title'),
   location: text('location'),
   bathrooms: integer('bathrooms'),
-  area: integer('area')
+  area: integer('area'),
 });
 
 // Add all other tables here

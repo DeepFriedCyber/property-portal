@@ -1,39 +1,37 @@
 // ✅ Type-Safe Database Updates with Drizzle ORM
 
 // Import the schema objects directly
-import { db } from "~/db";
-import { users } from "~/db/schema";
-import { eq } from "drizzle-orm";
+import { eq } from 'drizzle-orm';
+
+import { db } from '~/db';
+import { users } from '~/db/schema';
 
 // Example 1: Update a user with type safety
 async function updateUserName(userId: string, newName: string) {
   // ✅ Good: Using the schema object for type safety
-  await db.update(users)
-    .set({ name: newName })
-    .where(eq(users.id, userId));
+  await db.update(users).set({ name: newName }).where(eq(users.id, userId));
 }
 
 // Example 2: Update multiple fields with type safety
-async function updateUserProfile(userId: string, data: { 
-  name?: string, 
-  email?: string, 
-  role?: string 
-}) {
+async function updateUserProfile(
+  userId: string,
+  data: {
+    name?: string;
+    email?: string;
+    role?: string;
+  }
+) {
   // ✅ Good: Type-safe updates with proper filtering
-  await db.update(users)
-    .set(data)
-    .where(eq(users.id, userId));
+  await db.update(users).set(data).where(eq(users.id, userId));
 }
 
 // Example 3: Conditional updates with type safety
 async function promoteUserIfActive(userId: string) {
   // ✅ Good: Complex conditions with type safety
-  await db.update(users)
-    .set({ role: "admin" })
-    .where(
-      eq(users.id, userId),
-      eq(users.isActive, true)
-    );
+  await db
+    .update(users)
+    .set({ role: 'admin' })
+    .where(eq(users.id, userId), eq(users.isActive, true));
 }
 
 // ❌ Bad: Using string literals (avoid this approach)

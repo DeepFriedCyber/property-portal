@@ -1,14 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useUser, UserButton } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-export default function AgentLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AgentLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isLoaded, isSignedIn, user } = useUser();
 
@@ -37,10 +33,16 @@ export default function AgentLayout({
                 <span className="text-xl font-bold">Agent Portal</span>
               </div>
               <div className="ml-6 flex items-center space-x-4">
-                <a href="/agent/dashboard" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                <a
+                  href="/agent/dashboard"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+                >
                   Dashboard
                 </a>
-                <a href="/agent/properties" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                <a
+                  href="/agent/properties"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+                >
                   My Properties
                 </a>
               </div>
@@ -56,10 +58,8 @@ export default function AgentLayout({
           </div>
         </div>
       </nav>
-      
-      <main className="py-10">
-        {children}
-      </main>
+
+      <main className="py-10">{children}</main>
     </div>
   );
 }

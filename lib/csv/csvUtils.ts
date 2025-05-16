@@ -1,6 +1,7 @@
-import logger from '@root/lib/logging/logger';
 import * as csvParse from 'csv-parse/sync';
 import { NextResponse } from 'next/server';
+
+import logger from '../../lib/logging/logger';
 
 // Security constants
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -277,7 +278,7 @@ export function validateCsvRecords(
     }
 
     // Validate price field is a valid number
-    if ('price' in record && isNaN(parseInt(record.price, 10))) {
+    if ('price' in record && isNaN(parseInt(String(record.price), 10))) {
       logger.warn(`Record at index ${i} has invalid price value`, {
         recordIndex: i,
         priceValue: record.price,

@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '../../../src/ui';
-import UploadZone from '@components/common/UploadZone';
 import { useUser } from '@clerk/nextjs';
+import { useState, useEffect } from 'react';
+
+import UploadZone from '@components/common/UploadZone';
+
+import { Button } from '../../../src/ui';
 
 interface UploadRecord {
   id: string;
@@ -47,14 +49,14 @@ export default function AgentDashboard() {
         // This would be replaced with actual API calls
         const uploadsResponse = await fetch('/api/agent/uploads');
         const propertiesResponse = await fetch('/api/agent/properties');
-        
+
         if (!uploadsResponse.ok || !propertiesResponse.ok) {
           throw new Error('Failed to fetch data');
         }
-        
+
         const uploadsData = await uploadsResponse.json();
         const propertiesData = await propertiesResponse.json();
-        
+
         setUploads(uploadsData.uploads);
         setProperties(propertiesData.properties);
       } catch (err) {
@@ -90,19 +92,19 @@ export default function AgentDashboard() {
       }
 
       const data = await response.json();
-      
+
       // Add the new upload to the list
       setUploads([data.upload, ...uploads]);
-      
+
       setUploadStatus({
         isUploading: false,
         success: true,
         message: `Successfully uploaded ${file.name}`,
       });
-      
+
       // Clear success message after 5 seconds
       setTimeout(() => {
-        setUploadStatus(prev => ({
+        setUploadStatus((prev) => ({
           ...prev,
           success: null,
           message: null,
@@ -133,68 +135,63 @@ export default function AgentDashboard() {
               <p className="text-sm text-gray-600">Welcome,</p>
               <p className="font-medium">{user.firstName || user.emailAddresses[0].emailAddress}</p>
             </div>
-            <Button 
+            <Button
               variant="secondary"
               size="small"
-              onClick={() => window.location.href = "/sign-out"}
+              onClick={() => (window.location.href = '/sign-out')}
             >
               Sign Out
             </Button>
           </div>
         )}
       </div>
-      
+
       {/* Upload Section */}
       <div className="bg-white rounded shadow p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">Upload Properties</h2>
         <p className="text-gray-600 mb-4">
-          Upload a CSV file containing property details. The file should include columns for address, price, bedrooms, type, etc.
+          Upload a CSV file containing property details. The file should include columns for
+          address, price, bedrooms, type, etc.
         </p>
-        
+
         <UploadZone onUpload={handleFileUpload} />
-        
+
         {uploadStatus.isUploading && (
           <div className="mt-4 flex items-center text-blue-600">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
             <span>{uploadStatus.message}</span>
           </div>
         )}
-        
+
         {uploadStatus.success === true && (
-          <div className="mt-4 text-green-600">
-            {uploadStatus.message}
-          </div>
+          <div className="mt-4 text-green-600">{uploadStatus.message}</div>
         )}
-        
+
         {uploadStatus.success === false && (
-          <div className="mt-4 text-red-600">
-            {uploadStatus.message}
-          </div>
+          <div className="mt-4 text-red-600">{uploadStatus.message}</div>
         )}
       </div>
-      
+
       {/* Uploads Table */}
       <div className="bg-white rounded shadow overflow-hidden mb-8">
         <h2 className="text-xl font-semibold p-4 border-b">Your Uploads</h2>
-        
+
         {loading && (
           <div className="flex justify-center items-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-700"></div>
           </div>
         )}
-        
+
         {error && (
           <div className="p-4 text-red-600" role="alert">
             {error}
           </div>
         )}
-        
+
         {!loading && !error && uploads.length === 0 && (
-          <div className="p-4 text-gray-600">
-            You haven't uploaded any property files yet.
-          </div>
+          <div className="p-4 text-gray-600">You haven't uploaded any property files yet.</div>
         )}
-        
+
         {!loading && !error && uploads.length > 0 && (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -221,9 +218,7 @@ export default function AgentDashboard() {
                 {uploads.map((upload) => (
                   <tr key={upload.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {upload.filename}
-                      </div>
+                      <div className="text-sm font-medium text-gray-900">{upload.filename}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
@@ -234,15 +229,21 @@ export default function AgentDashboard() {
                       <div className="text-sm text-gray-900">{upload.propertyCount}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${upload.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                          upload.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                          'bg-red-100 text-red-800'}`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        ${
+                          upload.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : upload.status === 'approved'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}
+                      >
                         {upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Button 
+                      <Button
                         variant="secondary"
                         size="small"
                         onClick={() => viewUploadDetails(upload.id)}
@@ -257,29 +258,29 @@ export default function AgentDashboard() {
           </div>
         )}
       </div>
-      
+
       {/* Properties Preview */}
       <div className="bg-white rounded shadow overflow-hidden">
         <h2 className="text-xl font-semibold p-4 border-b">Your Properties</h2>
-        
+
         {loading && (
           <div className="flex justify-center items-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-700"></div>
           </div>
         )}
-        
+
         {error && (
           <div className="p-4 text-red-600" role="alert">
             {error}
           </div>
         )}
-        
+
         {!loading && !error && properties.length === 0 && (
           <div className="p-4 text-gray-600">
             You don't have any properties yet. Upload a CSV file to add properties.
           </div>
         )}
-        
+
         {!loading && !error && properties.length > 0 && (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -306,9 +307,7 @@ export default function AgentDashboard() {
                 {properties.slice(0, 5).map((property) => (
                   <tr key={property.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {property.address}
-                      </div>
+                      <div className="text-sm font-medium text-gray-900">{property.address}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
@@ -316,20 +315,16 @@ export default function AgentDashboard() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {property.bedrooms || 'N/A'}
-                      </div>
+                      <div className="text-sm text-gray-900">{property.bedrooms || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {property.type || 'N/A'}
-                      </div>
+                      <div className="text-sm text-gray-900">{property.type || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Button 
+                      <Button
                         variant="secondary"
                         size="small"
-                        onClick={() => window.location.href = `/agent/properties/${property.id}`}
+                        onClick={() => (window.location.href = `/agent/properties/${property.id}`)}
                       >
                         Edit
                       </Button>
@@ -338,12 +333,12 @@ export default function AgentDashboard() {
                 ))}
               </tbody>
             </table>
-            
+
             {properties.length > 5 && (
               <div className="p-4 text-center">
-                <Button 
+                <Button
                   variant="secondary"
-                  onClick={() => window.location.href = '/agent/properties'}
+                  onClick={() => (window.location.href = '/agent/properties')}
                 >
                   View All Properties ({properties.length})
                 </Button>

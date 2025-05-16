@@ -44,16 +44,14 @@ export default function Footer({ columns, copyrightText, socialLinks }: FooterPr
           </div>
         ))}
       </div>
-      
+
       <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center">
-        <div className="text-xs text-gray-400">
-          {copyrightText}
-        </div>
+        <div className="text-xs text-gray-400">{copyrightText}</div>
         <div className="flex space-x-4 mt-4 sm:mt-0">
           {socialLinks.map((social) => (
-            <a 
-              key={social.id} 
-              href={social.href} 
+            <a
+              key={social.id}
+              href={social.href}
               className="text-gray-400 hover:text-white transition-colors"
               aria-label={social.label}
             >

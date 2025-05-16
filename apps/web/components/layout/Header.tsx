@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
 import Link from 'next/link';
+import React, { useState } from 'react';
+
 import { Button } from '../../src/ui';
 
 export interface NavLink {
@@ -37,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
           <Link href="/" className="text-2xl font-bold text-blue-600">
             {logoText}
           </Link>
-          
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
@@ -50,40 +51,28 @@ export const Header: React.FC<HeaderProps> = ({
               </Link>
             ))}
           </nav>
-          
+
           {/* Auth Buttons or User Menu */}
           <div className="hidden md:flex items-center space-x-4">
             {isLoggedIn ? (
               <div className="flex items-center">
                 <span className="mr-2 text-gray-700">Hi, {userName}</span>
-                <Button 
-                  variant="secondary" 
-                  onClick={onLogout}
-                  className="text-sm"
-                >
+                <Button variant="secondary" onClick={onLogout} className="text-sm">
                   Logout
                 </Button>
               </div>
             ) : (
               <>
-                <Button 
-                  variant="secondary" 
-                  onClick={onLogin}
-                  className="text-sm"
-                >
+                <Button variant="secondary" onClick={onLogin} className="text-sm">
                   Login
                 </Button>
-                <Button 
-                  variant="primary" 
-                  onClick={onSignup}
-                  className="text-sm"
-                >
+                <Button variant="primary" onClick={onSignup} className="text-sm">
                   Sign Up
                 </Button>
               </>
             )}
           </div>
-          
+
           {/* Mobile Menu Button */}
           <button
             className="md:hidden text-gray-600"
@@ -91,17 +80,39 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             )}
           </button>
         </div>
-        
+
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t">
@@ -117,14 +128,14 @@ export const Header: React.FC<HeaderProps> = ({
                 </Link>
               ))}
             </nav>
-            
+
             {/* Auth Buttons for Mobile */}
             <div className="flex flex-col space-y-2 pb-4">
               {isLoggedIn ? (
                 <>
                   <div className="text-gray-700 mb-2">Hi, {userName}</div>
-                  <Button 
-                    variant="secondary" 
+                  <Button
+                    variant="secondary"
                     onClick={() => {
                       onLogout?.();
                       setIsMobileMenuOpen(false);
@@ -136,8 +147,8 @@ export const Header: React.FC<HeaderProps> = ({
                 </>
               ) : (
                 <>
-                  <Button 
-                    variant="secondary" 
+                  <Button
+                    variant="secondary"
                     onClick={() => {
                       onLogin?.();
                       setIsMobileMenuOpen(false);
@@ -146,8 +157,8 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     Login
                   </Button>
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     onClick={() => {
                       onSignup?.();
                       setIsMobileMenuOpen(false);

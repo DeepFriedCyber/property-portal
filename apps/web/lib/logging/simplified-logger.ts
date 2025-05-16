@@ -17,15 +17,15 @@ const SENSITIVE_FIELDS = [
   'socialSecurity',
   'creditCard',
   'cardNumber',
-  'cvv'
+  'cvv',
 ];
 
 export enum LogLevel {
-  DEBUG = "debug",
-  INFO = "info",
-  WARN = "warn",
-  ERROR = "error",
-  FATAL = "fatal",
+  DEBUG = 'debug',
+  INFO = 'info',
+  WARN = 'warn',
+  ERROR = 'error',
+  FATAL = 'fatal',
 }
 
 interface LoggerConfig {
@@ -52,23 +52,23 @@ function sanitizeForLogging(obj: any): any {
 
   // Handle arrays
   if (Array.isArray(obj)) {
-    return obj.map(item => sanitizeForLogging(item));
+    return obj.map((item) => sanitizeForLogging(item));
   }
 
   // Handle objects
   const sanitized = { ...obj };
   for (const key in sanitized) {
     const lowerKey = key.toLowerCase();
-    
+
     // Check if this key contains any sensitive terms
-    if (SENSITIVE_FIELDS.some(field => lowerKey.includes(field.toLowerCase()))) {
+    if (SENSITIVE_FIELDS.some((field) => lowerKey.includes(field.toLowerCase()))) {
       sanitized[key] = '[REDACTED]';
     } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
       // Recursively sanitize nested objects
       sanitized[key] = sanitizeForLogging(sanitized[key]);
     }
   }
-  
+
   return sanitized;
 }
 
@@ -76,8 +76,9 @@ const defaultConfig: LoggerConfig = {
   enableConsole: true,
   // Set different default log levels based on environment
   minLevel: process.env.NODE_ENV === 'production' ? LogLevel.WARN : LogLevel.DEBUG,
-  environment: (process.env.NODE_ENV as unknown as 'development' | 'test' | 'production') || 'development',
-  release: process.env.NEXT_PUBLIC_APP_VERSION
+  environment:
+    (process.env.NODE_ENV as unknown as 'development' | 'test' | 'production') || 'development',
+  release: process.env.NEXT_PUBLIC_APP_VERSION,
 };
 
 // Global logger configuration
@@ -92,26 +93,25 @@ let logRocketInitialized = false;
  */
 export function configureLogger(config: Partial<LoggerConfig>) {
   loggerConfig = { ...loggerConfig, ...config };
-  
+
   // Use environment variables for secrets if not explicitly provided
   const sentryDsn = loggerConfig.sentryDsn || process.env.NEXT_PUBLIC_SENTRY_DSN;
   const logRocketAppId = loggerConfig.logRocketAppId || process.env.NEXT_PUBLIC_LOGROCKET_APP_ID;
-  
+
   // Initialize external logging services if configured
   if (sentryDsn && typeof window !== 'undefined') {
     initSentry(sentryDsn, loggerConfig);
   }
-  
+
   if (logRocketAppId && typeof window !== 'undefined') {
     initLogRocket(logRocketAppId, loggerConfig);
   }
-  
+
   // In production, ensure we're not logging too verbosely
   if (process.env.NODE_ENV === 'production' && !config.minLevel) {
     loggerConfig.minLevel = LogLevel.WARN;
   }
 }
-
 
 /**
  * Initialize Sentry for error tracking
@@ -123,30 +123,30 @@ async function initSentry(dsn: string, config: LoggerConfig) {
     console.debug('Sentry already initialized, skipping initialization');
     return;
   }
-  
+
   if (!dsn || dsn.trim() === '') {
     console.warn('Sentry DSN is empty or missing, skipping initialization');
     return null;
   }
-  
+
   try {
     const Sentry = await import('@sentry/nextjs');
-    
+
     Sentry.init({
       dsn,
       environment: config.environment,
       release: config.release,
       tracesSampleRate: config.environment === 'production' ? 0.2 : 1.0,
     });
-    
+
     // Set user information if available
     if (config.userId || config.userEmail) {
       Sentry.setUser({
         id: config.userId,
-        email: config.userEmail
+        email: config.userEmail,
       });
     }
-    
+
     sentryInitialized = true;
     return Sentry;
   } catch (error) {
@@ -162,7 +162,6 @@ async function initSentry(dsn: string, config: LoggerConfig) {
   }
 }
 
-
 /**
  * Initialize LogRocket for session replay
  * @returns The LogRocket instance if initialization was successful, null otherwise
@@ -173,22 +172,22 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
     console.debug('LogRocket already initialized, skipping initialization');
     return;
   }
-  
+
   if (!appId || appId.trim() === '') {
     console.warn('LogRocket App ID is empty or missing, skipping initialization');
     return null;
   }
-  
+
   try {
     const LogRocket = (await import('logrocket')).default;
-    
+
     LogRocket.init(appId, {
       release: config.release,
       console: {
         isEnabled: {
           error: true,
-          warn: true
-        }
+          warn: true,
+        },
       },
       network: {
         isEnabled: true,
@@ -205,24 +204,24 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
             response.body = null;
           }
           return response;
-        }
-      }
+        },
+      },
     });
-    
+
     // Set user information if available
     if (config.userId || config.userEmail) {
       LogRocket.identify(config.userId || 'anonymous', {
-        email: config.userEmail
+        email: config.userEmail,
       });
     }
-    
+
     // Connect LogRocket with Sentry if both are enabled
     if (sentryInitialized) {
       const Sentry = await import('@sentry/nextjs');
       LogRocket.getSessionURL((sessionURL) => {
         Sentry.configureScope((scope) => {
           scope.setExtra('logRocketSessionURL', sessionURL);
-          
+
           // Add request ID to Sentry scope if available
           if (loggerConfig.requestId) {
             scope.setTag('requestId', loggerConfig.requestId);
@@ -230,12 +229,12 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
         });
       });
     }
-    
+
     // Add request ID to LogRocket metadata if available
     if (loggerConfig.requestId) {
       LogRocket.setMeta('requestId', loggerConfig.requestId);
     }
-    
+
     logRocketInitialized = true;
     return LogRocket;
   } catch (error) {
@@ -246,7 +245,9 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
       if (error.stack) console.error(`Stack trace: ${error.stack}`);
     }
     // Log environment information to help diagnose deployment issues
-    console.error(`Environment: ${process.env.NODE_ENV}, Release: ${config.release}, AppId: ${appId}`);
+    console.error(
+      `Environment: ${process.env.NODE_ENV}, Release: ${config.release}, AppId: ${appId}`
+    );
     return null;
   }
 }
@@ -257,20 +258,20 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
 export async function setLogUser(userId?: string, userEmail?: string) {
   loggerConfig.userId = userId;
   loggerConfig.userEmail = userEmail;
-  
+
   // Update user information in external services
   if (sentryInitialized) {
     const Sentry = await import('@sentry/nextjs');
     Sentry.setUser({
       id: userId,
-      email: userEmail
+      email: userEmail,
     });
   }
-  
+
   if (logRocketInitialized && typeof window !== 'undefined') {
     const LogRocket = (await import('logrocket')).default;
     LogRocket.identify(userId || 'anonymous', {
-      email: userEmail
+      email: userEmail,
     });
   }
 }
@@ -282,7 +283,7 @@ export async function setLogUser(userId?: string, userEmail?: string) {
  */
 export async function setRequestId(requestId: string) {
   loggerConfig.requestId = requestId;
-  
+
   // Update request ID in external services
   if (sentryInitialized && typeof window !== 'undefined') {
     try {
@@ -294,7 +295,7 @@ export async function setRequestId(requestId: string) {
       console.error('Failed to set request ID in Sentry:', err);
     }
   }
-  
+
   if (logRocketInitialized && typeof window !== 'undefined') {
     try {
       const LogRocket = (await import('logrocket')).default;
@@ -308,24 +309,30 @@ export async function setRequestId(requestId: string) {
 /**
  * Log a message with the specified level
  */
-async function log(level: LogLevel, message: string, context?: any, tags?: string[], error?: Error) {
+async function log(
+  level: LogLevel,
+  message: string,
+  context?: any,
+  tags?: string[],
+  error?: Error
+) {
   // Skip if below minimum log level
   if (loggerConfig.minLevel && shouldSkipLog(level, loggerConfig.minLevel)) {
     return;
   }
-  
+
   // Enhance context with requestId and userId if available in config
   const enhancedContext = sanitizeForLogging({
     ...(context || {}),
     ...(loggerConfig.requestId ? { requestId: loggerConfig.requestId } : {}),
-    ...(loggerConfig.userId ? { userId: loggerConfig.userId } : {})
+    ...(loggerConfig.userId ? { userId: loggerConfig.userId } : {}),
   });
-  
+
   // Log to console if enabled
   if (loggerConfig.enableConsole !== false) {
     logToConsole(level, message, enhancedContext, tags, error);
   }
-  
+
   // Log to external services
   await logToExternalServices(level, message, enhancedContext, tags, error);
 }
@@ -337,18 +344,24 @@ function shouldSkipLog(level: LogLevel, minLevel: LogLevel): boolean {
   const levels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR, LogLevel.FATAL];
   const levelIndex = levels.indexOf(level);
   const minLevelIndex = levels.indexOf(minLevel);
-  
+
   return levelIndex < minLevelIndex;
 }
 
 /**
  * Log to the console with appropriate formatting
  */
-function logToConsole(level: LogLevel, message: string, context?: any, tags?: string[], error?: Error) {
+function logToConsole(
+  level: LogLevel,
+  message: string,
+  context?: any,
+  tags?: string[],
+  error?: Error
+) {
   const timestamp = new Date().toISOString();
   const formattedMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
   const logData = { ...(context || {}), tags };
-  
+
   // Use the appropriate console method based on level
   switch (level) {
     case LogLevel.DEBUG:
@@ -370,12 +383,18 @@ function logToConsole(level: LogLevel, message: string, context?: any, tags?: st
 /**
  * Log to external services like Sentry and LogRocket
  */
-async function logToExternalServices(level: LogLevel, message: string, context?: any, tags?: string[], error?: Error) {
+async function logToExternalServices(
+  level: LogLevel,
+  message: string,
+  context?: any,
+  tags?: string[],
+  error?: Error
+) {
   // Send to Sentry if configured and level is ERROR or FATAL
   if (sentryInitialized && (level === LogLevel.ERROR || level === LogLevel.FATAL)) {
     try {
       const Sentry = await import('@sentry/nextjs');
-      
+
       // Set extra context
       Sentry.configureScope((scope) => {
         if (context) {
@@ -383,14 +402,14 @@ async function logToExternalServices(level: LogLevel, message: string, context?:
             scope.setExtra(key, value);
           });
         }
-        
+
         if (tags) {
           tags.forEach((tag) => {
             scope.setTag(tag, 'true');
           });
         }
       });
-      
+
       // Capture the error or message
       if (error) {
         Sentry.captureException(error);
@@ -405,17 +424,17 @@ async function logToExternalServices(level: LogLevel, message: string, context?:
       }
     }
   }
-  
+
   // Send to LogRocket if configured
   if (logRocketInitialized) {
     try {
       const LogRocket = (await import('logrocket')).default;
-      
+
       // Log the message
       if (level === LogLevel.ERROR || level === LogLevel.FATAL) {
         LogRocket.captureException(error || new Error(message), {
           tags: tags?.reduce((acc, tag) => ({ ...acc, [tag]: true }), {}),
-          extra: context
+          extra: context,
         });
       } else if (level === LogLevel.WARN) {
         LogRocket.warn(message, context);
@@ -476,7 +495,7 @@ const logger = {
   fatal,
   configureLogger,
   setLogUser,
-  setRequestId
+  setRequestId,
 };
 
 export default logger;

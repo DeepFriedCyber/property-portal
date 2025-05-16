@@ -1,13 +1,13 @@
 {
   "extends": "./tsconfig.json",
-          "compilerOptions": {
-            "composite": true,
+  "compilerOptions": {
+    "composite": true,
     "noEmit": false,
-            "declaration": true,
-            "declarationMap": true,
+    "declaration": true,
+    "declarationMap": true,
     "outDir": "dist",
     "plugins": []
-          },
+  },
   "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "dist", ".next", "pages/api"]
-        }
+  "exclude": ["node_modules", "dist", ".next", "pages/api", "**/*.d.ts"]
+}

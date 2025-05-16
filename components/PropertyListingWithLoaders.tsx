@@ -1,8 +1,9 @@
 // PropertyListingWithLoaders.tsx
 import React, { useState, useEffect } from 'react';
-import Spinner from './loaders/Spinner';
-import PropertyCardSkeleton from './loaders/PropertyCardSkeleton';
+
 import ErrorBoundary from './ErrorBoundary';
+import PropertyCardSkeleton from './loaders/PropertyCardSkeleton';
+import Spinner from './loaders/Spinner';
 
 interface Property {
   id: string;
@@ -23,16 +24,16 @@ const PropertyListingWithLoaders: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loadingState, setLoadingState] = useState<LoadingState>('idle');
   const [error, setError] = useState<string | null>(null);
-  
+
   // For demo purposes - toggle between different loading states
   const [loaderType, setLoaderType] = useState<'spinner' | 'skeleton'>('skeleton');
-  
+
   useEffect(() => {
     const fetchProperties = async () => {
       try {
         // Set loading state based on selected loader type
         setLoadingState(loaderType === 'spinner' ? 'loading' : 'skeleton');
-        
+
         // Simulate API call with delay
         const response = await new Promise<Property[]>((resolve) => {
           setTimeout(() => {
@@ -45,7 +46,7 @@ const PropertyListingWithLoaders: React.FC = () => {
                 bathrooms: 2,
                 area: 1800,
                 type: 'Single Family Home',
-                description: 'Beautiful home with modern amenities in a quiet neighborhood.'
+                description: 'Beautiful home with modern amenities in a quiet neighborhood.',
               },
               {
                 id: '2',
@@ -55,7 +56,7 @@ const PropertyListingWithLoaders: React.FC = () => {
                 bathrooms: 2.5,
                 area: 2200,
                 type: 'Townhouse',
-                description: 'Spacious townhouse with updated kitchen and private backyard.'
+                description: 'Spacious townhouse with updated kitchen and private backyard.',
               },
               {
                 id: '3',
@@ -65,12 +66,12 @@ const PropertyListingWithLoaders: React.FC = () => {
                 bathrooms: 1,
                 area: 1200,
                 type: 'Condo',
-                description: 'Cozy condo in the heart of downtown with amazing city views.'
-              }
+                description: 'Cozy condo in the heart of downtown with amazing city views.',
+              },
             ]);
           }, 2000); // 2 second delay to show loading state
         });
-        
+
         setProperties(response);
         setLoadingState('success');
         setError(null);
@@ -89,11 +90,11 @@ const PropertyListingWithLoaders: React.FC = () => {
     setError(null);
     setLoadingState('idle');
     // Toggle loader type to trigger useEffect
-    setLoaderType(prev => prev === 'spinner' ? 'skeleton' : 'spinner');
+    setLoaderType((prev) => (prev === 'spinner' ? 'skeleton' : 'spinner'));
   };
 
   const toggleLoaderType = () => {
-    setLoaderType(prev => prev === 'spinner' ? 'skeleton' : 'spinner');
+    setLoaderType((prev) => (prev === 'spinner' ? 'skeleton' : 'spinner'));
   };
 
   return (
@@ -134,18 +135,12 @@ const PropertyListingWithLoaders: React.FC = () => {
       {/* Success State */}
       {loadingState === 'success' && (
         <div className="properties-grid">
-          {properties.map(property => (
+          {properties.map((property) => (
             <div key={property.id} className="property-card">
               {property.imageUrl ? (
-                <img 
-                  src={property.imageUrl} 
-                  alt={property.address} 
-                  className="property-image"
-                />
+                <img src={property.imageUrl} alt={property.address} className="property-image" />
               ) : (
-                <div className="property-image-placeholder">
-                  No image available
-                </div>
+                <div className="property-image-placeholder">No image available</div>
               )}
               <h2>{property.address}</h2>
               <p className="property-price">${property.price.toLocaleString()}</p>

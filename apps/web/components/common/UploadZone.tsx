@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, DragEvent, ChangeEvent } from 'react';
+
 import { Button } from '../../src/ui';
 
 interface FileValidationResult {
@@ -20,8 +21,8 @@ interface UploadZoneProps {
   description?: string;
 }
 
-export default function UploadZone({ 
-  onUpload, 
+export default function UploadZone({
+  onUpload,
   acceptedFileTypes = '.csv',
   maxSizeInMB = 10,
   multiple = false,
@@ -29,7 +30,7 @@ export default function UploadZone({
   showPreview = false,
   customValidator,
   className = '',
-  description
+  description,
 }: UploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -39,8 +40,8 @@ export default function UploadZone({
   const dropZoneRef = useRef<HTMLDivElement>(null);
 
   // Convert acceptedFileTypes to array for easier handling
-  const acceptedTypesArray = Array.isArray(acceptedFileTypes) 
-    ? acceptedFileTypes 
+  const acceptedTypesArray = Array.isArray(acceptedFileTypes)
+    ? acceptedFileTypes
     : [acceptedFileTypes];
 
   // Clean up preview URL when component unmounts
@@ -94,7 +95,7 @@ export default function UploadZone({
     }
 
     // Check if file extension or MIME type matches any accepted type
-    return acceptedTypesArray.some(type => {
+    return acceptedTypesArray.some((type) => {
       // Check by extension (e.g., .csv)
       if (type.startsWith('.')) {
         return file.name.toLowerCase().endsWith(type.toLowerCase());
@@ -111,19 +112,21 @@ export default function UploadZone({
 
   const processFile = async (file: File) => {
     setValidationError(null);
-    
+
     // Validate file type
     if (!validateFileType(file)) {
-      setValidationError(`Invalid file type. Please upload ${acceptedTypesArray.join(' or ')} files.`);
+      setValidationError(
+        `Invalid file type. Please upload ${acceptedTypesArray.join(' or ')} files.`
+      );
       return;
     }
-    
+
     // Validate file size
     if (!validateFileSize(file)) {
       setValidationError(`File is too large. Maximum size is ${maxSizeInMB}MB.`);
       return;
     }
-    
+
     // Run custom validator if provided
     if (customValidator) {
       try {
@@ -137,7 +140,7 @@ export default function UploadZone({
         return;
       }
     }
-    
+
     // Create preview for image files
     if (showPreview && file.type.startsWith('image/')) {
       const url = URL.createObjectURL(file);
@@ -145,7 +148,7 @@ export default function UploadZone({
     } else {
       setPreviewUrl(null);
     }
-    
+
     setSelectedFile(file);
     onUpload(file);
   };
@@ -170,8 +173,11 @@ export default function UploadZone({
       <div
         ref={dropZoneRef}
         className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-          disabled ? 'bg-gray-100 border-gray-300 cursor-not-allowed opacity-60' :
-          isDragging ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-purple-400 cursor-pointer'
+          disabled
+            ? 'bg-gray-100 border-gray-300 cursor-not-allowed opacity-60'
+            : isDragging
+              ? 'border-purple-500 bg-purple-50'
+              : 'border-gray-300 hover:border-purple-400 cursor-pointer'
         }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -182,23 +188,25 @@ export default function UploadZone({
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept={Array.isArray(acceptedFileTypes) ? acceptedFileTypes.join(',') : acceptedFileTypes}
+          accept={
+            Array.isArray(acceptedFileTypes) ? acceptedFileTypes.join(',') : acceptedFileTypes
+          }
           multiple={multiple}
           disabled={disabled}
           className="hidden"
         />
-        
+
         {/* Preview area */}
         {showPreview && previewUrl && (
           <div className="mb-4">
-            <img 
-              src={previewUrl} 
-              alt="File preview" 
+            <img
+              src={previewUrl}
+              alt="File preview"
               className="max-h-40 max-w-full mx-auto rounded"
             />
           </div>
         )}
-        
+
         <div className="flex flex-col items-center justify-center">
           {!selectedFile ? (
             <>
@@ -220,28 +228,27 @@ export default function UploadZone({
                 <span className="font-semibold">Click to upload</span> or drag and drop
               </p>
               <p className="text-xs text-gray-500">
-                {Array.isArray(acceptedFileTypes) 
-                  ? acceptedFileTypes.join(', ') 
-                  : acceptedFileTypes} files up to {maxSizeInMB}MB
+                {Array.isArray(acceptedFileTypes)
+                  ? acceptedFileTypes.join(', ')
+                  : acceptedFileTypes}{' '}
+                files up to {maxSizeInMB}MB
               </p>
-              {description && (
-                <p className="mt-2 text-xs text-gray-500">{description}</p>
-              )}
+              {description && <p className="mt-2 text-xs text-gray-500">{description}</p>}
             </>
           ) : (
             <div className="flex flex-col items-center">
               <div className="flex items-center mb-2">
-                <svg 
-                  className="w-8 h-8 text-green-500 mr-2" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24" 
+                <svg
+                  className="w-8 h-8 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth="2" 
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   ></path>
                 </svg>
@@ -250,9 +257,9 @@ export default function UploadZone({
               <p className="text-xs text-gray-500 mb-3">
                 {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
               </p>
-              <Button 
-                variant="secondary" 
-                size="small" 
+              <Button
+                variant="secondary"
+                size="small"
                 onClick={() => {
                   if (fileInputRef.current) {
                     setSelectedFile(null);
@@ -268,13 +275,9 @@ export default function UploadZone({
           )}
         </div>
       </div>
-      
+
       {/* Error message */}
-      {validationError && (
-        <div className="mt-2 text-sm text-red-600">
-          {validationError}
-        </div>
-      )}
+      {validationError && <div className="mt-2 text-sm text-red-600">{validationError}</div>}
     </div>
   );
 }

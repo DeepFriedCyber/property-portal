@@ -1,13 +1,14 @@
 // ErrorBoundaryExample.tsx
 import React from 'react';
+
 import ErrorBoundary from './ErrorBoundary';
 
 // Example component that might throw an error
 const BuggyCounter = () => {
   const [counter, setCounter] = React.useState(0);
-  
+
   const handleClick = () => {
-    setCounter(prevCounter => prevCounter + 1);
+    setCounter((prevCounter) => prevCounter + 1);
   };
 
   if (counter === 5) {
@@ -42,7 +43,7 @@ const ErrorBoundaryExample = () => {
   return (
     <div>
       <h1>Error Boundary Example</h1>
-      
+
       {/* Basic usage */}
       <div style={{ marginBottom: '30px' }}>
         <h2>Basic Error Boundary</h2>
@@ -50,7 +51,7 @@ const ErrorBoundaryExample = () => {
           <BuggyCounter />
         </ErrorBoundary>
       </div>
-      
+
       {/* With custom fallback UI */}
       <div style={{ marginBottom: '30px' }}>
         <h2>Error Boundary with Custom Fallback</h2>
@@ -58,7 +59,7 @@ const ErrorBoundaryExample = () => {
           <BuggyCounter />
         </ErrorBoundary>
       </div>
-      
+
       {/* With error handler */}
       <div>
         <h2>Error Boundary with Error Handler</h2>

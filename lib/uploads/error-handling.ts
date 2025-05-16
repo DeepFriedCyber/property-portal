@@ -50,8 +50,9 @@ export function logUploadError(
   };
 
   // Remove sensitive information if not explicitly included
-  if (!includeUploaderId && errorObj.uploaderId) {
-    delete errorObj.uploaderId;
+  if (!includeUploaderId && context.additionalInfo && 'uploaderId' in context.additionalInfo) {
+    // Use type assertion or index notation to avoid TypeScript error
+    delete (errorObj as Record<string, any>)['uploaderId'];
   }
 
   // Log differently based on environment
@@ -82,7 +83,7 @@ export function createPropertyCountFallback(
     additionalInfo: {
       fileSize: upload?.fileSize,
       status: upload?.status,
-    }
+    },
   });
 
   // Return a sanitized object with fallback values
@@ -92,9 +93,10 @@ export function createPropertyCountFallback(
     propertyCount: 0,
     countError: true, // Flag to indicate the count is unreliable
     uploaderId: undefined, // Remove uploader ID for privacy
-    errorMessage: process.env.NODE_ENV === 'development' 
-      ? normalizeError(error) 
-      : 'Failed to determine property count',
+    errorMessage:
+      process.env.NODE_ENV === 'development'
+        ? normalizeError(error)
+        : 'Failed to determine property count',
   };
 }
 
@@ -123,9 +125,10 @@ export function createUploadErrorResponse(
     id: upload?.id || 'unknown',
     error: true,
     status: 'error',
-    errorMessage: process.env.NODE_ENV === 'development' 
-      ? normalizeError(error) 
-      : `Failed to process upload: ${operation}`,
+    errorMessage:
+      process.env.NODE_ENV === 'development'
+        ? normalizeError(error)
+        : `Failed to process upload: ${operation}`,
     uploaderId: undefined, // Remove uploader ID for privacy
   };
 }

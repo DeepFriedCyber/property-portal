@@ -1,13 +1,13 @@
 // lib/auth/clerk-wrapper.tsx
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
-import { 
-  ClerkProvider, 
-  useUser as useClerkUser, 
-  SignedIn, 
+import {
+  ClerkProvider,
+  useUser as useClerkUser,
+  SignedIn,
   SignedOut,
-  useAuth
+  useAuth,
 } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 
 // Define the authentication state
 interface AuthState {
@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { isLoaded: clerkLoaded, isSignedIn, user } = useClerkUser();
   const { signOut: clerkSignOut } = useAuth();
   const router = useRouter();
-  
+
   // Authentication state
   const [authState, setAuthState] = useState<AuthState>({
     isLoaded: false,
@@ -53,40 +53,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isError: false,
     errorMessage: null,
     retryCount: 0,
-    isRetrying: false
+    isRetrying: false,
   });
 
   // Maximum number of retry attempts
   const MAX_RETRY_ATTEMPTS = 3;
-  
+
   // Retry authentication
   const retryAuth = useCallback(() => {
     if (authState.retryCount >= MAX_RETRY_ATTEMPTS) {
-      setAuthState(prev => ({
+      setAuthState((prev) => ({
         ...prev,
         isError: true,
         errorMessage: 'Maximum retry attempts reached. Please refresh the page or try again later.',
-        isRetrying: false
+        isRetrying: false,
       }));
       return;
     }
-    
-    setAuthState(prev => ({
+
+    setAuthState((prev) => ({
       ...prev,
       isRetrying: true,
-      retryCount: prev.retryCount + 1
+      retryCount: prev.retryCount + 1,
     }));
-    
+
     // Simulate a retry by forcing a re-render
     // In a real app, you might want to call a specific Clerk method to refresh the session
     setTimeout(() => {
-      setAuthState(prev => ({
+      setAuthState((prev) => ({
         ...prev,
-        isRetrying: false
+        isRetrying: false,
       }));
     }, 1000);
   }, [authState.retryCount]);
-  
+
   // Sign out with error handling
   const handleSignOut = useCallback(async () => {
     try {
@@ -97,42 +97,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Error signing out:', error);
       // If sign out fails, we can still clear local state
-      setAuthState(prev => ({
+      setAuthState((prev) => ({
         ...prev,
         isSignedIn: false,
         isError: true,
-        errorMessage: 'Failed to sign out properly. Please refresh the page.'
+        errorMessage: 'Failed to sign out properly. Please refresh the page.',
       }));
     }
   }, [clerkSignOut, router]);
-  
+
   // Check if user has required roles
-  const isAuthorized = useCallback((requiredRoles?: string[]) => {
-    if (!isSignedIn || !user) return false;
-    if (!requiredRoles || requiredRoles.length === 0) return true;
-    
-    // Get user roles from public metadata
-    // This assumes roles are stored in publicMetadata.roles
-    const userRoles = (user.publicMetadata?.roles as string[]) || [];
-    
-    // Check if user has any of the required roles
-    return requiredRoles.some(role => userRoles.includes(role));
-  }, [isSignedIn, user]);
-  
+  const isAuthorized = useCallback(
+    (requiredRoles?: string[]) => {
+      if (!isSignedIn || !user) return false;
+      if (!requiredRoles || requiredRoles.length === 0) return true;
+
+      // Get user roles from public metadata
+      // This assumes roles are stored in publicMetadata.roles
+      const userRoles = (user.publicMetadata?.roles as string[]) || [];
+
+      // Check if user has any of the required roles
+      return requiredRoles.some((role) => userRoles.includes(role));
+    },
+    [isSignedIn, user]
+  );
+
   // Update auth state when Clerk state changes
   useEffect(() => {
     // If Clerk is still loading, don't update state yet
     if (!clerkLoaded) return;
-    
-    setAuthState(prev => ({
+
+    setAuthState((prev) => ({
       ...prev,
       isLoaded: true,
       isSignedIn,
       // Clear error state if authentication succeeds
-      ...(isSignedIn && { isError: false, errorMessage: null })
+      ...(isSignedIn && { isError: false, errorMessage: null }),
     }));
   }, [clerkLoaded, isSignedIn]);
-  
+
   // Handle offline/online status
   useEffect(() => {
     const handleOnline = () => {
@@ -141,39 +144,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         retryAuth();
       }
     };
-    
+
     const handleOffline = () => {
       // When going offline, set an appropriate error message
-      setAuthState(prev => ({
+      setAuthState((prev) => ({
         ...prev,
         isError: true,
-        errorMessage: 'You are currently offline. Authentication services may be unavailable.'
+        errorMessage: 'You are currently offline. Authentication services may be unavailable.',
       }));
     };
-    
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, [authState.isError, retryAuth]);
-  
+
   // Context value
   const contextValue: AuthContextType = {
     authState,
     user,
     retryAuth,
     signOut: handleSignOut,
-    isAuthorized
+    isAuthorized,
   };
-  
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
+
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 
 // Enhanced ClerkProvider with error handling
@@ -184,9 +183,7 @@ export const EnhancedClerkProvider: React.FC<{
 }> = ({ children, publishableKey, appearance }) => {
   return (
     <ClerkProvider publishableKey={publishableKey} appearance={appearance}>
-      <AuthProvider>
-        {children}
-      </AuthProvider>
+      <AuthProvider>{children}</AuthProvider>
     </ClerkProvider>
   );
 };
@@ -198,7 +195,7 @@ export const AuthRequired: React.FC<{
   requiredRoles?: string[];
 }> = ({ children, fallback, requiredRoles }) => {
   const { authState, user, retryAuth, isAuthorized } = useAuthWrapper();
-  
+
   // If still loading, show loading state
   if (!authState.isLoaded) {
     return (
@@ -207,28 +204,30 @@ export const AuthRequired: React.FC<{
       </div>
     );
   }
-  
+
   // If authentication error, show error state with retry button
   if (authState.isError) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen p-4">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-12 w-12 text-red-500 mx-auto mb-4" 
-            fill="none" 
-            viewBox="0 0 24 24" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 text-red-500 mx-auto mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
           <h2 className="text-xl font-semibold text-red-700 mb-2">Authentication Error</h2>
-          <p className="text-red-600 mb-4">{authState.errorMessage || 'There was a problem authenticating your account.'}</p>
+          <p className="text-red-600 mb-4">
+            {authState.errorMessage || 'There was a problem authenticating your account.'}
+          </p>
           <button
             onClick={retryAuth}
             disabled={authState.isRetrying}
@@ -243,7 +242,7 @@ export const AuthRequired: React.FC<{
       </div>
     );
   }
-  
+
   // If not signed in, show fallback or default message
   if (!authState.isSignedIn) {
     return (
@@ -252,7 +251,9 @@ export const AuthRequired: React.FC<{
           {fallback || (
             <div className="flex flex-col justify-center items-center min-h-screen p-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md text-center">
-                <h2 className="text-xl font-semibold text-blue-700 mb-2">Authentication Required</h2>
+                <h2 className="text-xl font-semibold text-blue-700 mb-2">
+                  Authentication Required
+                </h2>
                 <p className="text-blue-600 mb-4">Please sign in to access this page.</p>
                 <a
                   href="/sign-in"
@@ -267,24 +268,24 @@ export const AuthRequired: React.FC<{
       </>
     );
   }
-  
+
   // If roles are required but user doesn't have them
   if (requiredRoles && requiredRoles.length > 0 && !isAuthorized(requiredRoles)) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen p-4">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 max-w-md text-center">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-12 w-12 text-yellow-500 mx-auto mb-4" 
-            fill="none" 
-            viewBox="0 0 24 24" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 text-yellow-500 mx-auto mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M12 15v2m0 0v2m0-2h2m-2 0H9m3-3V9m0 0V7m0 2h2m-2 0H9" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 15v2m0 0v2m0-2h2m-2 0H9m3-3V9m0 0V7m0 2h2m-2 0H9"
             />
           </svg>
           <h2 className="text-xl font-semibold text-yellow-700 mb-2">Access Denied</h2>
@@ -301,13 +302,9 @@ export const AuthRequired: React.FC<{
       </div>
     );
   }
-  
+
   // If signed in and authorized, show children
-  return (
-    <SignedIn>
-      {children}
-    </SignedIn>
-  );
+  return <SignedIn>{children}</SignedIn>;
 };
 
 // Export a hook for checking authorization
@@ -327,6 +324,6 @@ export const useAuthentication = () => {
     isRetrying: authState.isRetrying,
     user,
     retryAuth,
-    signOut
+    signOut,
   };
 };

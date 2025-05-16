@@ -1,6 +1,7 @@
 // components/animations/AnimatedPropertyCard.tsx
-import React from 'react';
 import { motion } from 'framer-motion';
+import React from 'react';
+
 import { useScrollAnimation } from '@/hooks/useAnimation';
 
 interface Property {
@@ -28,25 +29,25 @@ const cardVariants = {
     transition: {
       delay: i * 0.1,
       duration: 0.5,
-      ease: [0.43, 0.13, 0.23, 0.96]
-    }
+      ease: [0.43, 0.13, 0.23, 0.96],
+    },
   }),
   hover: {
     y: -10,
     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
     transition: {
       duration: 0.3,
-      ease: 'easeOut'
-    }
+      ease: 'easeOut',
+    },
   },
   tap: {
     y: -5,
     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
     transition: {
       duration: 0.1,
-      ease: 'easeOut'
-    }
-  }
+      ease: 'easeOut',
+    },
+  },
 };
 
 /**
@@ -57,22 +58,22 @@ const AnimatedPropertyCard: React.FC<AnimatedPropertyCardProps> = ({
   property,
   index,
   onClick,
-  className = ''
+  className = '',
 }) => {
   // Use scroll animation hook with proper cleanup
   const { ref, variants, animate, custom } = useScrollAnimation({
     variants: cardVariants,
     custom: index,
     threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
+    rootMargin: '0px 0px -100px 0px',
   });
-  
+
   const handleClick = () => {
     if (onClick) {
       onClick(property);
     }
   };
-  
+
   return (
     <motion.div
       ref={ref as React.RefObject<HTMLDivElement>}
@@ -99,17 +100,17 @@ const AnimatedPropertyCard: React.FC<AnimatedPropertyCardProps> = ({
             No image available
           </div>
         )}
-        
+
         {/* Price tag */}
         <div className="absolute bottom-0 left-0 bg-blue-600 text-white px-3 py-1 rounded-tr-lg font-semibold">
           ${property.price.toLocaleString()}
         </div>
       </div>
-      
+
       {/* Property details */}
       <div className="p-4">
         <h3 className="text-lg font-semibold mb-2 line-clamp-1">{property.address}</h3>
-        
+
         <div className="flex justify-between text-gray-600">
           <div className="flex items-center">
             <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -117,13 +118,15 @@ const AnimatedPropertyCard: React.FC<AnimatedPropertyCardProps> = ({
             </svg>
             <span>{property.type}</span>
           </div>
-          
+
           <div className="flex items-center">
             <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
               <path d="M7 3a1 1 0 00-1 1v12a1 1 0 002 0V4a1 1 0 00-1-1zm6 0a1 1 0 00-1 1v12a1 1 0 002 0V4a1 1 0 00-1-1z" />
               <path d="M3 7a1 1 0 00-1 1v8a1 1 0 002 0V8a1 1 0 00-1-1zm14 0a1 1 0 00-1 1v8a1 1 0 002 0V8a1 1 0 00-1-1z" />
             </svg>
-            <span>{property.bedrooms} {property.bedrooms === 1 ? 'bed' : 'beds'}</span>
+            <span>
+              {property.bedrooms} {property.bedrooms === 1 ? 'bed' : 'beds'}
+            </span>
           </div>
         </div>
       </div>

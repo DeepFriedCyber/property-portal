@@ -26,15 +26,15 @@ type ApiError = NetworkError | TimeoutError | Error;
 
 // Fetch with timeout utility
 const fetchWithTimeout = async (
-  url: string, 
-  options: RequestInit = {}, 
+  url: string,
+  options: RequestInit = {},
   timeout = 8000
 ): Promise<Response> => {
   const controller = new AbortController();
   const { signal } = controller;
-  
+
   const timeoutId = setTimeout(() => controller.abort(), timeout);
-  
+
   try {
     const response = await fetch(url, { ...options, signal });
     clearTimeout(timeoutId);
@@ -61,36 +61,35 @@ const fetchWithRetry = async <T,>(
   timeout = 8000
 ): Promise<T> => {
   let lastError: ApiError;
-  
+
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const response = await fetchWithTimeout(url, options, timeout);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       return await response.json();
     } catch (err) {
       const error = err as ApiError;
       lastError = error;
-      
+
       // Don't retry if we've reached max retries
       if (attempt === retries) break;
-      
+
       // Don't retry for certain status codes
-      if (error.message.includes('Status: 404') || 
-          error.message.includes('Status: 401')) {
+      if (error.message.includes('Status: 404') || error.message.includes('Status: 401')) {
         break;
       }
-      
+
       // Wait with exponential backoff before retrying
       const delay = backoff * Math.pow(2, attempt);
       console.log(`Retrying fetch (${attempt + 1}/${retries}) after ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
-  
+
   throw lastError;
 };
 
@@ -100,7 +99,7 @@ const UseEffectExample = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [retryTrigger, setRetryTrigger] = useState<number>(0);
-  
+
   // State for selected user and their posts
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
@@ -115,7 +114,7 @@ const UseEffectExample = () => {
   // Retry handler for user data
   const handleRetry = useCallback(() => {
     setError(null);
-    setRetryTrigger(prev => prev + 1);
+    setRetryTrigger((prev) => prev + 1);
   }, []);
 
   // Retry handler for posts data
@@ -135,16 +134,16 @@ const UseEffectExample = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        
+
         // Using fetchWithRetry with timeout and retry logic
         const data = await fetchWithRetry<User[]>(
           'https://jsonplaceholder.typicode.com/users',
           { signal },
-          2,  // 2 retries
+          2, // 2 retries
           300, // 300ms initial backoff
           5000 // 5 second timeout
         );
-        
+
         setUsers(data);
         setError(null);
       } catch (err) {
@@ -155,7 +154,7 @@ const UseEffectExample = () => {
             console.log('Users fetch aborted');
             return;
           }
-          
+
           // Handle specific error types
           if (err.name === 'TimeoutError') {
             setError('Request timed out. Please check your connection and try again.');
@@ -164,7 +163,7 @@ const UseEffectExample = () => {
           } else {
             setError('Failed to fetch users. Please try again later.');
           }
-          
+
           console.error('Error fetching users:', err);
         } else {
           setError('An unknown error occurred. Please try again later.');
@@ -188,25 +187,25 @@ const UseEffectExample = () => {
   useEffect(() => {
     // Skip if no user is selected
     if (selectedUserId === null) return;
-    
+
     let isMounted = true; // Flag to prevent state updates if component unmounts
     const controller = new AbortController();
     const { signal } = controller;
-    
+
     const fetchUserPosts = async () => {
       try {
         setPostsLoading(true);
         setPostsError(null);
-        
+
         // Using fetchWithRetry with timeout and retry logic
         const data = await fetchWithRetry<Post[]>(
           `https://jsonplaceholder.typicode.com/posts?userId=${selectedUserId}`,
           { signal },
-          2,  // 2 retries
+          2, // 2 retries
           300, // 300ms initial backoff
           5000 // 5 second timeout
         );
-        
+
         // Only update state if component is still mounted
         if (isMounted) {
           setUserPosts(data);
@@ -220,7 +219,7 @@ const UseEffectExample = () => {
               console.log('Posts fetch aborted');
               return;
             }
-            
+
             // Handle specific error types
             if (err.name === 'TimeoutError') {
               setPostsError('Request timed out. Please check your connection and try again.');
@@ -229,7 +228,7 @@ const UseEffectExample = () => {
             } else {
               setPostsError('Failed to fetch posts. Please try again later.');
             }
-            
+
             console.error('Error fetching posts:', err);
           } else {
             setPostsError('An unknown error occurred. Please try again later.');
@@ -257,7 +256,7 @@ const UseEffectExample = () => {
   useEffect(() => {
     // Skip during server-side rendering
     if (typeof window === 'undefined') return;
-    
+
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -280,7 +279,7 @@ const UseEffectExample = () => {
   return (
     <div className="use-effect-example">
       <h1>useEffect Examples</h1>
-      
+
       <div className="window-width">
         <h2>Window Width (Resize Event Example)</h2>
         <p>Current window width: {windowWidth}px</p>
@@ -289,7 +288,7 @@ const UseEffectExample = () => {
 
       <div className="users-section">
         <h2>Users (Data Fetching Example)</h2>
-        
+
         {loading ? (
           <div className="loading-indicator">
             <p>Loading users...</p>
@@ -297,11 +296,7 @@ const UseEffectExample = () => {
         ) : error ? (
           <div className="error-container">
             <div className="error-message">{error}</div>
-            <button 
-              onClick={handleRetry} 
-              className="retry-button"
-              aria-label="Retry loading users"
-            >
+            <button onClick={handleRetry} className="retry-button" aria-label="Retry loading users">
               Retry
             </button>
           </div>
@@ -309,9 +304,9 @@ const UseEffectExample = () => {
           <div className="user-list">
             <p>Select a user to see their posts:</p>
             <ul>
-              {users.map(user => (
+              {users.map((user) => (
                 <li key={user.id}>
-                  <button 
+                  <button
                     onClick={() => handleUserSelect(user.id)}
                     className={selectedUserId === user.id ? 'selected' : ''}
                   >
@@ -327,7 +322,7 @@ const UseEffectExample = () => {
       {selectedUserId && (
         <div className="posts-section">
           <h2>Posts by User (Dependent Data Fetching)</h2>
-          
+
           {postsLoading ? (
             <div className="loading-indicator">
               <p>Loading posts...</p>
@@ -335,8 +330,8 @@ const UseEffectExample = () => {
           ) : postsError ? (
             <div className="error-container">
               <div className="error-message">{postsError}</div>
-              <button 
-                onClick={handlePostsRetry} 
+              <button
+                onClick={handlePostsRetry}
                 className="retry-button"
                 aria-label="Retry loading posts"
               >
@@ -345,7 +340,7 @@ const UseEffectExample = () => {
             </div>
           ) : userPosts.length > 0 ? (
             <ul className="post-list">
-              {userPosts.map(post => (
+              {userPosts.map((post) => (
                 <li key={post.id}>
                   <h3>{post.title}</h3>
                   <p>{post.body}</p>

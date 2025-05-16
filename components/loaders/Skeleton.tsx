@@ -1,5 +1,6 @@
 // Skeleton.tsx
 import React from 'react';
+
 import styles from './Skeleton.module.css';
 
 interface SkeletonProps {
@@ -15,17 +16,17 @@ const Skeleton: React.FC<SkeletonProps> = ({
   height = '16px',
   borderRadius = '4px',
   className = '',
-  animation = 'pulse'
+  animation = 'pulse',
 }) => {
   const animationClass = animation !== 'none' ? styles[`skeleton--${animation}`] : '';
-  
+
   return (
-    <div 
+    <div
       className={`${styles.skeleton} ${animationClass} ${className}`}
       style={{
         width: typeof width === 'number' ? `${width}px` : width,
         height: typeof height === 'number' ? `${height}px` : height,
-        borderRadius: typeof borderRadius === 'number' ? `${borderRadius}px` : borderRadius
+        borderRadius: typeof borderRadius === 'number' ? `${borderRadius}px` : borderRadius,
       }}
       aria-hidden="true"
     />

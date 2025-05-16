@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Button, ButtonProps } from './Button'; // Import the component and its props
+
+import { Button } from './Button'; // Import the component
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta: Meta<typeof Button> = {
@@ -26,7 +27,8 @@ const meta: Meta<typeof Button> = {
     children: { control: 'text' },
     onClick: { action: 'clicked' }, // Log clicks in Storybook actions panel
   },
-  args: { // Default args for all stories
+  args: {
+    // Default args for all stories
     variant: 'primary',
     size: 'medium',
     isLoading: false,

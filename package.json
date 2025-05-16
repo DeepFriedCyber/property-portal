@@ -2,6 +2,7 @@
   "name": "property-portal",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -10,11 +11,16 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
+    "lint:all": "eslint .",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "coverage": "turbo run coverage",
     "test:ui": "vitest --ui",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "lint:fix": "eslint . --fix",
+    "lint:src": "eslint ./src --fix",
+    "lint:web": "eslint ./apps/web/src --fix",
+    "lint:ui": "eslint ./packages/ui/src --fix",
+    "lint:safe": "npm run lint:src && npm run lint:web && npm run lint:ui",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
     "prepare": "husky"
@@ -36,11 +42,11 @@
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
+    "@eslint/eslintrc": "^3.3.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/express": "^5.0.1",
-
     "@types/node": "^22.15.17",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
@@ -66,6 +72,7 @@
     "prettier": "^3.5.3",
     "tsx": "^4.19.4",
     "turbo": "^1.10.0",
+    "typescript": "^5.8.3",
     "vitest": "^3.1.3"
   }
 }

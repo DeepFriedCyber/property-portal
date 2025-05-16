@@ -1,12 +1,12 @@
 /**
  * Example of improved upload error handling
  */
-import { 
-  createPropertyCountFallback, 
+import {
+  createPropertyCountFallback,
   createUploadErrorResponse,
   sanitizeUploadData,
   logUploadError,
-  UploadData 
+  UploadData,
 } from '../lib/uploads/error-handling';
 
 /**
@@ -35,7 +35,7 @@ async function getPropertyCountForUpload(uploadId: string): Promise<number> {
     logUploadError(error, {
       operation: 'getPropertyCount',
       uploadId,
-      additionalInfo: { attemptedOperation: 'database query' }
+      additionalInfo: { attemptedOperation: 'database query' },
     });
 
     // Re-throw to be handled by the caller
@@ -50,13 +50,13 @@ async function getUploadWithPropertyCount(uploadId: string): Promise<UploadData>
   try {
     // Get basic upload information
     const upload = await simulateGetUpload(uploadId);
-    
+
     // Get property count
     try {
       const propertyCount = await getPropertyCountForUpload(uploadId);
       return {
         ...upload,
-        propertyCount
+        propertyCount,
       };
     } catch (error) {
       // ❌ BAD: Inconsistent error handling
@@ -85,11 +85,7 @@ async function getUploadWithPropertyCount(uploadId: string): Promise<UploadData>
     */
 
     // ✅ GOOD: Use the utility function for consistent error response
-    return createUploadErrorResponse(
-      { id: uploadId },
-      error,
-      'getUploadWithPropertyCount'
-    );
+    return createUploadErrorResponse({ id: uploadId }, error, 'getUploadWithPropertyCount');
   }
 }
 
@@ -99,10 +95,10 @@ async function getUploadWithPropertyCount(uploadId: string): Promise<UploadData>
 async function handleGetUploadRequest(req: any, res: any) {
   const uploadId = req.params.id;
   const isAdmin = req.user?.role === 'admin';
-  
+
   try {
     const upload = await getUploadWithPropertyCount(uploadId);
-    
+
     // ❌ BAD: Inconsistent handling of private data
     /*
     if (!isAdmin) {
@@ -110,7 +106,7 @@ async function handleGetUploadRequest(req: any, res: any) {
     }
     res.json(upload);
     */
-    
+
     // ✅ GOOD: Use the utility function for consistent data sanitization
     const sanitizedUpload = sanitizeUploadData(upload, isAdmin);
     res.json(sanitizedUpload);
@@ -120,19 +116,20 @@ async function handleGetUploadRequest(req: any, res: any) {
     console.error("API error:", error);
     res.status(500).json({ error: "Failed to get upload" });
     */
-    
+
     // ✅ GOOD: Use the utility function for consistent error response
     logUploadError(error, {
       operation: 'handleGetUploadRequest',
       uploadId,
-      additionalInfo: { userRole: req.user?.role }
+      additionalInfo: { userRole: req.user?.role },
     });
-    
+
     res.status(500).json({
       error: true,
-      message: process.env.NODE_ENV === 'development' 
-        ? String(error) 
-        : 'Failed to retrieve upload information'
+      message:
+        process.env.NODE_ENV === 'development'
+          ? String(error)
+          : 'Failed to retrieve upload information',
     });
   }
 }
@@ -161,7 +158,7 @@ async function simulateGetUpload(uploadId: string): Promise<UploadData> {
       uploaderId: 'user-123',
       status: 'processed',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
   } else if (uploadId === 'error-id') {
     throw new Error('Database query failed');
@@ -170,8 +167,4 @@ async function simulateGetUpload(uploadId: string): Promise<UploadData> {
   }
 }
 
-export {
-  getPropertyCountForUpload,
-  getUploadWithPropertyCount,
-  handleGetUploadRequest
-};
+export { getPropertyCountForUpload, getUploadWithPropertyCount, handleGetUploadRequest };

@@ -13,11 +13,11 @@ When handling errors in upload processing, inconsistent approaches can lead to:
 
 ```typescript
 // Inconsistent error logging
-console.error("Failed to get property count for upload:", upload?.id, error);
+console.error('Failed to get property count for upload:', upload?.id, error);
 
 // Environment-specific logging with string concatenation
-if (process.env.NODE_ENV === "development") {
-  console.error("Property count error (uploadId: " + upload?.id + "):", error);
+if (process.env.NODE_ENV === 'development') {
+  console.error('Property count error (uploadId: ' + upload?.id + '):', error);
 }
 
 // Inconsistent fallback response
@@ -44,7 +44,7 @@ logUploadError(error, {
   additionalInfo: {
     fileSize: upload?.fileSize,
     status: upload?.status,
-  }
+  },
 });
 ```
 
@@ -66,16 +66,19 @@ try {
 ## Key Principles for Upload Error Handling
 
 1. **Consistent Error Logging**
+
    - Use structured logging with relevant context
    - Avoid exposing sensitive information in logs
    - Include operation name, upload ID, and timestamp
 
 2. **Privacy Protection**
+
    - Remove sensitive information like uploader IDs from responses
    - Sanitize data before returning it to clients
    - Use different error messages for development and production
 
 3. **Fallback Strategies**
+
    - Provide meaningful fallback values when operations fail
    - Indicate to the client when values are fallbacks (e.g., `countError: true`)
    - Maintain the integrity of the response structure
@@ -92,22 +95,22 @@ async function processUpload(uploadId: string, req: any, res: any) {
   try {
     // Get upload details
     const upload = await getUpload(uploadId);
-    
+
     // Process the upload
     try {
       const result = await processUploadData(upload);
-      
+
       // Return sanitized response
       const sanitizedResult = sanitizeUploadData(result, req.user.isAdmin);
       res.json(sanitizedResult);
     } catch (processingError) {
       // Handle processing errors with consistent fallback
       const fallbackResponse = createUploadErrorResponse(
-        upload, 
-        processingError, 
+        upload,
+        processingError,
         'processUploadData'
       );
-      
+
       // Return sanitized fallback
       const sanitizedFallback = sanitizeUploadData(fallbackResponse, req.user.isAdmin);
       res.status(500).json(sanitizedFallback);
@@ -117,12 +120,12 @@ async function processUpload(uploadId: string, req: any, res: any) {
     logUploadError(error, {
       operation: 'getUpload',
       uploadId,
-      additionalInfo: { userRole: req.user?.role }
+      additionalInfo: { userRole: req.user?.role },
     });
-    
+
     res.status(404).json({
       error: true,
-      message: 'Upload not found or could not be processed'
+      message: 'Upload not found or could not be processed',
     });
   }
 }
@@ -133,16 +136,19 @@ async function processUpload(uploadId: string, req: any, res: any) {
 Our library provides several utility functions to standardize error handling:
 
 1. **`logUploadError(error, context, includeUploaderId)`**
+
    - Logs errors with consistent formatting and context
    - Handles environment-specific logging automatically
    - Protects sensitive information by default
 
 2. **`createPropertyCountFallback(upload, error)`**
+
    - Creates a safe fallback when property count determination fails
    - Logs the error with appropriate context
    - Removes sensitive information from the response
 
 3. **`createUploadErrorResponse(upload, error, operation)`**
+
    - Creates a standardized error response for upload processing errors
    - Includes appropriate error flags and messages
    - Sanitizes sensitive information

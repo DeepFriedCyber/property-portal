@@ -1,9 +1,9 @@
 // components/error-handling/GlobalErrorHandler.tsx
 'use client';
 
-import React, { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import LogRocket from 'logrocket';
+import React, { useEffect } from 'react';
 
 interface GlobalErrorHandlerProps {
   children: React.ReactNode;
@@ -21,7 +21,7 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
   sentryDsn,
   logRocketAppId,
   environment,
-  release
+  release,
 }) => {
   useEffect(() => {
     // Initialize Sentry if DSN is provided
@@ -51,8 +51,8 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
 
       // Integrate LogRocket with Sentry if both are available
       if (sentryDsn) {
-        LogRocket.getSessionURL(sessionURL => {
-          Sentry.withScope(scope => {
+        LogRocket.getSessionURL((sessionURL) => {
+          Sentry.withScope((scope) => {
             scope.setExtra('logRocketSessionURL', sessionURL);
           });
         });
@@ -75,7 +75,7 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
 
     // Set up unhandled promise rejection handler
     const originalOnUnhandledRejection = window.onunhandledrejection;
-    
+
     // Using addEventListener instead of direct assignment to avoid 'this' context issues
     window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
       // Call the original handler if it exists

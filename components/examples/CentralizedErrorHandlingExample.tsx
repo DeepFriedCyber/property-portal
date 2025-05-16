@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import { useCentralizedErrorHandler } from '@/hooks/useCentralizedErrorHandler';
 import { ApiError } from '@/lib/api/error-handling';
 import { ValidationError } from '@/lib/api/validation';
@@ -11,7 +12,7 @@ import { ErrorType, ErrorSeverity } from '@/lib/error/error-service';
  */
 const CentralizedErrorHandlingExample: React.FC = () => {
   const [count, setCount] = useState(0);
-  
+
   // Use the centralized error handler hook
   const {
     hasError,
@@ -25,71 +26,67 @@ const CentralizedErrorHandlingExample: React.FC = () => {
     handleError,
     resetError,
     withErrorHandling,
-    withAsyncErrorHandling
+    withAsyncErrorHandling,
   } = useCentralizedErrorHandler({
     component: 'CentralizedErrorHandlingExample',
-    tags: ['example', 'error-handling']
+    tags: ['example', 'error-handling'],
   });
-  
+
   // Function that throws a regular error
   const throwError = () => {
     throw new Error('This is a regular error');
   };
-  
+
   // Function that throws an API error
   const throwApiError = () => {
-    throw new ApiError(
-      'This is an API error',
-      500,
-      'API_ERROR',
-      { details: 'Some API error details' }
-    );
+    throw new ApiError('This is an API error', 500, 'API_ERROR', {
+      details: 'Some API error details',
+    });
   };
-  
+
   // Function that throws a validation error
   const throwValidationError = () => {
-    throw new ValidationError(
-      'This is a validation error',
-      'VALIDATION_ERROR',
-      {
-        name: 'Name is required',
-        email: 'Email is invalid'
-      }
-    );
+    throw new ValidationError('This is a validation error', 'VALIDATION_ERROR', {
+      name: 'Name is required',
+      email: 'Email is invalid',
+    });
   };
-  
+
   // Async function that throws an error
   const throwAsyncError = async () => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     throw new Error('This is an async error');
   };
-  
+
   // Safe versions of the error-throwing functions
-  const safeThrowError = withErrorHandling(throwError, { 
+  const safeThrowError = withErrorHandling(throwError, {
     action: 'throwRegularError',
-    severity: ErrorSeverity.MEDIUM
+    severity: ErrorSeverity.MEDIUM,
   });
-  
-  const safeThrowApiError = withErrorHandling(throwApiError, { 
+
+  const safeThrowApiError = withErrorHandling(throwApiError, {
     action: 'throwApiError',
-    severity: ErrorSeverity.HIGH
+    severity: ErrorSeverity.HIGH,
   });
-  
-  const safeThrowValidationError = withErrorHandling(throwValidationError, { 
+
+  const safeThrowValidationError = withErrorHandling(throwValidationError, {
     action: 'throwValidationError',
-    severity: ErrorSeverity.LOW
+    severity: ErrorSeverity.LOW,
   });
-  
-  const safeThrowAsyncError = withAsyncErrorHandling(throwAsyncError, { 
+
+  const safeThrowAsyncError = withAsyncErrorHandling(throwAsyncError, {
     action: 'throwAsyncError',
-    severity: ErrorSeverity.CRITICAL
+    severity: ErrorSeverity.CRITICAL,
   });
-  
+
   // Safe function that doesn't throw
-  const safeIncrement = withErrorHandling(() => {
-    setCount(prev => prev + 1);
-  }, { action: 'increment' });
-  
+  const safeIncrement = withErrorHandling(
+    () => {
+      setCount((prev) => prev + 1);
+    },
+    { action: 'increment' }
+  );
+
   // Get the appropriate color for the error severity
   const getSeverityColor = () => {
     switch (errorSeverity) {
@@ -105,11 +102,11 @@ const CentralizedErrorHandlingExample: React.FC = () => {
         return 'text-gray-600';
     }
   };
-  
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
       <h3 className="text-lg font-semibold mb-4">Centralized Error Handling Example</h3>
-      
+
       {/* Display error if there is one */}
       {hasError && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -118,14 +115,14 @@ const CentralizedErrorHandlingExample: React.FC = () => {
               {isApiError ? 'API Error' : isValidationError ? 'Validation Error' : 'Error'}
               {errorCode && ` (${errorCode})`}
             </h4>
-            
+
             <span className={`px-2 py-1 text-xs rounded-full ${getSeverityColor()} bg-opacity-10`}>
               {errorType} - {errorSeverity}
             </span>
           </div>
-          
+
           <p className={`mb-2 ${getSeverityColor()}`}>{errorMessage}</p>
-          
+
           {isValidationError && errorDetails && (
             <div className="mt-2 p-2 bg-white rounded border border-red-100 text-sm">
               <ul className="list-disc pl-5">
@@ -137,7 +134,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
               </ul>
             </div>
           )}
-          
+
           <button
             onClick={resetError}
             className="mt-3 px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
@@ -146,12 +143,12 @@ const CentralizedErrorHandlingExample: React.FC = () => {
           </button>
         </div>
       )}
-      
+
       <div className="mb-4">
         <p className="text-gray-600 mb-2">
           Current count: <span className="font-semibold">{count}</span>
         </p>
-        
+
         <button
           onClick={safeIncrement}
           className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 mr-2"
@@ -159,7 +156,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
           Safe Increment
         </button>
       </div>
-      
+
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div>
           <h4 className="text-sm font-semibold mb-2">Synchronous Errors</h4>
@@ -170,14 +167,14 @@ const CentralizedErrorHandlingExample: React.FC = () => {
             >
               Throw Regular Error (Medium)
             </button>
-            
+
             <button
               onClick={() => safeThrowApiError()}
               className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
             >
               Throw API Error (High)
             </button>
-            
+
             <button
               onClick={() => safeThrowValidationError()}
               className="px-3 py-1 bg-orange-600 text-white text-sm rounded hover:bg-orange-700"
@@ -186,7 +183,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
             </button>
           </div>
         </div>
-        
+
         <div>
           <h4 className="text-sm font-semibold mb-2">Asynchronous Errors</h4>
           <div className="flex flex-col space-y-2">
@@ -196,12 +193,14 @@ const CentralizedErrorHandlingExample: React.FC = () => {
             >
               Throw Async Error (Critical)
             </button>
-            
+
             <button
-              onClick={() => handleError(new Error('Manually handled error'), {
-                action: 'manualError',
-                severity: ErrorSeverity.LOW
-              })}
+              onClick={() =>
+                handleError(new Error('Manually handled error'), {
+                  action: 'manualError',
+                  severity: ErrorSeverity.LOW,
+                })
+              }
               className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
             >
               Manual Error (Low)
@@ -209,7 +208,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="text-sm text-gray-600 mt-4 p-3 bg-gray-50 rounded">
         <p className="mb-2">
           This example demonstrates the centralized error handling system. All errors are:

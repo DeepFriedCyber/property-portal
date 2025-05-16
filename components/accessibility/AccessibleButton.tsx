@@ -32,19 +32,19 @@ const AccessibleButton: React.FC<AccessibleButtonProps> = ({
   variant = 'primary',
   size = 'medium',
   icon,
-  iconPosition = 'left'
+  iconPosition = 'left',
 }) => {
   // Determine if we need to use aria-label
   // If the button only contains an icon and no text, aria-label is required
   const needsAriaLabel = !children && icon && !ariaLabel;
-  
+
   if (needsAriaLabel) {
     console.warn('AccessibleButton: Buttons with only icons must have an aria-label');
   }
-  
+
   const variantClass = `btn-${variant}`;
   const sizeClass = `btn-${size}`;
-  
+
   return (
     <button
       type={type}
@@ -62,9 +62,9 @@ const AccessibleButton: React.FC<AccessibleButtonProps> = ({
           {icon}
         </span>
       )}
-      
+
       {children}
-      
+
       {icon && iconPosition === 'right' && (
         <span className="btn-icon btn-icon-right" aria-hidden="true">
           {icon}

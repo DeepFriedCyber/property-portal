@@ -67,16 +67,21 @@ ARIA (Accessible Rich Internet Applications) attributes enhance accessibility wh
 ### Key ARIA Attributes:
 
 1. **Roles**: Define what an element is or does
+
    ```jsx
-   <div role="button" tabIndex={0}>Click me</div>
+   <div role="button" tabIndex={0}>
+     Click me
+   </div>
    ```
 
 2. **Properties**: Define properties of elements
+
    ```jsx
    <button aria-pressed="true">Selected</button>
    ```
 
 3. **States**: Define the current state of an element
+
    ```jsx
    <div aria-expanded="false">Collapsed content</div>
    ```
@@ -185,15 +190,15 @@ Provide text alternatives for non-text content.
 
 ```jsx
 // Informative image
-<img 
-  src="/images/property-exterior.jpg" 
+<img
+  src="/images/property-exterior.jpg"
   alt="Two-story colonial house with red brick exterior and white trim"
 />
 
 // Decorative image
-<img 
-  src="/images/decorative-divider.png" 
-  alt="" 
+<img
+  src="/images/decorative-divider.png"
+  alt=""
   role="presentation"
 />
 ```
@@ -214,10 +219,12 @@ Create accessible forms with clear labels, instructions, and error messages.
 
 ```jsx
 <div className="form-field">
-  <label htmlFor="name" className="required-field">Name</label>
-  <input 
-    id="name" 
-    type="text" 
+  <label htmlFor="name" className="required-field">
+    Name
+  </label>
+  <input
+    id="name"
+    type="text"
     aria-required="true"
     aria-invalid={!!errors.name}
     aria-describedby="name-error"
@@ -279,11 +286,7 @@ Ensure that dynamically updated content is accessible.
 ```jsx
 // Live region for search results
 <div aria-live="polite" aria-atomic="true">
-  {isLoading ? (
-    <p>Loading search results...</p>
-  ) : (
-    <p>{results.length} properties found</p>
-  )}
+  {isLoading ? <p>Loading search results...</p> : <p>{results.length} properties found</p>}
 </div>
 ```
 

@@ -1,13 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -21,17 +17,17 @@ export default function AdminLayout({
         const response = await fetch('/api/auth/check', {
           credentials: 'include',
         });
-        
+
         if (!response.ok) {
           throw new Error('Not authenticated');
         }
-        
+
         const data = await response.json();
-        
+
         if (data.role !== 'admin') {
           throw new Error('Not authorized');
         }
-        
+
         setIsAuthenticated(true);
       } catch (err) {
         console.error('Auth check failed:', err);
@@ -67,19 +63,28 @@ export default function AdminLayout({
                 <span className="text-xl font-bold">Admin Portal</span>
               </div>
               <div className="ml-6 flex items-center space-x-4">
-                <a href="/admin/dashboard" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700">
+                <a
+                  href="/admin/dashboard"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700"
+                >
                   Dashboard
                 </a>
-                <a href="/admin/properties" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700">
+                <a
+                  href="/admin/properties"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700"
+                >
                   Properties
                 </a>
-                <a href="/admin/users" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700">
+                <a
+                  href="/admin/users"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700"
+                >
                   Users
                 </a>
               </div>
             </div>
             <div className="flex items-center">
-              <button 
+              <button
                 onClick={() => {
                   // This would be replaced with your actual logout logic
                   router.push('/login');
@@ -92,10 +97,8 @@ export default function AdminLayout({
           </div>
         </div>
       </nav>
-      
-      <main className="py-10">
-        {children}
-      </main>
+
+      <main className="py-10">{children}</main>
     </div>
   );
 }
