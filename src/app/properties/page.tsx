@@ -4,8 +4,27 @@ import LoadingSkeleton from '@/app/components/LoadingSkeleton'
 import PropertyList from '@/app/components/PropertyList'
 import ErrorBoundary from '@/app/components/ErrorBoundary'
 import { fetchProperties } from '@/lib/api'
+import { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Browse Properties',
+  description: 'Browse our extensive collection of properties for sale and rent. Filter by price, location, bedrooms and more to find your perfect home.',
+  keywords: 'property listings, houses for sale, apartments for rent, property search',
+  openGraph: {
+    title: 'Browse Properties | Property Portal',
+    description: 'Find your perfect property with our advanced search filters.',
+    images: [
+      {
+        url: 'https://property-portal.com/images/properties-og.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Property listings',
+      },
+    ],
+  },
+}
 
 /**
  * This component handles the data fetching and passes it to the PropertyList component

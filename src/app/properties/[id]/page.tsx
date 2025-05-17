@@ -17,13 +17,37 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 
   const metadata = property.metadata || {}
   const title = metadata.title || property.address
-
+  const description = property.description || `View details for ${title} - ${property.bedrooms} bedroom ${property.type} in ${property.city}`
+  const imageUrl = metadata.mainImageUrl || 'https://property-portal.com/images/property-placeholder.jpg'
+  const listingType = metadata.listingType === 'rent' ? 'For Rent' : 'For Sale'
+  
   return {
-    title: title,
-    description: `View listing for ${title}`,
+    title: `${title} - ${listingType}`,
+    description: description,
+    keywords: `${property.type}, ${listingType.toLowerCase()}, ${property.bedrooms} bedroom, ${property.city}, property, real estate`,
     openGraph: {
-      title: title,
-      images: [metadata.mainImageUrl],
+      title: `${title} - ${listingType} | Property Portal`,
+      description: description,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: title,
+        }
+      ],
+      type: 'article',
+      locale: 'en_GB',
+      publishedTime: property.createdAt,
+      modifiedTime: property.updatedAt,
+      section: 'Properties',
+      tags: [property.type, listingType.toLowerCase(), `${property.bedrooms} bedroom`, property.city],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} - ${listingType}`,
+      description: description,
+      images: [imageUrl],
     },
   }
 }
