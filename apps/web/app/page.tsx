@@ -198,11 +198,13 @@ export default function HomePage() {
 
   // Event handlers
   const handleLogin = () => {
-    window.location.href = '/sign-in';
+    console.log('Login clicked');
+    alert('Login functionality disabled for testing');
   };
 
   const handleSignup = () => {
-    window.location.href = '/sign-up';
+    console.log('Signup clicked');
+    alert('Signup functionality disabled for testing');
   };
 
   const handlePrimaryCTA = () => {
