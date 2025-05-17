@@ -2,20 +2,19 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
-import { getProperty } from '@/app/actions/properties'
 import ErrorBoundary from '@/app/components/ErrorBoundary'
 import PropertyTimestamps from '@/app/components/PropertyTimestamps'
 import { formatCurrency, formatSquareFootage, capitalize } from '@/lib/utils/formatters'
 import { Property } from '@/types/property'
+import { fetchPropertyById } from '@/lib/api'
 
 export const dynamic = 'force-dynamic'
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const result = await getProperty(params.id)
-  if (!result.success || !result.data) return {}
+  const { property } = await fetchPropertyById(params.id)
+  if (!property) return {}
 
-  const property = result.data
   const metadata = property.metadata || {}
   const title = metadata.title || property.address
 
@@ -209,13 +208,13 @@ function PropertyDetailSkeleton() {
 
 // Data fetching component
 async function PropertyDetailData({ id }: { id: string }) {
-  const result = await getProperty(id)
+  const { property, error } = await fetchPropertyById(id)
 
-  if (!result.success || !result.data) {
+  if (!property || error) {
     notFound()
   }
 
-  return <PropertyDetailContent property={result.data} />
+  return <PropertyDetailContent property={property} />
 }
 
 // Main page component

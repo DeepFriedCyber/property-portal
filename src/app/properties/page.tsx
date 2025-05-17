@@ -1,32 +1,34 @@
-import Link from 'next/link';
-import { Suspense } from 'react';
-import { getProperties } from '@/app/actions/properties';
-import LoadingSkeleton from '@/app/components/LoadingSkeleton';
-import PropertyList from '@/app/components/PropertyList';
-import ErrorDisplay from '@/app/components/ErrorDisplay';
-import ErrorBoundary from '@/app/components/ErrorBoundary';
+import Link from 'next/link'
+import { Suspense } from 'react'
+import LoadingSkeleton from '@/app/components/LoadingSkeleton'
+import PropertyList from '@/app/components/PropertyList'
+import ErrorBoundary from '@/app/components/ErrorBoundary'
+import { fetchProperties } from '@/lib/api'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
-// This component handles the data fetching and passes it to the PropertyList component
+/**
+ * This component handles the data fetching and passes it to the PropertyList component
+ * Uses the fetchProperties API function for cleaner code
+ */
 async function PropertyListContainer({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[] | undefined }
 }) {
   // Parse search parameters
-  const listingType = searchParams.listingType as 'sale' | 'rent' | undefined;
-  const minPrice = searchParams.minPrice ? parseInt(searchParams.minPrice as string) : undefined;
-  const maxPrice = searchParams.maxPrice ? parseInt(searchParams.maxPrice as string) : undefined;
-  const bedrooms = searchParams.bedrooms ? parseInt(searchParams.bedrooms as string) : undefined;
-  const propertyType = searchParams.propertyType as string | undefined;
-  const location = searchParams.location as string | undefined;
-  const page = searchParams.page ? parseInt(searchParams.page as string) : 1;
-  const limit = 10;
-  const offset = (page - 1) * limit;
+  const listingType = searchParams.listingType as 'sale' | 'rent' | undefined
+  const minPrice = searchParams.minPrice ? parseInt(searchParams.minPrice as string) : undefined
+  const maxPrice = searchParams.maxPrice ? parseInt(searchParams.maxPrice as string) : undefined
+  const bedrooms = searchParams.bedrooms ? parseInt(searchParams.bedrooms as string) : undefined
+  const propertyType = searchParams.propertyType as string | undefined
+  const location = searchParams.location as string | undefined
+  const page = searchParams.page ? parseInt(searchParams.page as string) : 1
+  const limit = 10
+  const offset = (page - 1) * limit
 
-  // Fetch properties using server action
-  const result = await getProperties({
+  // Fetch properties using our API utility
+  const { properties, totalCount, error } = await fetchProperties({
     listingType,
     minPrice,
     maxPrice,
@@ -35,30 +37,29 @@ async function PropertyListContainer({
     location,
     limit,
     offset,
-  });
+  })
 
-  if (!result.success) {
-    throw new Error(result.error?.message || 'Failed to load properties');
+  if (error) {
+    throw new Error(error)
   }
 
-  const { properties, totalCount } = result.data;
-  const totalPages = Math.ceil(totalCount / limit);
+  const totalPages = Math.ceil(totalCount / limit)
 
   return (
-    <PropertyList 
-      properties={properties} 
-      totalCount={totalCount} 
-      page={page} 
-      totalPages={totalPages} 
-      searchParams={searchParams} 
+    <PropertyList
+      properties={properties}
+      totalCount={totalCount}
+      page={page}
+      totalPages={totalPages}
+      searchParams={searchParams}
     />
-  );
+  )
 }
 
 export default function PropertiesPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[] | undefined }
 }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -80,5 +81,5 @@ export default function PropertiesPage({
         </Suspense>
       </ErrorBoundary>
     </div>
-  );
+  )
 }
