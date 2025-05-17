@@ -11,6 +11,8 @@
 /.next/
 **/.next/
 /out/
+**/out/
+**/.next/**/*
 
 # production
 /build
@@ -25,6 +27,7 @@
 # build artifacts
 .turbo/
 **/.turbo/
+**/.turbo/**/*
 **/dist/
 **/.cache/
 storybook-static/
