@@ -23,10 +23,14 @@
     "lint:safe": "npm run lint:src && npm run lint:web && npm run lint:ui",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.19.2",
+    "@prisma/client": "^6.8.2",
     "@types/uuid": "^10.0.0",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
@@ -34,6 +38,7 @@
     "framer-motion": "^12.11.0",
     "openai": "^4.98.0",
     "postgres": "^3.4.5",
+    "prisma": "^6.8.2",
     "uuid": "^11.1.0",
     "zod": "^3.24.4"
   },
