@@ -1,30 +1,32 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Map from './Map'
 import { Property } from '@/types/property'
+import { Location } from '@/hooks/useLeafletMap'
 
 interface PropertyMapProps {
   property: Property
   nearbyProperties?: Property[]
 }
 
+/**
+ * A component that displays a property on a map along with nearby properties
+ */
 const PropertyMap = ({ property, nearbyProperties = [] }: PropertyMapProps) => {
   const [selectedProperty, setSelectedProperty] = useState<Property>(property)
   
-  // Extract location from property
-  const getLocation = (prop: Property) => {
-    // This is a simplified example - you would need to extract real coordinates
-    // from your property data structure
+  // Extract location from property - memoized to avoid unnecessary recalculations
+  const getLocation = useCallback((prop: Property): Location => {
     return {
       lat: prop.latitude || 51.505, // Default to London if not available
       lng: prop.longitude || -0.09,
     }
-  }
+  }, [])
   
   // Create markers for nearby properties
   const markers = nearbyProperties.map(prop => getLocation(prop))
   
   // Handle marker click
-  const handleMarkerClick = (location: { lat: number; lng: number }) => {
+  const handleMarkerClick = useCallback((location: Location) => {
     // Find the property that matches this location
     const clickedProperty = nearbyProperties.find(
       prop => prop.latitude === location.lat && prop.longitude === location.lng
@@ -33,7 +35,12 @@ const PropertyMap = ({ property, nearbyProperties = [] }: PropertyMapProps) => {
     if (clickedProperty) {
       setSelectedProperty(clickedProperty)
     }
-  }
+  }, [nearbyProperties])
+  
+  // Reset to main property
+  const handleResetProperty = useCallback(() => {
+    setSelectedProperty(property)
+  }, [property])
   
   return (
     <div className="property-map-container">
@@ -52,7 +59,8 @@ const PropertyMap = ({ property, nearbyProperties = [] }: PropertyMapProps) => {
           <p>{selectedProperty.address}</p>
           <button
             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => setSelectedProperty(property)}
+            onClick={handleResetProperty}
+            aria-label="Return to main property"
           >
             Back to Main Property
           </button>

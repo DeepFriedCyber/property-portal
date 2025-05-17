@@ -1,12 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import L from 'leaflet'
+import { useRef, useEffect } from 'react'
 import 'leaflet/dist/leaflet.css'
-
-// Define the location type
-interface Location {
-  lat: number
-  lng: number
-}
+import { useLeafletMap, Location } from '@/hooks/useLeafletMap'
 
 interface MapProps {
   selectedLocation?: Location
@@ -16,78 +10,40 @@ interface MapProps {
   height?: string
 }
 
+/**
+ * A reusable map component using Leaflet
+ * 
+ * This component is responsible for:
+ * - Rendering the map container
+ * - Passing props to the useLeafletMap hook
+ * - Updating the map view when selectedLocation changes
+ */
 const Map = ({
-  selectedLocation,
+  selectedLocation = { lat: 51.505, lng: -0.09 }, // Default to London
   markers = [],
   onMarkerClick,
   zoom = 13,
   height = '400px',
 }: MapProps) => {
-  const mapRef = useRef<L.Map | null>(null)
   const mapContainerRef = useRef<HTMLDivElement>(null)
-  const markersLayerRef = useRef<L.LayerGroup | null>(null)
-  const [isMapInitialized, setIsMapInitialized] = useState(false)
-
-  // Initialize map
-  useEffect(() => {
-    if (mapContainerRef.current && !mapRef.current) {
-      // Initialize the map
-      const map = L.map(mapContainerRef.current).setView(
-        selectedLocation || [51.505, -0.09], // Default to London if no location
-        zoom
-      )
-
-      // Add OpenStreetMap tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map)
-
-      // Create a layer group for markers
-      markersLayerRef.current = L.layerGroup().addTo(map)
-      
-      // Store map reference
-      mapRef.current = map
-      setIsMapInitialized(true)
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove()
-        mapRef.current = null
-        markersLayerRef.current = null
-        setIsMapInitialized(false)
-      }
-    }
-  }, [zoom]) // Only re-initialize if zoom changes
+  
+  // Use our custom hook to manage the map
+  const { isMapReady, setView } = useLeafletMap({
+    containerRef: mapContainerRef,
+    initialLocation: selectedLocation,
+    markers,
+    onMarkerClick,
+    zoom,
+  })
 
   // Update view when selected location changes
   useEffect(() => {
-    if (isMapInitialized && mapRef.current && selectedLocation) {
-      mapRef.current.setView([selectedLocation.lat, selectedLocation.lng], zoom)
+    if (isMapReady && selectedLocation) {
+      setView(selectedLocation, zoom)
     }
-  }, [selectedLocation, zoom, isMapInitialized])
+  }, [selectedLocation, zoom, isMapReady, setView])
 
-  // Update markers when markers array changes
-  useEffect(() => {
-    if (isMapInitialized && markersLayerRef.current) {
-      // Clear existing markers
-      markersLayerRef.current.clearLayers()
-      
-      // Add new markers
-      markers.forEach(location => {
-        const marker = L.marker([location.lat, location.lng])
-        
-        if (onMarkerClick) {
-          marker.on('click', () => onMarkerClick(location))
-        }
-        
-        marker.addTo(markersLayerRef.current!)
-      })
-    }
-  }, [markers, onMarkerClick, isMapInitialized])
-
-  return <div ref={mapContainerRef} style={{ height, width: '100%' }} />
+  return <div ref={mapContainerRef} style={{ height, width: '100%' }} data-testid="map-container" />
 }
 
 export default Map
