@@ -1,5 +1,2 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Temporarily comment out lint-staged to allow commits
 # npx lint-staged
