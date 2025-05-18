@@ -1,15 +1,15 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import { motion } from 'framer-motion'
+import React, { useState } from 'react'
 
 import AnimatedComponent, {
   fadeInVariants,
   slideInVariants,
   scaleVariants,
-} from '@/components/animations/AnimatedComponent';
-import AnimatedModal from '@/components/animations/AnimatedModal';
-import AnimatedPropertyCard from '@/components/animations/AnimatedPropertyCard';
+} from '@/components/animations/AnimatedComponent'
+import AnimatedModal from '@/components/animations/AnimatedModal'
+import AnimatedPropertyCard from '@/components/animations/AnimatedPropertyCard'
 
 // Sample property data
 const sampleProperties = [
@@ -45,25 +45,25 @@ const sampleProperties = [
     type: 'Condo',
     image: 'https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?w=500&q=80',
   },
-];
+]
 
 // Animation examples page
 export default function AnimationExamplesPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedProperty, setSelectedProperty] = useState<(typeof sampleProperties)[0] | null>(
     null
-  );
+  )
 
   // Open modal with selected property
   const handlePropertyClick = (property: (typeof sampleProperties)[0]) => {
-    setSelectedProperty(property);
-    setIsModalOpen(true);
-  };
+    setSelectedProperty(property)
+    setIsModalOpen(true)
+  }
 
   // Close modal
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+    setIsModalOpen(false)
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -238,5 +238,5 @@ export default function AnimationExamplesPage() {
         )}
       </AnimatedModal>
     </div>
-  );
+  )
 }

@@ -1,14 +1,14 @@
-'use client';
+'use client'
 
-import { motion, AnimatePresence } from 'framer-motion';
-import React, { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion'
+import React, { useEffect, useRef } from 'react'
 
 interface AnimatedModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-  ariaDescribedby?: string;
+  isOpen: boolean
+  onClose: () => void
+  title: string
+  children: React.ReactNode
+  ariaDescribedby?: string
 }
 
 /**
@@ -21,69 +21,69 @@ const AnimatedModal: React.FC<AnimatedModalProps> = ({
   children,
   ariaDescribedby,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
   // Handle keyboard events
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
-      onClose();
+      onClose()
     }
-  };
+  }
 
   // Handle click outside
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      onClose()
     }
-  };
+  }
 
   // Manage focus and keyboard events
   useEffect(() => {
     if (isOpen) {
       // Store the previously focused element
-      previousFocusRef.current = document.activeElement as HTMLElement;
+      previousFocusRef.current = document.activeElement as HTMLElement
 
       // Add keyboard event listener
-      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keydown', handleKeyDown)
 
       // Focus the modal
       if (modalRef.current) {
-        modalRef.current.focus();
+        modalRef.current.focus()
       }
 
       // Prevent body scrolling
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     } else {
       // Remove keyboard event listener
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown)
 
       // Restore focus to the previously focused element
       if (previousFocusRef.current) {
-        previousFocusRef.current.focus();
+        previousFocusRef.current.focus()
       }
 
       // Restore body scrolling
-      document.body.style.overflow = '';
+      document.body.style.overflow = ''
     }
 
     // Cleanup
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, handleKeyDown]);
+      window.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = ''
+    }
+  }, [isOpen, handleKeyDown])
 
   // Modal animation variants
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
-  };
+  }
 
   const modalVariants = {
     hidden: { opacity: 0, y: 50, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1 },
-  };
+  }
 
   return (
     <AnimatePresence>
@@ -139,7 +139,7 @@ const AnimatedModal: React.FC<AnimatedModalProps> = ({
         </motion.div>
       )}
     </AnimatePresence>
-  );
-};
+  )
+}
 
-export default AnimatedModal;
+export default AnimatedModal

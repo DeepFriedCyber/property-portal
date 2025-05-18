@@ -121,10 +121,10 @@ Ensure all interactive elements are accessible via keyboard.
   role="button"
   tabIndex={0}
   onClick={handleClick}
-  onKeyDown={(e) => {
+  onKeyDown={e => {
     if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleClick();
+      e.preventDefault()
+      handleClick()
     }
   }}
 >

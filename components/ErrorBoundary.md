@@ -7,7 +7,7 @@ This Error Boundary component prevents crashes in sub-components and provides us
 Wrap any component that might throw an error with the ErrorBoundary component:
 
 ```jsx
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundary from './components/ErrorBoundary'
 
 function App() {
   return (
@@ -16,7 +16,7 @@ function App() {
         <ComponentThatMightError />
       </ErrorBoundary>
     </div>
-  );
+  )
 }
 ```
 
@@ -27,7 +27,7 @@ function App() {
 You can provide a custom fallback UI to be displayed when an error occurs:
 
 ```jsx
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundary from './components/ErrorBoundary'
 
 function App() {
   const customFallback = (
@@ -35,7 +35,7 @@ function App() {
       <h2>Oops! Something went wrong.</h2>
       <button onClick={() => window.location.reload()}>Refresh</button>
     </div>
-  );
+  )
 
   return (
     <div className="app">
@@ -43,7 +43,7 @@ function App() {
         <ComponentThatMightError />
       </ErrorBoundary>
     </div>
-  );
+  )
 }
 ```
 
@@ -52,14 +52,14 @@ function App() {
 You can provide an error handler function to log or report errors:
 
 ```jsx
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundary from './components/ErrorBoundary'
 
 function App() {
   const handleError = (error, errorInfo) => {
     // Send error to your error reporting service
-    console.error('Error caught:', error, errorInfo);
+    console.error('Error caught:', error, errorInfo)
     // logErrorToService(error, errorInfo);
-  };
+  }
 
   return (
     <div className="app">
@@ -67,7 +67,7 @@ function App() {
         <ComponentThatMightError />
       </ErrorBoundary>
     </div>
-  );
+  )
 }
 ```
 

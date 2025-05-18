@@ -1,83 +1,83 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import { ApiError } from '@/lib/api/error-handling';
-import { ValidationError } from '@/lib/api/validation';
-import logger from '@/lib/logging/logger';
+import { ApiError } from '@/lib/api/error-handling'
+import { ValidationError } from '@/lib/api/validation'
+import logger from '@/lib/logging/logger'
 
 /**
  * Example component demonstrating centralized error handling
  */
 const CentralizedErrorHandlingExample: React.FC = () => {
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null)
+  const [loading, setLoading] = useState(false)
 
   // Simulate different types of errors
   const simulateGenericError = () => {
-    setLoading(true);
+    setLoading(true)
     setTimeout(() => {
       try {
-        throw new Error('This is a simulated generic error');
+        throw new Error('This is a simulated generic error')
       } catch (err) {
         if (err instanceof Error) {
           // Log the error
-          logger.error('Generic error occurred:', err);
+          logger.error('Generic error occurred:', err)
           // Set the error state
-          setError(err);
+          setError(err)
         }
-        setLoading(false);
+        setLoading(false)
       }
-    }, 500);
-  };
+    }, 500)
+  }
 
   const simulateApiError = () => {
-    setLoading(true);
+    setLoading(true)
     setTimeout(() => {
       try {
         throw new ApiError('Failed to fetch user data', 404, 'USER_NOT_FOUND', {
           userId: '12345',
-        });
+        })
       } catch (err) {
         if (err instanceof Error) {
           // Log the error
-          logger.error('API error occurred:', err);
+          logger.error('API error occurred:', err)
           // Set the error state
-          setError(err);
+          setError(err)
         }
-        setLoading(false);
+        setLoading(false)
       }
-    }, 500);
-  };
+    }, 500)
+  }
 
   const simulateValidationError = () => {
-    setLoading(true);
+    setLoading(true)
     setTimeout(() => {
       try {
         throw new ValidationError('Form validation failed', 'VALIDATION_ERROR', {
           email: 'Email is required',
           password: 'Password must be at least 8 characters',
-        });
+        })
       } catch (err) {
         if (err instanceof Error) {
           // Log the error
-          logger.error('Validation error occurred:', err);
+          logger.error('Validation error occurred:', err)
           // Set the error state
-          setError(err);
+          setError(err)
         }
-        setLoading(false);
+        setLoading(false)
       }
-    }, 500);
-  };
+    }, 500)
+  }
 
   // Clear the error
   const clearError = () => {
-    setError(null);
-  };
+    setError(null)
+  }
 
   // Render appropriate error UI based on error type
   const renderErrorUI = () => {
-    if (!error) return null;
+    if (!error) return null
 
     if (error instanceof ApiError) {
       return (
@@ -96,7 +96,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
             Dismiss
           </button>
         </div>
-      );
+      )
     }
 
     if (error instanceof ValidationError) {
@@ -123,7 +123,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
             Dismiss
           </button>
         </div>
-      );
+      )
     }
 
     // Generic error
@@ -138,8 +138,8 @@ const CentralizedErrorHandlingExample: React.FC = () => {
           Dismiss
         </button>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
@@ -178,7 +178,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CentralizedErrorHandlingExample;
+export default CentralizedErrorHandlingExample

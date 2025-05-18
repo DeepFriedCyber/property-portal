@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import { useState, useRef, useEffect, DragEvent, ChangeEvent } from 'react';
+import { useState, useRef, useEffect, DragEvent, ChangeEvent } from 'react'
 
-import { Button } from '../../src/ui';
+import { Button } from '../../src/ui'
 
 interface FileValidationResult {
-  valid: boolean;
-  message: string;
+  valid: boolean
+  message: string
 }
 
 interface UploadZoneProps {
-  onUpload: (file: File) => void;
-  acceptedFileTypes?: string | string[];
-  maxSizeInMB?: number;
-  multiple?: boolean;
-  disabled?: boolean;
-  showPreview?: boolean;
-  customValidator?: (file: File) => Promise<FileValidationResult> | FileValidationResult;
-  className?: string;
-  description?: string;
+  onUpload: (file: File) => void
+  acceptedFileTypes?: string | string[]
+  maxSizeInMB?: number
+  multiple?: boolean
+  disabled?: boolean
+  showPreview?: boolean
+  customValidator?: (file: File) => Promise<FileValidationResult> | FileValidationResult
+  className?: string
+  description?: string
 }
 
 export default function UploadZone({
@@ -32,141 +32,141 @@ export default function UploadZone({
   className = '',
   description,
 }: UploadZoneProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [validationError, setValidationError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropZoneRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [validationError, setValidationError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const dropZoneRef = useRef<HTMLDivElement>(null)
 
   // Convert acceptedFileTypes to array for easier handling
   const acceptedTypesArray = Array.isArray(acceptedFileTypes)
     ? acceptedFileTypes
-    : [acceptedFileTypes];
+    : [acceptedFileTypes]
 
   // Clean up preview URL when component unmounts
   useEffect(() => {
     return () => {
       if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
+        URL.revokeObjectURL(previewUrl)
       }
-    };
-  }, [previewUrl]);
+    }
+  }, [previewUrl])
 
   // Handle drag events
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
     if (!disabled) {
-      setIsDragging(true);
+      setIsDragging(true)
     }
-  };
+  }
 
   const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
 
-    if (disabled) return;
+    if (disabled) return
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      processFile(file);
+      const file = e.dataTransfer.files[0]
+      processFile(file)
     }
-  };
+  }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      processFile(file);
+      const file = e.target.files[0]
+      processFile(file)
     }
-  };
+  }
 
   const validateFileType = (file: File): boolean => {
     // If no specific types are required, accept all
     if (acceptedTypesArray.length === 0 || acceptedTypesArray[0] === '*') {
-      return true;
+      return true
     }
 
     // Check if file extension or MIME type matches any accepted type
-    return acceptedTypesArray.some((type) => {
+    return acceptedTypesArray.some(type => {
       // Check by extension (e.g., .csv)
       if (type.startsWith('.')) {
-        return file.name.toLowerCase().endsWith(type.toLowerCase());
+        return file.name.toLowerCase().endsWith(type.toLowerCase())
       }
       // Check by MIME type (e.g., text/csv)
-      return file.type === type;
-    });
-  };
+      return file.type === type
+    })
+  }
 
   const validateFileSize = (file: File): boolean => {
-    const fileSizeInMB = file.size / (1024 * 1024);
-    return fileSizeInMB <= maxSizeInMB;
-  };
+    const fileSizeInMB = file.size / (1024 * 1024)
+    return fileSizeInMB <= maxSizeInMB
+  }
 
   const processFile = async (file: File) => {
-    setValidationError(null);
+    setValidationError(null)
 
     // Validate file type
     if (!validateFileType(file)) {
       setValidationError(
         `Invalid file type. Please upload ${acceptedTypesArray.join(' or ')} files.`
-      );
-      return;
+      )
+      return
     }
 
     // Validate file size
     if (!validateFileSize(file)) {
-      setValidationError(`File is too large. Maximum size is ${maxSizeInMB}MB.`);
-      return;
+      setValidationError(`File is too large. Maximum size is ${maxSizeInMB}MB.`)
+      return
     }
 
     // Run custom validator if provided
     if (customValidator) {
       try {
-        const result = await Promise.resolve(customValidator(file));
+        const result = await Promise.resolve(customValidator(file))
         if (!result.valid) {
-          setValidationError(result.message);
-          return;
+          setValidationError(result.message)
+          return
         }
       } catch (error) {
-        setValidationError('File validation failed.');
-        return;
+        setValidationError('File validation failed.')
+        return
       }
     }
 
     // Create preview for image files
     if (showPreview && file.type.startsWith('image/')) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      const url = URL.createObjectURL(file)
+      setPreviewUrl(url)
     } else {
-      setPreviewUrl(null);
+      setPreviewUrl(null)
     }
 
-    setSelectedFile(file);
-    onUpload(file);
-  };
+    setSelectedFile(file)
+    onUpload(file)
+  }
 
   const handleButtonClick = () => {
     if (!disabled && fileInputRef.current) {
-      fileInputRef.current.click();
+      fileInputRef.current.click()
     }
-  };
+  }
 
   const clearFile = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    setSelectedFile(null);
-    setPreviewUrl(null);
+    e.stopPropagation()
+    setSelectedFile(null)
+    setPreviewUrl(null)
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = ''
     }
-  };
+  }
 
   return (
     <div className={`${className}`}>
@@ -262,9 +262,9 @@ export default function UploadZone({
                 size="small"
                 onClick={() => {
                   if (fileInputRef.current) {
-                    setSelectedFile(null);
-                    setPreviewUrl(null);
-                    fileInputRef.current.value = '';
+                    setSelectedFile(null)
+                    setPreviewUrl(null)
+                    fileInputRef.current.value = ''
                   }
                 }}
                 disabled={disabled}
@@ -279,5 +279,5 @@ export default function UploadZone({
       {/* Error message */}
       {validationError && <div className="mt-2 text-sm text-red-600">{validationError}</div>}
     </div>
-  );
+  )
 }

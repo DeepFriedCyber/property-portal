@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react'
 
-import { Button } from './Button'; // Import the component
+import { Button } from './Button' // Import the component
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta: Meta<typeof Button> = {
@@ -35,10 +35,10 @@ const meta: Meta<typeof Button> = {
     disabled: false,
     children: 'Button Text',
   },
-};
+}
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
 export const Primary: Story = {
@@ -46,46 +46,46 @@ export const Primary: Story = {
     variant: 'primary',
     children: 'Primary Button',
   },
-};
+}
 
 export const Secondary: Story = {
   args: {
     variant: 'secondary',
     children: 'Secondary Button',
   },
-};
+}
 
 export const Destructive: Story = {
   args: {
     variant: 'destructive',
     children: 'Delete Action',
   },
-};
+}
 
 export const Large: Story = {
   args: {
     size: 'large',
     children: 'Large Button',
   },
-};
+}
 
 export const Small: Story = {
   args: {
     size: 'small',
     children: 'Small Button',
   },
-};
+}
 
 export const IsLoading: Story = {
   args: {
     isLoading: true,
     children: 'Loading...', // Children might be ignored by the component when isLoading
   },
-};
+}
 
 export const Disabled: Story = {
   args: {
     disabled: true,
     children: 'Disabled Button',
   },
-};
+}

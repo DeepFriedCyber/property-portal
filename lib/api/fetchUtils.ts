@@ -1,28 +1,28 @@
 // fetchUtils.ts
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 // Custom error types
 export class NetworkError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = 'NetworkError';
+    super(message)
+    this.name = 'NetworkError'
   }
 }
 
 export class TimeoutError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = 'TimeoutError';
+    super(message)
+    this.name = 'TimeoutError'
   }
 }
 
 export class ApiError extends Error {
-  status: number;
+  status: number
 
   constructor(message: string, status: number) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
   }
 }
 
@@ -32,7 +32,7 @@ const defaultOptions = {
   maxRetries: 3,
   backoffFactor: 2,
   retryStatusCodes: [408, 429, 500, 502, 503, 504],
-};
+}
 
 /**
  * Fetch with timeout utility function
@@ -46,26 +46,26 @@ export const fetchWithTimeout = async (
   options: RequestInit = {},
   timeout = defaultOptions.timeout
 ): Promise<Response> => {
-  const controller = new AbortController();
-  const { signal } = controller;
+  const controller = new AbortController()
+  const { signal } = controller
 
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const timeoutId = setTimeout(() => controller.abort(), timeout)
 
   try {
-    const response = await fetch(url, { ...options, signal });
-    clearTimeout(timeoutId);
-    return response;
+    const response = await fetch(url, { ...options, signal })
+    clearTimeout(timeoutId)
+    return response
   } catch (error) {
-    clearTimeout(timeoutId);
+    clearTimeout(timeoutId)
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        throw new TimeoutError(`Request timed out after ${timeout}ms`);
+        throw new TimeoutError(`Request timed out after ${timeout}ms`)
       }
-      throw new NetworkError(`Network error: ${error.message}`);
+      throw new NetworkError(`Network error: ${error.message}`)
     }
-    throw error;
+    throw error
   }
-};
+}
 
 /**
  * Fetch with retry and exponential backoff
@@ -83,31 +83,31 @@ export const fetchWithRetry = async <T>(
   backoff = defaultOptions.backoffFactor * 100,
   timeout = defaultOptions.timeout
 ): Promise<T> => {
-  let lastError: Error;
+  let lastError: Error
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const response = await fetchWithTimeout(url, options, timeout);
+      const response = await fetchWithTimeout(url, options, timeout)
 
       if (!response.ok) {
-        const status = response.status;
-        const shouldRetry = defaultOptions.retryStatusCodes.includes(status);
+        const status = response.status
+        const shouldRetry = defaultOptions.retryStatusCodes.includes(status)
 
         // Don't retry for certain status codes
         if (!shouldRetry && attempt < retries) {
-          throw new ApiError(`HTTP error! Status: ${status}`, status);
+          throw new ApiError(`HTTP error! Status: ${status}`, status)
         }
 
-        throw new ApiError(`HTTP error! Status: ${status}`, status);
+        throw new ApiError(`HTTP error! Status: ${status}`, status)
       }
 
-      return await response.json();
+      return await response.json()
     } catch (err) {
-      const error = err as Error;
-      lastError = error;
+      const error = err as Error
+      lastError = error
 
       // Don't retry if we've reached max retries
-      if (attempt === retries) break;
+      if (attempt === retries) break
 
       // Don't retry for certain errors
       if (error instanceof ApiError) {
@@ -117,19 +117,19 @@ export const fetchWithRetry = async <T>(
           error.status < 500 &&
           !defaultOptions.retryStatusCodes.includes(error.status)
         ) {
-          break;
+          break
         }
       }
 
       // Wait with exponential backoff before retrying
-      const delay = backoff * Math.pow(2, attempt);
-      console.log(`Retrying fetch (${attempt + 1}/${retries}) after ${delay}ms...`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      const delay = backoff * Math.pow(2, attempt)
+      console.log(`Retrying fetch (${attempt + 1}/${retries}) after ${delay}ms...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
 
-  throw lastError;
-};
+  throw lastError
+}
 
 /**
  * Axios with retry and exponential backoff
@@ -145,50 +145,50 @@ export const axiosWithRetry = async <T>(
 ): Promise<AxiosResponse<T>> => {
   // Set default timeout if not provided
   if (!config.timeout) {
-    config.timeout = defaultOptions.timeout;
+    config.timeout = defaultOptions.timeout
   }
 
-  let lastError: Error;
+  let lastError: Error
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      return await axios.request<T>(config);
+      return await axios.request<T>(config)
     } catch (err) {
-      const error = err as Error;
-      lastError = error;
+      const error = err as Error
+      lastError = error
 
       // Don't retry if we've reached max retries
-      if (attempt === retries) break;
+      if (attempt === retries) break
 
       // Handle Axios errors
       if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError;
+        const axiosError = error as AxiosError
 
         // Don't retry for timeout errors
         if (axiosError.code === 'ECONNABORTED') {
-          throw new TimeoutError(`Request timed out after ${config.timeout}ms`);
+          throw new TimeoutError(`Request timed out after ${config.timeout}ms`)
         }
 
         // Don't retry for certain status codes
         if (axiosError.response) {
-          const status = axiosError.response.status;
-          const shouldRetry = defaultOptions.retryStatusCodes.includes(status);
+          const status = axiosError.response.status
+          const shouldRetry = defaultOptions.retryStatusCodes.includes(status)
 
           if (!shouldRetry && status >= 400 && status < 500) {
-            break;
+            break
           }
         }
       }
 
       // Wait with exponential backoff before retrying
-      const delay = backoff * Math.pow(2, attempt);
-      console.log(`Retrying axios request (${attempt + 1}/${retries}) after ${delay}ms...`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      const delay = backoff * Math.pow(2, attempt)
+      console.log(`Retrying axios request (${attempt + 1}/${retries}) after ${delay}ms...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
 
-  throw lastError;
-};
+  throw lastError
+}
 
 /**
  * Create a circuit breaker for API calls
@@ -196,18 +196,18 @@ export const axiosWithRetry = async <T>(
  * @returns Circuit breaker object
  */
 export const createCircuitBreaker = (options: {
-  name: string;
-  failureThreshold?: number;
-  resetTimeout?: number;
+  name: string
+  failureThreshold?: number
+  resetTimeout?: number
 }) => {
   const state = {
     failures: 0,
     lastFailure: null as number | null,
     status: 'CLOSED' as 'CLOSED' | 'OPEN' | 'HALF_OPEN',
-  };
+  }
 
-  const failureThreshold = options.failureThreshold || 5;
-  const resetTimeout = options.resetTimeout || 30000; // 30 seconds
+  const failureThreshold = options.failureThreshold || 5
+  const resetTimeout = options.resetTimeout || 30000 // 30 seconds
 
   return {
     /**
@@ -217,23 +217,23 @@ export const createCircuitBreaker = (options: {
     canMakeRequest(): boolean {
       // If circuit is closed, allow the request
       if (state.status === 'CLOSED') {
-        return true;
+        return true
       }
 
       // If circuit is open, check if it's time to try again
       if (state.status === 'OPEN') {
-        const now = Date.now();
+        const now = Date.now()
         if (state.lastFailure && now - state.lastFailure > resetTimeout) {
           // Move to half-open state
-          state.status = 'HALF_OPEN';
-          console.log(`Circuit breaker ${options.name} is now HALF_OPEN`);
-          return true;
+          state.status = 'HALF_OPEN'
+          console.log(`Circuit breaker ${options.name} is now HALF_OPEN`)
+          return true
         }
-        return false;
+        return false
       }
 
       // If circuit is half-open, allow one test request
-      return true;
+      return true
     },
 
     /**
@@ -242,10 +242,10 @@ export const createCircuitBreaker = (options: {
     recordSuccess(): void {
       if (state.status === 'HALF_OPEN') {
         // Reset the circuit breaker
-        state.failures = 0;
-        state.lastFailure = null;
-        state.status = 'CLOSED';
-        console.log(`Circuit breaker ${options.name} is now CLOSED`);
+        state.failures = 0
+        state.lastFailure = null
+        state.status = 'CLOSED'
+        console.log(`Circuit breaker ${options.name} is now CLOSED`)
       }
     },
 
@@ -253,15 +253,15 @@ export const createCircuitBreaker = (options: {
      * Record a failed request
      */
     recordFailure(): void {
-      state.failures += 1;
-      state.lastFailure = Date.now();
+      state.failures += 1
+      state.lastFailure = Date.now()
 
       if (state.status === 'CLOSED' && state.failures >= failureThreshold) {
-        state.status = 'OPEN';
-        console.log(`Circuit breaker ${options.name} is now OPEN`);
+        state.status = 'OPEN'
+        console.log(`Circuit breaker ${options.name} is now OPEN`)
       } else if (state.status === 'HALF_OPEN') {
-        state.status = 'OPEN';
-        console.log(`Circuit breaker ${options.name} is now OPEN after failed test`);
+        state.status = 'OPEN'
+        console.log(`Circuit breaker ${options.name} is now OPEN after failed test`)
       }
     },
 
@@ -270,20 +270,20 @@ export const createCircuitBreaker = (options: {
      * @returns Circuit breaker status
      */
     getStatus(): 'CLOSED' | 'OPEN' | 'HALF_OPEN' {
-      return state.status;
+      return state.status
     },
 
     /**
      * Reset the circuit breaker
      */
     reset(): void {
-      state.failures = 0;
-      state.lastFailure = null;
-      state.status = 'CLOSED';
-      console.log(`Circuit breaker ${options.name} has been reset`);
+      state.failures = 0
+      state.lastFailure = null
+      state.status = 'CLOSED'
+      console.log(`Circuit breaker ${options.name} has been reset`)
     },
-  };
-};
+  }
+}
 
 /**
  * Execute a function with circuit breaker protection
@@ -299,24 +299,24 @@ export const withCircuitBreaker = async <T>(
 ): Promise<T> => {
   if (!circuitBreaker.canMakeRequest()) {
     if (fallbackFn) {
-      console.log('Circuit breaker is OPEN, using fallback');
-      return fallbackFn();
+      console.log('Circuit breaker is OPEN, using fallback')
+      return fallbackFn()
     }
-    throw new Error('Service is unavailable and no fallback is available');
+    throw new Error('Service is unavailable and no fallback is available')
   }
 
   try {
-    const result = await fn();
-    circuitBreaker.recordSuccess();
-    return result;
+    const result = await fn()
+    circuitBreaker.recordSuccess()
+    return result
   } catch (error) {
-    circuitBreaker.recordFailure();
+    circuitBreaker.recordFailure()
 
     if (fallbackFn) {
-      console.log('Primary function failed, using fallback');
-      return fallbackFn();
+      console.log('Primary function failed, using fallback')
+      return fallbackFn()
     }
 
-    throw error;
+    throw error
   }
-};
+}

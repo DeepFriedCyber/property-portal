@@ -1,18 +1,18 @@
 // components/error-handling/EnhancedErrorBoundary.tsx
-import React, { Component, ErrorInfo, ReactNode, useState, useEffect } from 'react';
+import React, { Component, ErrorInfo, ReactNode, useState, useEffect } from 'react'
 
-import logger from '@/lib/logging/logger';
+import logger from '@/lib/logging/logger'
 
 interface ErrorBoundaryProps {
-  children: ReactNode;
-  fallback?: ReactNode | ((error: Error, resetError: () => void) => ReactNode);
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
-  errorTypes?: Array<string>;
+  children: ReactNode
+  fallback?: ReactNode | ((error: Error, resetError: () => void) => ReactNode)
+  onError?: (error: Error, errorInfo: ErrorInfo) => void
+  errorTypes?: Array<string>
 }
 
 interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
+  hasError: boolean
+  error: Error | null
 }
 
 /**
@@ -20,18 +20,18 @@ interface ErrorBoundaryState {
  */
 class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
-    super(props);
+    super(props)
     this.state = {
       hasError: false,
       error: null,
-    };
+    }
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return {
       hasError: true,
       error,
-    };
+    }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
@@ -45,11 +45,11 @@ class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState
         errorMessage: error.message,
       },
       ['error-boundary', 'render-error']
-    );
+    )
 
     // Call the optional onError callback
     if (this.props.onError) {
-      this.props.onError(error, errorInfo);
+      this.props.onError(error, errorInfo)
     }
   }
 
@@ -57,26 +57,26 @@ class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState
     this.setState({
       hasError: false,
       error: null,
-    });
-  };
+    })
+  }
 
   render(): ReactNode {
-    const { hasError, error } = this.state;
-    const { children, fallback, errorTypes } = this.props;
+    const { hasError, error } = this.state
+    const { children, fallback, errorTypes } = this.props
 
     if (hasError && error) {
       // Check if we should handle this type of error
       if (errorTypes && !errorTypes.includes(error.name)) {
         // Re-throw errors we don't want to handle
-        throw error;
+        throw error
       }
 
       // Render custom fallback if provided
       if (fallback) {
         if (typeof fallback === 'function') {
-          return fallback(error, this.resetError);
+          return fallback(error, this.resetError)
         }
-        return fallback;
+        return fallback
       }
 
       // Default error UI
@@ -98,10 +98,10 @@ class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState
             Try again
           </button>
         </div>
-      );
+      )
     }
 
-    return children;
+    return children
   }
 }
 
@@ -109,16 +109,16 @@ class ErrorBoundaryBase extends Component<ErrorBoundaryProps, ErrorBoundaryState
  * Hook to catch and handle async errors
  */
 function useAsyncErrorHandler(onError?: (error: Error) => void, errorTypes?: Array<string>) {
-  const [asyncError, setAsyncError] = useState<Error | null>(null);
+  const [asyncError, setAsyncError] = useState<Error | null>(null)
 
   // Set up global error handler for unhandled promise rejections
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      const error = event.reason;
+      const error = event.reason
 
       // Check if we should handle this type of error
       if (errorTypes && error.name && !errorTypes.includes(error.name)) {
-        return;
+        return
       }
 
       // Log the error
@@ -130,57 +130,57 @@ function useAsyncErrorHandler(onError?: (error: Error) => void, errorTypes?: Arr
           errorMessage: error.message,
         },
         ['error-boundary', 'async-error', 'unhandled-rejection']
-      );
+      )
 
       // Set the error state
-      setAsyncError(error);
+      setAsyncError(error)
 
       // Call the optional onError callback
       if (onError) {
-        onError(error);
+        onError(error)
       }
 
       // Prevent the default handler
-      event.preventDefault();
-    };
+      event.preventDefault()
+    }
 
     // Add event listener
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection)
 
     // Clean up
     return () => {
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-    };
-  }, [onError, errorTypes]);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection)
+    }
+  }, [onError, errorTypes])
 
   // Reset the error state
   const resetAsyncError = () => {
-    setAsyncError(null);
-  };
+    setAsyncError(null)
+  }
 
-  return { asyncError, resetAsyncError };
+  return { asyncError, resetAsyncError }
 }
 
 /**
  * Enhanced error boundary that catches both render errors and async errors
  */
-const EnhancedErrorBoundary: React.FC<ErrorBoundaryProps> = (props) => {
-  const { children, fallback, onError, errorTypes } = props;
+const EnhancedErrorBoundary: React.FC<ErrorBoundaryProps> = props => {
+  const { children, fallback, onError, errorTypes } = props
 
   // Use the async error handler hook
-  const { asyncError, resetAsyncError } = useAsyncErrorHandler((error) => {
+  const { asyncError, resetAsyncError } = useAsyncErrorHandler(error => {
     if (onError) {
-      onError(error, { componentStack: '' });
+      onError(error, { componentStack: '' })
     }
-  }, errorTypes);
+  }, errorTypes)
 
   // If there's an async error, render the fallback
   if (asyncError) {
     if (fallback) {
       if (typeof fallback === 'function') {
-        return <>{fallback(asyncError, resetAsyncError)}</>;
+        return <>{fallback(asyncError, resetAsyncError)}</>
       }
-      return <>{fallback}</>;
+      return <>{fallback}</>
     }
 
     // Default error UI for async errors
@@ -202,11 +202,11 @@ const EnhancedErrorBoundary: React.FC<ErrorBoundaryProps> = (props) => {
           Try again
         </button>
       </div>
-    );
+    )
   }
 
   // If no async error, use the base error boundary for render errors
-  return <ErrorBoundaryBase {...props} />;
-};
+  return <ErrorBoundaryBase {...props} />
+}
 
-export default EnhancedErrorBoundary;
+export default EnhancedErrorBoundary

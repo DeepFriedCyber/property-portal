@@ -1,12 +1,12 @@
-'use client';
+'use client'
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
     // Check if user is authenticated and has admin role
@@ -16,41 +16,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         // For example, calling an API endpoint to verify the session
         const response = await fetch('/api/auth/check', {
           credentials: 'include',
-        });
+        })
 
         if (!response.ok) {
-          throw new Error('Not authenticated');
+          throw new Error('Not authenticated')
         }
 
-        const data = await response.json();
+        const data = await response.json()
 
         if (data.role !== 'admin') {
-          throw new Error('Not authorized');
+          throw new Error('Not authorized')
         }
 
-        setIsAuthenticated(true);
+        setIsAuthenticated(true)
       } catch (err) {
-        console.error('Auth check failed:', err);
+        console.error('Auth check failed:', err)
         // Redirect to login page
-        router.push('/login?redirect=/admin/dashboard');
+        router.push('/login?redirect=/admin/dashboard')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    checkAuth();
-  }, [router]);
+    checkAuth()
+  }, [router])
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700"></div>
       </div>
-    );
+    )
   }
 
   if (!isAuthenticated) {
-    return null; // Will redirect in the useEffect
+    return null // Will redirect in the useEffect
   }
 
   return (
@@ -87,7 +87,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <button
                 onClick={() => {
                   // This would be replaced with your actual logout logic
-                  router.push('/login');
+                  router.push('/login')
                 }}
                 className="px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-700"
               >
@@ -100,5 +100,5 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <main className="py-10">{children}</main>
     </div>
-  );
+  )
 }

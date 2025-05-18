@@ -1,21 +1,21 @@
 // AccessibleButton.tsx
-import React from 'react';
+import React from 'react'
 
 interface AccessibleButtonProps {
-  children: React.ReactNode;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  ariaLabel?: string;
-  ariaExpanded?: boolean;
-  ariaControls?: string;
-  ariaPressed?: boolean;
-  ariaDescribedby?: string;
-  disabled?: boolean;
-  className?: string;
-  type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary' | 'outline' | 'text';
-  size?: 'small' | 'medium' | 'large';
-  icon?: React.ReactNode;
-  iconPosition?: 'left' | 'right';
+  children: React.ReactNode
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
+  ariaLabel?: string
+  ariaExpanded?: boolean
+  ariaControls?: string
+  ariaPressed?: boolean
+  ariaDescribedby?: string
+  disabled?: boolean
+  className?: string
+  type?: 'button' | 'submit' | 'reset'
+  variant?: 'primary' | 'secondary' | 'outline' | 'text'
+  size?: 'small' | 'medium' | 'large'
+  icon?: React.ReactNode
+  iconPosition?: 'left' | 'right'
 }
 
 const AccessibleButton: React.FC<AccessibleButtonProps> = ({
@@ -36,14 +36,14 @@ const AccessibleButton: React.FC<AccessibleButtonProps> = ({
 }) => {
   // Determine if we need to use aria-label
   // If the button only contains an icon and no text, aria-label is required
-  const needsAriaLabel = !children && icon && !ariaLabel;
+  const needsAriaLabel = !children && icon && !ariaLabel
 
   if (needsAriaLabel) {
-    console.warn('AccessibleButton: Buttons with only icons must have an aria-label');
+    console.warn('AccessibleButton: Buttons with only icons must have an aria-label')
   }
 
-  const variantClass = `btn-${variant}`;
-  const sizeClass = `btn-${size}`;
+  const variantClass = `btn-${variant}`
+  const sizeClass = `btn-${size}`
 
   return (
     <button
@@ -71,7 +71,7 @@ const AccessibleButton: React.FC<AccessibleButtonProps> = ({
         </span>
       )}
     </button>
-  );
-};
+  )
+}
 
-export default AccessibleButton;
+export default AccessibleButton

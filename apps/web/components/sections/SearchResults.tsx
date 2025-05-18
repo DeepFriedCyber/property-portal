@@ -1,26 +1,26 @@
-import React from 'react';
+import React from 'react'
 
-import { Button } from '../../src/ui';
+import { Button } from '../../src/ui'
 
 export interface Property {
-  id: string;
-  title: string;
-  price: string;
-  location: string;
-  bedrooms: number;
-  bathrooms: number;
-  area: string;
-  description: string;
-  imageUrl: string;
+  id: string
+  title: string
+  price: string
+  location: string
+  bedrooms: number
+  bathrooms: number
+  area: string
+  description: string
+  imageUrl: string
 }
 
 interface SearchResultsProps {
-  query: string;
-  results: Property[];
-  isLoading: boolean;
-  error?: string;
-  onViewDetails?: (propertyId: string) => void;
-  onClearSearch?: () => void;
+  query: string
+  results: Property[]
+  isLoading: boolean
+  error?: string
+  onViewDetails?: (propertyId: string) => void
+  onClearSearch?: () => void
 }
 
 // Skeleton loader for property cards
@@ -41,7 +41,7 @@ const PropertyCardSkeleton = () => (
       <div className="h-10 bg-gray-300 rounded w-full"></div>
     </div>
   </div>
-);
+)
 
 const SearchResults: React.FC<SearchResultsProps> = ({
   query,
@@ -51,7 +51,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   onViewDetails,
   onClearSearch,
 }) => {
-  if (!query) return null;
+  if (!query) return null
 
   return (
     <section
@@ -144,7 +144,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             aria-labelledby="search-results-heading"
           >
-            {results.map((property) => (
+            {results.map(property => (
               <article
                 key={property.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02]"
@@ -199,7 +199,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         )}
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default SearchResults;
+export default SearchResults

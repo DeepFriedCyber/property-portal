@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import { formatDate } from '@/lib/utils/formatters';
+import { formatDate } from '@/lib/utils/formatters'
 
 interface PropertyTimestampsProps {
-  createdAt: Date;
-  updatedAt: Date | null;
+  createdAt: Date
+  updatedAt: Date | null
 }
 
 export default function PropertyTimestamps({ createdAt, updatedAt }: PropertyTimestampsProps) {
@@ -15,5 +15,5 @@ export default function PropertyTimestamps({ createdAt, updatedAt }: PropertyTim
         <p>Last updated: {formatDate(updatedAt)}</p>
       )}
     </div>
-  );
+  )
 }

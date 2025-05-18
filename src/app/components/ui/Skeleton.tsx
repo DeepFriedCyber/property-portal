@@ -1,15 +1,15 @@
-'use client';
+'use client'
 
 interface SkeletonProps {
-  className?: string;
-  shimmer?: boolean;
+  className?: string
+  shimmer?: boolean
 }
 
 export function Skeleton({ className = '', shimmer = true }: SkeletonProps) {
-  const baseClasses = 'relative rounded bg-gray-200 dark:bg-gray-800';
+  const baseClasses = 'relative rounded bg-gray-200 dark:bg-gray-800'
   const shimmerClasses = shimmer
     ? 'overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent'
-    : '';
+    : ''
 
   return (
     <div
@@ -24,5 +24,5 @@ export function Skeleton({ className = '', shimmer = true }: SkeletonProps) {
         }),
       }}
     />
-  );
+  )
 }

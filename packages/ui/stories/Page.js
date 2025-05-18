@@ -1,10 +1,10 @@
-import React from 'react';
-import { jsx as _jsx, jsxs as _jsxs } from 'react/jsx-runtime';
+import React from 'react'
+import { jsx as _jsx, jsxs as _jsxs } from 'react/jsx-runtime'
 
-import { Header } from './Header';
-import './page.css';
+import { Header } from './Header'
+import './page.css'
 export const Page = () => {
-  const [user, setUser] = React.useState();
+  const [user, setUser] = React.useState()
   return _jsxs('article', {
     children: [
       _jsx(Header, {
@@ -95,6 +95,6 @@ export const Page = () => {
         ],
       }),
     ],
-  });
-};
+  })
+}
 //# sourceMappingURL=Page.js.map

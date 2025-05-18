@@ -8,7 +8,7 @@
  * @returns A string representation of the error
  */
 export function normalizeError(error: unknown): string {
-  return String(error);
+  return String(error)
 }
 
 /**
@@ -18,9 +18,9 @@ export function normalizeError(error: unknown): string {
  */
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
-    return error.message;
+    return error.message
   }
-  return String(error);
+  return String(error)
 }
 
 /**
@@ -29,12 +29,12 @@ export function getErrorMessage(error: unknown): string {
  * @returns An object containing error details
  */
 export function getErrorDetails(error: unknown): {
-  message: string;
-  stack?: string;
-  code?: string;
-  name?: string;
-  status?: number;
-  type?: string;
+  message: string
+  stack?: string
+  code?: string
+  name?: string
+  status?: number
+  type?: string
 } {
   // Handle Error objects
   if (error instanceof Error) {
@@ -42,36 +42,36 @@ export function getErrorDetails(error: unknown): {
       message: error.message,
       name: error.name,
       stack: error.stack,
-    };
+    }
 
     // Extract additional properties that might exist on error objects
     // Common properties in various error types
-    const errorObj = error as any;
-    if ('code' in errorObj) details.code = String(errorObj.code);
-    if ('status' in errorObj) details.status = Number(errorObj.status);
-    if ('statusCode' in errorObj) details.status = Number(errorObj.statusCode);
-    if ('type' in errorObj) details.type = String(errorObj.type);
+    const errorObj = error as any
+    if ('code' in errorObj) details.code = String(errorObj.code)
+    if ('status' in errorObj) details.status = Number(errorObj.status)
+    if ('statusCode' in errorObj) details.status = Number(errorObj.statusCode)
+    if ('type' in errorObj) details.type = String(errorObj.type)
 
-    return details;
+    return details
   }
 
   // Handle non-Error objects
   if (error !== null && typeof error === 'object') {
     try {
-      const errorObj = error as Record<string, any>;
+      const errorObj = error as Record<string, any>
       return {
         message: errorObj.message ? String(errorObj.message) : JSON.stringify(error),
         ...(errorObj.code && { code: String(errorObj.code) }),
         ...(errorObj.status && { status: Number(errorObj.status) }),
         ...(errorObj.type && { type: String(errorObj.type) }),
-      };
+      }
     } catch {
-      return { message: String(error) };
+      return { message: String(error) }
     }
   }
 
   // Handle primitive values
-  return { message: String(error) };
+  return { message: String(error) }
 }
 
 /**
@@ -80,11 +80,11 @@ export function getErrorDetails(error: unknown): {
  * @param error Any type of error
  */
 export function logError(context: string, error: unknown): void {
-  console.error(`[ERROR] ${context}:`, String(error));
+  console.error(`[ERROR] ${context}:`, String(error))
 
   // Log additional details if available
   if (error instanceof Error && error.stack) {
-    console.error(`[STACK] ${context}:`, error.stack);
+    console.error(`[STACK] ${context}:`, error.stack)
   }
 }
 
@@ -95,18 +95,18 @@ export function logError(context: string, error: unknown): void {
  * @returns A new Error object with combined information
  */
 export function createErrorWithCause(message: string, originalError: unknown): Error {
-  const newError = new Error(`${message}: ${String(originalError)}`);
+  const newError = new Error(`${message}: ${String(originalError)}`)
 
   // Preserve the original stack if possible
   if (originalError instanceof Error && originalError.stack) {
     // Append original stack to the new error
-    newError.stack = `${newError.stack}\nCaused by: ${originalError.stack}`;
+    newError.stack = `${newError.stack}\nCaused by: ${originalError.stack}`
   }
 
   // Add a cause property (supported in newer JS environments)
-  (newError as any).cause = originalError;
+  ;(newError as any).cause = originalError
 
-  return newError;
+  return newError
 }
 
 /**
@@ -121,9 +121,9 @@ export function withErrorHandling<T, Args extends any[]>(
 ): (...args: Args) => Promise<T> {
   return async (...args: Args): Promise<T> => {
     try {
-      return await fn(...args);
+      return await fn(...args)
     } catch (error) {
-      throw createErrorWithCause(errorMessage, error);
+      throw createErrorWithCause(errorMessage, error)
     }
-  };
+  }
 }

@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Browse Properties',
-  description: 'Browse our extensive collection of properties for sale and rent. Filter by price, location, bedrooms and more to find your perfect home.',
+  description:
+    'Browse our extensive collection of properties for sale and rent. Filter by price, location, bedrooms and more to find your perfect home.',
   keywords: 'property listings, houses for sale, apartments for rent, property search',
   openGraph: {
     title: 'Browse Properties | Property Portal',

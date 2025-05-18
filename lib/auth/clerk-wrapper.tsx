@@ -1,50 +1,44 @@
 // lib/auth/clerk-wrapper.tsx
-import {
-  ClerkProvider,
-  useUser as useClerkUser,
-  SignedIn,
-  SignedOut,
-  useAuth,
-} from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import { ClerkProvider, useUser as useClerkUser, SignedIn, SignedOut, useAuth } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
+import React, { useState, useEffect, useCallback, createContext, useContext } from 'react'
 
 // Define the authentication state
 interface AuthState {
-  isLoaded: boolean;
-  isSignedIn: boolean | null;
-  isError: boolean;
-  errorMessage: string | null;
-  retryCount: number;
-  isRetrying: boolean;
+  isLoaded: boolean
+  isSignedIn: boolean | null
+  isError: boolean
+  errorMessage: string | null
+  retryCount: number
+  isRetrying: boolean
 }
 
 // Define the authentication context
 interface AuthContextType {
-  authState: AuthState;
-  user: ReturnType<typeof useClerkUser>['user'] | null;
-  retryAuth: () => void;
-  signOut: () => Promise<void>;
-  isAuthorized: (requiredRoles?: string[]) => boolean;
+  authState: AuthState
+  user: ReturnType<typeof useClerkUser>['user'] | null
+  retryAuth: () => void
+  signOut: () => Promise<void>
+  isAuthorized: (requiredRoles?: string[]) => boolean
 }
 
 // Create the authentication context
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | null>(null)
 
 // Custom hook to use the authentication context
 export const useAuthWrapper = () => {
-  const context = useContext(AuthContext);
+  const context = useContext(AuthContext)
   if (!context) {
-    throw new Error('useAuthWrapper must be used within an AuthProvider');
+    throw new Error('useAuthWrapper must be used within an AuthProvider')
   }
-  return context;
-};
+  return context
+}
 
 // Authentication provider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoaded: clerkLoaded, isSignedIn, user } = useClerkUser();
-  const { signOut: clerkSignOut } = useAuth();
-  const router = useRouter();
+  const { isLoaded: clerkLoaded, isSignedIn, user } = useClerkUser()
+  const { signOut: clerkSignOut } = useAuth()
+  const router = useRouter()
 
   // Authentication state
   const [authState, setAuthState] = useState<AuthState>({
@@ -54,114 +48,114 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     errorMessage: null,
     retryCount: 0,
     isRetrying: false,
-  });
+  })
 
   // Maximum number of retry attempts
-  const MAX_RETRY_ATTEMPTS = 3;
+  const MAX_RETRY_ATTEMPTS = 3
 
   // Retry authentication
   const retryAuth = useCallback(() => {
     if (authState.retryCount >= MAX_RETRY_ATTEMPTS) {
-      setAuthState((prev) => ({
+      setAuthState(prev => ({
         ...prev,
         isError: true,
         errorMessage: 'Maximum retry attempts reached. Please refresh the page or try again later.',
         isRetrying: false,
-      }));
-      return;
+      }))
+      return
     }
 
-    setAuthState((prev) => ({
+    setAuthState(prev => ({
       ...prev,
       isRetrying: true,
       retryCount: prev.retryCount + 1,
-    }));
+    }))
 
     // Simulate a retry by forcing a re-render
     // In a real app, you might want to call a specific Clerk method to refresh the session
     setTimeout(() => {
-      setAuthState((prev) => ({
+      setAuthState(prev => ({
         ...prev,
         isRetrying: false,
-      }));
-    }, 1000);
-  }, [authState.retryCount]);
+      }))
+    }, 1000)
+  }, [authState.retryCount])
 
   // Sign out with error handling
   const handleSignOut = useCallback(async () => {
     try {
       if (clerkSignOut) {
-        await clerkSignOut();
-        router.push('/');
+        await clerkSignOut()
+        router.push('/')
       }
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Error signing out:', error)
       // If sign out fails, we can still clear local state
-      setAuthState((prev) => ({
+      setAuthState(prev => ({
         ...prev,
         isSignedIn: false,
         isError: true,
         errorMessage: 'Failed to sign out properly. Please refresh the page.',
-      }));
+      }))
     }
-  }, [clerkSignOut, router]);
+  }, [clerkSignOut, router])
 
   // Check if user has required roles
   const isAuthorized = useCallback(
     (requiredRoles?: string[]) => {
-      if (!isSignedIn || !user) return false;
-      if (!requiredRoles || requiredRoles.length === 0) return true;
+      if (!isSignedIn || !user) return false
+      if (!requiredRoles || requiredRoles.length === 0) return true
 
       // Get user roles from public metadata
       // This assumes roles are stored in publicMetadata.roles
-      const userRoles = (user.publicMetadata?.roles as string[]) || [];
+      const userRoles = (user.publicMetadata?.roles as string[]) || []
 
       // Check if user has any of the required roles
-      return requiredRoles.some((role) => userRoles.includes(role));
+      return requiredRoles.some(role => userRoles.includes(role))
     },
     [isSignedIn, user]
-  );
+  )
 
   // Update auth state when Clerk state changes
   useEffect(() => {
     // If Clerk is still loading, don't update state yet
-    if (!clerkLoaded) return;
+    if (!clerkLoaded) return
 
-    setAuthState((prev) => ({
+    setAuthState(prev => ({
       ...prev,
       isLoaded: true,
       isSignedIn,
       // Clear error state if authentication succeeds
       ...(isSignedIn && { isError: false, errorMessage: null }),
-    }));
-  }, [clerkLoaded, isSignedIn]);
+    }))
+  }, [clerkLoaded, isSignedIn])
 
   // Handle offline/online status
   useEffect(() => {
     const handleOnline = () => {
       // When coming back online, check if we had an error and retry
       if (authState.isError) {
-        retryAuth();
+        retryAuth()
       }
-    };
+    }
 
     const handleOffline = () => {
       // When going offline, set an appropriate error message
-      setAuthState((prev) => ({
+      setAuthState(prev => ({
         ...prev,
         isError: true,
         errorMessage: 'You are currently offline. Authentication services may be unavailable.',
-      }));
-    };
+      }))
+    }
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, [authState.isError, retryAuth]);
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [authState.isError, retryAuth])
 
   // Context value
   const contextValue: AuthContextType = {
@@ -170,31 +164,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     retryAuth,
     signOut: handleSignOut,
     isAuthorized,
-  };
+  }
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
-};
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+}
 
 // Enhanced ClerkProvider with error handling
 export const EnhancedClerkProvider: React.FC<{
-  children: React.ReactNode;
-  publishableKey?: string;
-  appearance?: any;
+  children: React.ReactNode
+  publishableKey?: string
+  appearance?: any
 }> = ({ children, publishableKey, appearance }) => {
   return (
     <ClerkProvider publishableKey={publishableKey} appearance={appearance}>
       <AuthProvider>{children}</AuthProvider>
     </ClerkProvider>
-  );
-};
+  )
+}
 
 // Authentication required component
 export const AuthRequired: React.FC<{
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-  requiredRoles?: string[];
+  children: React.ReactNode
+  fallback?: React.ReactNode
+  requiredRoles?: string[]
 }> = ({ children, fallback, requiredRoles }) => {
-  const { authState, user, retryAuth, isAuthorized } = useAuthWrapper();
+  const { authState, user, retryAuth, isAuthorized } = useAuthWrapper()
 
   // If still loading, show loading state
   if (!authState.isLoaded) {
@@ -202,7 +196,7 @@ export const AuthRequired: React.FC<{
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700"></div>
       </div>
-    );
+    )
   }
 
   // If authentication error, show error state with retry button
@@ -240,7 +234,7 @@ export const AuthRequired: React.FC<{
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   // If not signed in, show fallback or default message
@@ -266,7 +260,7 @@ export const AuthRequired: React.FC<{
           )}
         </SignedOut>
       </>
-    );
+    )
   }
 
   // If roles are required but user doesn't have them
@@ -300,22 +294,22 @@ export const AuthRequired: React.FC<{
           </a>
         </div>
       </div>
-    );
+    )
   }
 
   // If signed in and authorized, show children
-  return <SignedIn>{children}</SignedIn>;
-};
+  return <SignedIn>{children}</SignedIn>
+}
 
 // Export a hook for checking authorization
 export const useAuthorization = () => {
-  const { isAuthorized } = useAuthWrapper();
-  return { isAuthorized };
-};
+  const { isAuthorized } = useAuthWrapper()
+  return { isAuthorized }
+}
 
 // Export a hook for getting authentication state
 export const useAuthentication = () => {
-  const { authState, user, retryAuth, signOut } = useAuthWrapper();
+  const { authState, user, retryAuth, signOut } = useAuthWrapper()
   return {
     isLoaded: authState.isLoaded,
     isSignedIn: authState.isSignedIn,
@@ -325,5 +319,5 @@ export const useAuthentication = () => {
     user,
     retryAuth,
     signOut,
-  };
-};
+  }
+}

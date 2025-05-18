@@ -1,7 +1,7 @@
 // db/error-handler.ts
-import { PostgresError } from 'postgres';
+import { PostgresError } from 'postgres'
 
-import { createDetailedDbConnectionErrorMessage } from './error-utils';
+import { createDetailedDbConnectionErrorMessage } from './error-utils'
 
 // Custom database error types
 export class DatabaseConnectionError extends Error {
@@ -10,10 +10,10 @@ export class DatabaseConnectionError extends Error {
     public cause?: unknown
   ) {
     // Use the detailed error message if cause is provided
-    const detailedMessage = cause ? createDetailedDbConnectionErrorMessage(cause) : message;
+    const detailedMessage = cause ? createDetailedDbConnectionErrorMessage(cause) : message
 
-    super(detailedMessage);
-    this.name = 'DatabaseConnectionError';
+    super(detailedMessage)
+    this.name = 'DatabaseConnectionError'
   }
 }
 
@@ -24,8 +24,8 @@ export class DatabaseQueryError extends Error {
     public params?: unknown[],
     public cause?: unknown
   ) {
-    super(message);
-    this.name = 'DatabaseQueryError';
+    super(message)
+    this.name = 'DatabaseQueryError'
   }
 }
 
@@ -35,8 +35,8 @@ export class DatabaseConstraintError extends Error {
     public constraint?: string,
     public cause?: unknown
   ) {
-    super(message);
-    this.name = 'DatabaseConstraintError';
+    super(message)
+    this.name = 'DatabaseConstraintError'
   }
 }
 
@@ -45,8 +45,8 @@ export class DatabaseTimeoutError extends Error {
     message: string,
     public cause?: unknown
   ) {
-    super(message);
-    this.name = 'DatabaseTimeoutError';
+    super(message)
+    this.name = 'DatabaseTimeoutError'
   }
 }
 
@@ -67,14 +67,14 @@ export function handleDatabaseError(
     error instanceof DatabaseConstraintError ||
     error instanceof DatabaseTimeoutError
   ) {
-    return error;
+    return error
   }
 
   // Handle postgres-js specific errors
   if (typeof error === 'object' && error !== null) {
     // Check if it's a PostgresError
     if ('code' in error && typeof error.code === 'string') {
-      const pgError = error as PostgresError;
+      const pgError = error as PostgresError
 
       // Connection errors
       if (pgError.code.startsWith('08')) {
@@ -82,17 +82,17 @@ export function handleDatabaseError(
         return new DatabaseConnectionError(
           'Database connection error', // This will be replaced with detailed message
           error
-        );
+        )
       }
 
       // Constraint violations
       if (pgError.code.startsWith('23')) {
-        const constraint = 'constraint' in pgError ? String(pgError.constraint) : undefined;
+        const constraint = 'constraint' in pgError ? String(pgError.constraint) : undefined
         return new DatabaseConstraintError(
           `Database constraint violation: ${pgError.message || 'Unknown constraint error'}`,
           constraint,
           error
-        );
+        )
       }
 
       // Query timeout
@@ -100,7 +100,7 @@ export function handleDatabaseError(
         return new DatabaseTimeoutError(
           `Database query timeout: ${pgError.message || 'Query canceled due to timeout'}`,
           error
-        );
+        )
       }
     }
 
@@ -110,24 +110,24 @@ export function handleDatabaseError(
       typeof error.message === 'string' &&
       error.message.includes('timeout')
     ) {
-      return new DatabaseTimeoutError(`Database operation timed out: ${error.message}`, error);
+      return new DatabaseTimeoutError(`Database operation timed out: ${error.message}`, error)
     }
   }
 
   // For all other errors, wrap in a generic DatabaseQueryError with detailed context
-  let errorMessage = error instanceof Error ? error.message : String(error);
+  let errorMessage = error instanceof Error ? error.message : String(error)
 
   // Add query context to the error message if available
   if (context?.query) {
     // Truncate long queries for readability
     const truncatedQuery =
-      context.query.length > 100 ? `${context.query.substring(0, 100)}...` : context.query;
+      context.query.length > 100 ? `${context.query.substring(0, 100)}...` : context.query
 
-    errorMessage += ` | Query: ${truncatedQuery}`;
+    errorMessage += ` | Query: ${truncatedQuery}`
 
     // Add parameter information if available
     if (context.params && context.params.length > 0) {
-      errorMessage += ` | Params: ${JSON.stringify(context.params)}`;
+      errorMessage += ` | Params: ${JSON.stringify(context.params)}`
     }
   }
 
@@ -136,7 +136,7 @@ export function handleDatabaseError(
     context?.query,
     context?.params,
     error
-  );
+  )
 }
 
 /**
@@ -150,8 +150,8 @@ export async function withDatabaseErrorHandling<T>(
   context?: { query?: string; params?: unknown[] }
 ): Promise<T> {
   try {
-    return await operation();
+    return await operation()
   } catch (error) {
-    throw handleDatabaseError(error, context);
+    throw handleDatabaseError(error, context)
   }
 }

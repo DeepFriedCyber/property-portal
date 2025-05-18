@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
 
 // Placeholder API route
 export async function GET(_req: NextRequest) {
@@ -8,5 +8,5 @@ export async function GET(_req: NextRequest) {
       uploads: [],
     },
     { status: 200 }
-  );
+  )
 }

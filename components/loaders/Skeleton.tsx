@@ -1,14 +1,14 @@
 // Skeleton.tsx
-import React from 'react';
+import React from 'react'
 
-import styles from './Skeleton.module.css';
+import styles from './Skeleton.module.css'
 
 interface SkeletonProps {
-  width?: string | number;
-  height?: string | number;
-  borderRadius?: string | number;
-  className?: string;
-  animation?: 'pulse' | 'wave' | 'none';
+  width?: string | number
+  height?: string | number
+  borderRadius?: string | number
+  className?: string
+  animation?: 'pulse' | 'wave' | 'none'
 }
 
 const Skeleton: React.FC<SkeletonProps> = ({
@@ -18,7 +18,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
   className = '',
   animation = 'pulse',
 }) => {
-  const animationClass = animation !== 'none' ? styles[`skeleton--${animation}`] : '';
+  const animationClass = animation !== 'none' ? styles[`skeleton--${animation}`] : ''
 
   return (
     <div
@@ -30,7 +30,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
       }}
       aria-hidden="true"
     />
-  );
-};
+  )
+}
 
-export default Skeleton;
+export default Skeleton

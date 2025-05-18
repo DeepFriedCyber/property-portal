@@ -1,58 +1,54 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { addProperty } from '@/app/actions/properties';
-import { CreatePropertyInput } from '@/lib/schemas/propertySchemas';
+import { useState } from 'react'
+import { addProperty } from '@/app/actions/properties'
+import { CreatePropertyInput } from '@/lib/schemas/propertySchemas'
 
 export default function AddPropertyForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
   async function handleSubmit(formData: FormData) {
-    setIsSubmitting(true);
-    setError(null);
-    setSuccess(false);
+    setIsSubmitting(true)
+    setError(null)
+    setSuccess(false)
 
     try {
-      const result = await addProperty(formData);
-      
+      const result = await addProperty(formData)
+
       if (result.success) {
-        setSuccess(true);
+        setSuccess(true)
         // Reset form
-        (document.getElementById('property-form') as HTMLFormElement).reset();
+        ;(document.getElementById('property-form') as HTMLFormElement).reset()
       } else {
-        setError(result.error?.message || 'Failed to add property');
-        console.error('Validation errors:', result.error?.details);
+        setError(result.error?.message || 'Failed to add property')
+        console.error('Validation errors:', result.error?.details)
       }
     } catch (err) {
-      setError('An unexpected error occurred');
-      console.error(err);
+      setError('An unexpected error occurred')
+      console.error(err)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6">Add New Property</h2>
-      
-      {error && (
-        <div className="mb-4 p-4 text-red-700 bg-red-100 rounded-md">
-          {error}
-        </div>
-      )}
-      
+
+      {error && <div className="mb-4 p-4 text-red-700 bg-red-100 rounded-md">{error}</div>}
+
       {success && (
         <div className="mb-4 p-4 text-green-700 bg-green-100 rounded-md">
           Property added successfully!
         </div>
       )}
-      
+
       <form id="property-form" action={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Basic Information</h3>
-          
+
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700">
               Property Title
@@ -65,7 +61,7 @@ export default function AddPropertyForm() {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700">
@@ -81,7 +77,7 @@ export default function AddPropertyForm() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
-            
+
             <div>
               <label htmlFor="listingType" className="block text-sm font-medium text-gray-700">
                 Listing Type
@@ -97,7 +93,7 @@ export default function AddPropertyForm() {
               </select>
             </div>
           </div>
-          
+
           <div>
             <label htmlFor="propertyType" className="block text-sm font-medium text-gray-700">
               Property Type
@@ -119,7 +115,7 @@ export default function AddPropertyForm() {
               <option value="other">Other</option>
             </select>
           </div>
-          
+
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700">
               Description
@@ -132,10 +128,10 @@ export default function AddPropertyForm() {
             ></textarea>
           </div>
         </div>
-        
+
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Address</h3>
-          
+
           <div>
             <label htmlFor="address.line1" className="block text-sm font-medium text-gray-700">
               Address Line 1
@@ -148,7 +144,7 @@ export default function AddPropertyForm() {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
-          
+
           <div>
             <label htmlFor="address.line2" className="block text-sm font-medium text-gray-700">
               Address Line 2 (Optional)
@@ -160,7 +156,7 @@ export default function AddPropertyForm() {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="address.town" className="block text-sm font-medium text-gray-700">
@@ -174,7 +170,7 @@ export default function AddPropertyForm() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
-            
+
             <div>
               <label htmlFor="address.county" className="block text-sm font-medium text-gray-700">
                 County (Optional)
@@ -187,7 +183,7 @@ export default function AddPropertyForm() {
               />
             </div>
           </div>
-          
+
           <div>
             <label htmlFor="address.postcode" className="block text-sm font-medium text-gray-700">
               Postcode
@@ -201,10 +197,10 @@ export default function AddPropertyForm() {
             />
           </div>
         </div>
-        
+
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Property Details</h3>
-          
+
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700">
@@ -218,7 +214,7 @@ export default function AddPropertyForm() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
-            
+
             <div>
               <label htmlFor="bathrooms" className="block text-sm font-medium text-gray-700">
                 Bathrooms
@@ -232,7 +228,7 @@ export default function AddPropertyForm() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
-            
+
             <div>
               <label htmlFor="receptionRooms" className="block text-sm font-medium text-gray-700">
                 Reception Rooms
@@ -246,7 +242,7 @@ export default function AddPropertyForm() {
               />
             </div>
           </div>
-          
+
           <div>
             <label htmlFor="squareFootage" className="block text-sm font-medium text-gray-700">
               Square Footage
@@ -259,7 +255,7 @@ export default function AddPropertyForm() {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="tenure" className="block text-sm font-medium text-gray-700">
@@ -277,7 +273,7 @@ export default function AddPropertyForm() {
                 <option value="commonhold">Commonhold</option>
               </select>
             </div>
-            
+
             <div>
               <label htmlFor="councilTaxBand" className="block text-sm font-medium text-gray-700">
                 Council Tax Band
@@ -299,7 +295,7 @@ export default function AddPropertyForm() {
               </select>
             </div>
           </div>
-          
+
           <div>
             <label htmlFor="epcRating" className="block text-sm font-medium text-gray-700">
               EPC Rating
@@ -320,7 +316,7 @@ export default function AddPropertyForm() {
             </select>
           </div>
         </div>
-        
+
         <div className="pt-5">
           <div className="flex justify-end">
             <button
@@ -341,5 +337,5 @@ export default function AddPropertyForm() {
         </div>
       </form>
     </div>
-  );
+  )
 }

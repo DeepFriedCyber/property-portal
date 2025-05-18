@@ -1,70 +1,70 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
 
-import { Button } from '../../../src/ui';
+import { Button } from '../../../src/ui'
 
-import { useAuthentication, AuthRequired } from '@/lib/auth/clerk-wrapper';
+import { useAuthentication, AuthRequired } from '@/lib/auth/clerk-wrapper'
 
 // Profile editor component
 const ProfileEditor = () => {
-  const { user } = useAuthentication();
-  const [isEditing, setIsEditing] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { user } = useAuthentication()
+  const [isEditing, setIsEditing] = useState(false)
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   // Reset success/error messages when editing state changes
   const handleEditProfile = () => {
-    setFirstName(user?.firstName || '');
-    setLastName(user?.lastName || '');
-    setIsEditing(true);
-    setError(null);
-    setSuccessMessage(null);
-  };
+    setFirstName(user?.firstName || '')
+    setLastName(user?.lastName || '')
+    setIsEditing(true)
+    setError(null)
+    setSuccessMessage(null)
+  }
 
   // Save profile with error handling and retry logic
   const handleSaveProfile = async () => {
-    if (!user) return;
+    if (!user) return
 
-    setIsSubmitting(true);
-    setError(null);
+    setIsSubmitting(true)
+    setError(null)
 
     try {
       await user.update({
         firstName,
         lastName,
-      });
+      })
 
-      setIsEditing(false);
-      setSuccessMessage('Profile updated successfully!');
+      setIsEditing(false)
+      setSuccessMessage('Profile updated successfully!')
 
       // Clear success message after 3 seconds
       setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
+        setSuccessMessage(null)
+      }, 3000)
     } catch (error) {
-      console.error('Error updating profile:', error);
-      setError('Failed to update profile. Please try again.');
+      console.error('Error updating profile:', error)
+      setError('Failed to update profile. Please try again.')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   // Retry profile update
   const handleRetry = () => {
-    handleSaveProfile();
-  };
+    handleSaveProfile()
+  }
 
   // Cancel editing
   const handleCancelEdit = () => {
-    setIsEditing(false);
-    setError(null);
-  };
+    setIsEditing(false)
+    setError(null)
+  }
 
-  if (!user) return null;
+  if (!user) return null
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -101,7 +101,7 @@ const ProfileEditor = () => {
                 type="text"
                 id="firstName"
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={e => setFirstName(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 disabled={isSubmitting}
               />
@@ -114,7 +114,7 @@ const ProfileEditor = () => {
                 type="text"
                 id="lastName"
                 value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                onChange={e => setLastName(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 disabled={isSubmitting}
               />
@@ -165,8 +165,8 @@ const ProfileEditor = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
 // Main profile page with authentication required
 export default function ProfilePage() {
@@ -192,5 +192,5 @@ export default function ProfilePage() {
     >
       <ProfileEditor />
     </AuthRequired>
-  );
+  )
 }

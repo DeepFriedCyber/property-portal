@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm'
 
 /**
  * Safely bind a vector array to a SQL query
@@ -8,9 +8,9 @@ import { sql } from 'drizzle-orm';
 export function bindVector(array: number[]) {
   // Use SQL parameter binding instead of JSON.stringify
   return sql`array[${sql.join(
-    array.map((value) => sql`${value}`),
+    array.map(value => sql`${value}`),
     sql`, `
-  )}]::vector`;
+  )}]::vector`
 }
 
 /**
@@ -21,7 +21,7 @@ export function bindVector(array: number[]) {
 export function bindJsonbArray(array: number[]) {
   // Use SQL parameter binding instead of JSON.stringify
   return sql`array[${sql.join(
-    array.map((value) => sql`${value}`),
+    array.map(value => sql`${value}`),
     sql`, `
-  )}]::jsonb`;
+  )}]::jsonb`
 }

@@ -1,21 +1,21 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
-import React from 'react';
+import { motion } from 'framer-motion'
+import React from 'react'
 
 interface Property {
-  id: string;
-  address: string;
-  price: number;
-  bedrooms: number;
-  type: string;
-  image?: string;
+  id: string
+  address: string
+  price: number
+  bedrooms: number
+  type: string
+  image?: string
 }
 
 interface AnimatedPropertyCardProps {
-  property: Property;
-  index: number;
-  onClick: (property: Property) => void;
+  property: Property
+  index: number
+  onClick: (property: Property) => void
 }
 
 /**
@@ -37,7 +37,7 @@ const AnimatedPropertyCard: React.FC<AnimatedPropertyCardProps> = ({
         duration: 0.5,
       },
     }),
-  };
+  }
 
   return (
     <motion.div
@@ -70,7 +70,7 @@ const AnimatedPropertyCard: React.FC<AnimatedPropertyCardProps> = ({
         </p>
       </div>
     </motion.div>
-  );
-};
+  )
+}
 
-export default AnimatedPropertyCard;
+export default AnimatedPropertyCard

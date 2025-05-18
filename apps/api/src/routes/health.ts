@@ -1,16 +1,16 @@
 // health.ts
-import { isDatabaseHealthy, getDatabaseStatus } from '@your-org/db';
-import { Router } from 'express';
+import { isDatabaseHealthy, getDatabaseStatus } from '@your-org/db'
+import { Router } from 'express'
 
-const router = Router();
+const router = Router()
 
 /**
  * Health check endpoint
  * GET /health
  */
 router.get('/', (req, res) => {
-  const dbStatus = getDatabaseStatus();
-  const isDbHealthy = isDatabaseHealthy();
+  const dbStatus = getDatabaseStatus()
+  const isDbHealthy = isDatabaseHealthy()
 
   const health = {
     status: isDbHealthy ? 'healthy' : 'unhealthy',
@@ -26,21 +26,21 @@ router.get('/', (req, res) => {
         healthy: true,
       },
     },
-  };
+  }
 
   // Return 503 if any service is unhealthy
-  const statusCode = isDbHealthy ? 200 : 503;
+  const statusCode = isDbHealthy ? 200 : 503
 
-  res.status(statusCode).json(health);
-});
+  res.status(statusCode).json(health)
+})
 
 /**
  * Detailed health check endpoint (admin only)
  * GET /health/details
  */
 router.get('/details', (req, res) => {
-  const dbStatus = getDatabaseStatus();
-  const isDbHealthy = isDatabaseHealthy();
+  const dbStatus = getDatabaseStatus()
+  const isDbHealthy = isDatabaseHealthy()
 
   const health = {
     status: isDbHealthy ? 'healthy' : 'unhealthy',
@@ -64,12 +64,12 @@ router.get('/details', (req, res) => {
         environment: process.env.NODE_ENV,
       },
     },
-  };
+  }
 
   // Return 503 if any service is unhealthy
-  const statusCode = isDbHealthy ? 200 : 503;
+  const statusCode = isDbHealthy ? 200 : 503
 
-  res.status(statusCode).json(health);
-});
+  res.status(statusCode).json(health)
+})
 
-export default router;
+export default router

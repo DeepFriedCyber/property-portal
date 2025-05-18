@@ -1,17 +1,17 @@
 // components/error-handling/FormErrorBoundary.tsx
-'use client';
+'use client'
 
-import React from 'react';
+import React from 'react'
 
-import EnhancedErrorBoundary from './EnhancedErrorBoundary';
+import EnhancedErrorBoundary from './EnhancedErrorBoundary'
 
-import { ValidationError } from '@/lib/api/validation';
-import logger from '@/lib/logging/logger';
+import { ValidationError } from '@/lib/api/validation'
+import logger from '@/lib/logging/logger'
 
 interface FormErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode | ((error: Error, resetError: () => void) => React.ReactNode);
-  onError?: (error: Error) => void;
+  children: React.ReactNode
+  fallback?: React.ReactNode | ((error: Error, resetError: () => void) => React.ReactNode)
+  onError?: (error: Error) => void
 }
 
 /**
@@ -20,8 +20,8 @@ interface FormErrorBoundaryProps {
 const FormErrorBoundary: React.FC<FormErrorBoundaryProps> = ({ children, fallback, onError }) => {
   // Default fallback UI for form errors
   const defaultFallback = (error: Error, resetError: () => void) => {
-    const isValidationError = error instanceof ValidationError;
-    const details = isValidationError ? (error as ValidationError).details : null;
+    const isValidationError = error instanceof ValidationError
+    const details = isValidationError ? (error as ValidationError).details : null
 
     return (
       <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -48,8 +48,8 @@ const FormErrorBoundary: React.FC<FormErrorBoundaryProps> = ({ children, fallbac
           Try again
         </button>
       </div>
-    );
-  };
+    )
+  }
 
   // Handle form errors
   const handleError = (error: Error) => {
@@ -63,13 +63,13 @@ const FormErrorBoundary: React.FC<FormErrorBoundaryProps> = ({ children, fallbac
         details: error instanceof ValidationError ? (error as ValidationError).details : undefined,
       },
       ['error-boundary', 'form-error']
-    );
+    )
 
     // Call the optional onError callback
     if (onError) {
-      onError(error);
+      onError(error)
     }
-  };
+  }
 
   return (
     <EnhancedErrorBoundary
@@ -79,7 +79,7 @@ const FormErrorBoundary: React.FC<FormErrorBoundaryProps> = ({ children, fallbac
     >
       {children}
     </EnhancedErrorBoundary>
-  );
-};
+  )
+}
 
-export default FormErrorBoundary;
+export default FormErrorBoundary

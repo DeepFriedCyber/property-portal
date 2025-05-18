@@ -115,7 +115,7 @@ export default [
           'import/no-unresolved': [
             'error',
             {
-              'ignore': ['^@/', '^@root/', '^@lib/', '^@components/', '^@your-org/']
+              'ignore': ['^@/', '^@root/', '^@lib/', '^@components/', '^@your-org/', '^leaflet$']
             }
           ],
           '@typescript-eslint/naming-convention': [

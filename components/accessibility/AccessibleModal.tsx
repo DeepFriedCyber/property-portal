@@ -1,16 +1,16 @@
 // AccessibleModal.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react'
 
 interface AccessibleModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-  ariaDescribedby?: string;
-  className?: string;
-  showCloseButton?: boolean;
-  closeOnEsc?: boolean;
-  closeOnOutsideClick?: boolean;
+  isOpen: boolean
+  onClose: () => void
+  title: string
+  children: React.ReactNode
+  ariaDescribedby?: string
+  className?: string
+  showCloseButton?: boolean
+  closeOnEsc?: boolean
+  closeOnOutsideClick?: boolean
 }
 
 const AccessibleModal: React.FC<AccessibleModalProps> = ({
@@ -24,101 +24,101 @@ const AccessibleModal: React.FC<AccessibleModalProps> = ({
   closeOnEsc = true,
   closeOnOutsideClick = true,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
   // Store the element that had focus before opening the modal
   useEffect(() => {
     if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
+      previousFocusRef.current = document.activeElement as HTMLElement
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   // Handle keyboard navigation and focus trap
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Close on ESC key
       if (closeOnEsc && event.key === 'Escape') {
-        onClose();
-        return;
+        onClose()
+        return
       }
 
       // Trap focus inside modal
       if (event.key === 'Tab') {
-        if (!modalRef.current) return;
+        if (!modalRef.current) return
 
         const focusableElements = modalRef.current.querySelectorAll(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+        )
 
-        const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+        const firstElement = focusableElements[0] as HTMLElement
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
 
         // Shift + Tab
         if (event.shiftKey) {
           if (document.activeElement === firstElement) {
-            lastElement.focus();
-            event.preventDefault();
+            lastElement.focus()
+            event.preventDefault()
           }
         }
         // Tab
         else {
           if (document.activeElement === lastElement) {
-            firstElement.focus();
-            event.preventDefault();
+            firstElement.focus()
+            event.preventDefault()
           }
         }
       }
-    };
+    }
 
     // Set focus to the first focusable element in the modal
     const setInitialFocus = () => {
       if (modalRef.current) {
         const focusableElement = modalRef.current.querySelector(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        ) as HTMLElement;
+        ) as HTMLElement
 
         if (focusableElement) {
-          focusableElement.focus();
+          focusableElement.focus()
         } else {
           // If no focusable element, focus the modal itself
-          modalRef.current.focus();
+          modalRef.current.focus()
         }
       }
-    };
+    }
 
     // Add event listeners
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown)
 
     // Set initial focus after a short delay to ensure the modal is fully rendered
-    setTimeout(setInitialFocus, 50);
+    setTimeout(setInitialFocus, 50)
 
     // Prevent scrolling of the body when modal is open
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden'
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown)
 
       // Restore body scrolling when modal closes
-      document.body.style.overflow = '';
+      document.body.style.overflow = ''
 
       // Restore focus to the element that had focus before the modal was opened
       if (previousFocusRef.current) {
-        previousFocusRef.current.focus();
+        previousFocusRef.current.focus()
       }
-    };
-  }, [isOpen, onClose, closeOnEsc]);
+    }
+  }, [isOpen, onClose, closeOnEsc])
 
   // Handle outside click
   const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (closeOnOutsideClick && event.target === event.currentTarget) {
-      onClose();
+      onClose()
     }
-  };
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div className="modal-backdrop" onClick={handleBackdropClick} role="presentation">
@@ -151,7 +151,7 @@ const AccessibleModal: React.FC<AccessibleModalProps> = ({
         <div className="modal-content">{children}</div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AccessibleModal;
+export default AccessibleModal

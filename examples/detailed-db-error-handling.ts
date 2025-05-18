@@ -6,38 +6,38 @@ import {
   createDetailedDbConnectionErrorMessage,
   createDbConnectionErrorObject,
   getUserFriendlyDbErrorMessage,
-} from '../lib/db/error-utils';
+} from '../lib/db/error-utils'
 
 /**
  * Example database connection function with improved error handling
  */
 async function connectToDatabase(config: {
-  host: string;
-  port: number;
-  database: string;
-  user: string;
-  password: string;
+  host: string
+  port: number
+  database: string
+  user: string
+  password: string
 }) {
   try {
     // Simulated database connection
-    const connection = await simulateDatabaseConnection(config);
-    return connection;
+    const connection = await simulateDatabaseConnection(config)
+    return connection
   } catch (err) {
     // ❌ BAD: Generic error message
     // console.error('Database connection error:', err.message);
     // throw new Error(`Database connection error: ${err.message}`);
 
     // ✅ GOOD: Detailed error message with connection details
-    const detailedErrorMessage = createDetailedDbConnectionErrorMessage(err);
-    console.error(detailedErrorMessage);
+    const detailedErrorMessage = createDetailedDbConnectionErrorMessage(err)
+    console.error(detailedErrorMessage)
 
     // For logging systems or error tracking services
-    const errorObject = createDbConnectionErrorObject(err);
-    logError('database_connection_failed', errorObject);
+    const errorObject = createDbConnectionErrorObject(err)
+    logError('database_connection_failed', errorObject)
 
     // For user-facing errors, provide a friendly message
-    const userFriendlyMessage = getUserFriendlyDbErrorMessage(err);
-    throw new Error(userFriendlyMessage);
+    const userFriendlyMessage = getUserFriendlyDbErrorMessage(err)
+    throw new Error(userFriendlyMessage)
   }
 }
 
@@ -47,27 +47,27 @@ async function connectToDatabase(config: {
 async function executeQuery(query: string, params: any[]) {
   try {
     // Simulated query execution
-    const result = await simulateQueryExecution(query, params);
-    return result;
+    const result = await simulateQueryExecution(query, params)
+    return result
   } catch (err) {
     // ❌ BAD: Generic error message
     // console.error('Query error:', err.message);
     // throw new Error(`Query error: ${err.message}`);
 
     // ✅ GOOD: Detailed error message with query information
-    const errorObj = err as Record<string, any>;
-    const detailedErrorMessage = `Database query error: ${errorObj.message || 'Unknown error'} | Query: ${query} | Parameters: ${JSON.stringify(params)}`;
+    const errorObj = err as Record<string, any>
+    const detailedErrorMessage = `Database query error: ${errorObj.message || 'Unknown error'} | Query: ${query} | Parameters: ${JSON.stringify(params)}`
 
     if (errorObj.code) {
-      detailedErrorMessage += ` | Error Code: ${errorObj.code}`;
+      detailedErrorMessage += ` | Error Code: ${errorObj.code}`
     }
 
     if (errorObj.position) {
-      detailedErrorMessage += ` | Position: ${errorObj.position}`;
+      detailedErrorMessage += ` | Position: ${errorObj.position}`
     }
 
-    console.error(detailedErrorMessage);
-    throw new Error(detailedErrorMessage);
+    console.error(detailedErrorMessage)
+    throw new Error(detailedErrorMessage)
   }
 }
 
@@ -75,25 +75,25 @@ async function executeQuery(query: string, params: any[]) {
  * Example of handling database transaction errors
  */
 async function executeTransaction(queries: { sql: string; params: any[] }[]) {
-  let transaction: any = null;
+  let transaction: any = null
 
   try {
     // Simulated transaction start
-    transaction = await simulateTransactionStart();
+    transaction = await simulateTransactionStart()
 
     for (const { sql, params } of queries) {
-      await simulateQueryExecution(sql, params, transaction);
+      await simulateQueryExecution(sql, params, transaction)
     }
 
     // Simulated transaction commit
-    await simulateTransactionCommit(transaction);
+    await simulateTransactionCommit(transaction)
 
-    return { success: true };
+    return { success: true }
   } catch (err) {
     // Rollback transaction if it exists
     if (transaction) {
       try {
-        await simulateTransactionRollback(transaction);
+        await simulateTransactionRollback(transaction)
       } catch (rollbackErr) {
         // ❌ BAD: Generic rollback error message
         // console.error('Transaction rollback error:', rollbackErr.message);
@@ -101,7 +101,7 @@ async function executeTransaction(queries: { sql: string; params: any[] }[]) {
         // ✅ GOOD: Detailed rollback error message
         console.error(
           `Transaction rollback error: ${String(rollbackErr)} | Original error: ${String(err)}`
-        );
+        )
       }
     }
 
@@ -110,19 +110,19 @@ async function executeTransaction(queries: { sql: string; params: any[] }[]) {
     // throw new Error(`Transaction error: ${err.message}`);
 
     // ✅ GOOD: Detailed error message with transaction information
-    const errorObj = err as Record<string, any>;
-    const detailedErrorMessage = `Database transaction error: ${errorObj.message || 'Unknown error'} | Queries: ${queries.length}`;
+    const errorObj = err as Record<string, any>
+    const detailedErrorMessage = `Database transaction error: ${errorObj.message || 'Unknown error'} | Queries: ${queries.length}`
 
     if (errorObj.code) {
-      detailedErrorMessage += ` | Error Code: ${errorObj.code}`;
+      detailedErrorMessage += ` | Error Code: ${errorObj.code}`
     }
 
     if (errorObj.query) {
-      detailedErrorMessage += ` | Failed Query: ${errorObj.query}`;
+      detailedErrorMessage += ` | Failed Query: ${errorObj.query}`
     }
 
-    console.error(detailedErrorMessage);
-    throw new Error(detailedErrorMessage);
+    console.error(detailedErrorMessage)
+    throw new Error(detailedErrorMessage)
   }
 }
 
@@ -130,21 +130,21 @@ async function executeTransaction(queries: { sql: string; params: any[] }[]) {
 async function simulateDatabaseConnection(config: any) {
   // Simulate different connection errors based on configuration
   if (config.host === 'localhost' && config.port === 5432) {
-    return { connected: true };
+    return { connected: true }
   } else if (config.host === 'invalid-host') {
     throw {
       message: 'getaddrinfo ENOTFOUND invalid-host',
       code: 'ENOTFOUND',
       host: 'invalid-host',
       port: config.port,
-    };
+    }
   } else if (config.port === 1234) {
     throw {
       message: 'connect ECONNREFUSED 127.0.0.1:1234',
       code: 'ECONNREFUSED',
       address: '127.0.0.1',
       port: 1234,
-    };
+    }
   } else if (config.user === 'invalid-user') {
     throw {
       message: 'password authentication failed for user "invalid-user"',
@@ -152,40 +152,40 @@ async function simulateDatabaseConnection(config: any) {
       host: config.host,
       port: config.port,
       user: 'invalid-user',
-    };
+    }
   } else {
     throw {
       message: 'connection timeout',
       code: 'ETIMEDOUT',
       host: config.host,
       port: config.port,
-    };
+    }
   }
 }
 
 async function simulateQueryExecution(query: string, params: any[], transaction?: any) {
   // Simulate query execution
-  return { rows: [] };
+  return { rows: [] }
 }
 
 async function simulateTransactionStart() {
   // Simulate transaction start
-  return { id: 'tx-123' };
+  return { id: 'tx-123' }
 }
 
 async function simulateTransactionCommit(transaction: any) {
   // Simulate transaction commit
-  return true;
+  return true
 }
 
 async function simulateTransactionRollback(transaction: any) {
   // Simulate transaction rollback
-  return true;
+  return true
 }
 
 function logError(code: string, details: any) {
   // Simulate error logging to a service
-  console.log(`[ERROR_LOG] ${code}:`, JSON.stringify(details, null, 2));
+  console.log(`[ERROR_LOG] ${code}:`, JSON.stringify(details, null, 2))
 }
 
 // Example usage
@@ -198,10 +198,10 @@ async function main() {
       database: 'mydb',
       user: 'postgres',
       password: 'password',
-    });
-    console.log('Connected successfully');
+    })
+    console.log('Connected successfully')
   } catch (err) {
-    console.error('Main error handler:', err.message);
+    console.error('Main error handler:', err.message)
   }
 
   try {
@@ -212,10 +212,10 @@ async function main() {
       database: 'mydb',
       user: 'postgres',
       password: 'password',
-    });
+    })
   } catch (err) {
-    console.error('Main error handler:', err.message);
+    console.error('Main error handler:', err.message)
   }
 }
 
-export { connectToDatabase, executeQuery, executeTransaction };
+export { connectToDatabase, executeQuery, executeTransaction }

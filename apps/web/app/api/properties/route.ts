@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
 
 /**
  * Placeholder API for properties
@@ -11,12 +11,12 @@ export async function GET(_request: NextRequest) {
     price: 350000,
     bedrooms: 3,
     type: 'House',
-  };
+  }
 
   return NextResponse.json({
     success: true,
     data: mockProperty,
-  });
+  })
 }
 
 export async function POST(_request: NextRequest) {
@@ -26,7 +26,7 @@ export async function POST(_request: NextRequest) {
       id: '123',
       message: 'Property created successfully',
     },
-  });
+  })
 }
 
 export async function PATCH(_request: NextRequest) {
@@ -36,7 +36,7 @@ export async function PATCH(_request: NextRequest) {
       id: '123',
       message: 'Property updated successfully',
     },
-  });
+  })
 }
 
 export async function DELETE(_request: NextRequest) {
@@ -46,5 +46,5 @@ export async function DELETE(_request: NextRequest) {
       id: '123',
       message: 'Property deleted successfully',
     },
-  });
+  })
 }

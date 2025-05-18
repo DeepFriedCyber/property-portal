@@ -1,0 +1,14 @@
+{
+  "name": "@property-portal/hooks",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
+  },
+  "scripts": {
+    "setup": "node setup-eslint.js"
+  }
+}

@@ -1,123 +1,123 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 import {
   EnhancedErrorBoundary,
   ApiErrorBoundary,
   FormErrorBoundary,
-} from '@/components/error-handling';
-import CentralizedErrorHandlingExample from '@/components/examples/CentralizedErrorHandlingExample';
-import ErrorHandlingHookExample from '@/components/examples/ErrorHandlingHookExample';
-import { ApiError } from '@/lib/api/error-handling';
-import { ValidationError } from '@/lib/api/validation';
-import logger from '@/lib/logging/logger';
+} from '@/components/error-handling'
+import CentralizedErrorHandlingExample from '@/components/examples/CentralizedErrorHandlingExample'
+import ErrorHandlingHookExample from '@/components/examples/ErrorHandlingHookExample'
+import { ApiError } from '@/lib/api/error-handling'
+import { ValidationError } from '@/lib/api/validation'
+import logger from '@/lib/logging/logger'
 
 // Component that throws a render error
 const RenderErrorComponent = () => {
   // This will throw an error when rendered
   if (true) {
-    throw new Error('This is a simulated render error');
+    throw new Error('This is a simulated render error')
   }
 
-  return <div>This will never render</div>;
-};
+  return <div>This will never render</div>
+}
 
 // Component that throws an async error
 const AsyncErrorComponent = () => {
-  const [hasError, setHasError] = useState(false);
+  const [hasError, setHasError] = useState(false)
 
   React.useEffect(() => {
     const fetchData = async () => {
       // Simulate an async error
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       if (!hasError) {
-        setHasError(true);
-        throw new Error('This is a simulated async error');
+        setHasError(true)
+        throw new Error('This is a simulated async error')
       }
-    };
+    }
 
-    fetchData();
-  }, [hasError]);
+    fetchData()
+  }, [hasError])
 
-  return <div>Loading data...</div>;
-};
+  return <div>Loading data...</div>
+}
 
 // Component that throws an API error
 const ApiErrorComponent = () => {
-  const [hasError, setHasError] = useState(false);
+  const [hasError, setHasError] = useState(false)
 
   React.useEffect(() => {
     const fetchData = async () => {
       // Simulate an API error
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       if (!hasError) {
-        setHasError(true);
+        setHasError(true)
         throw new ApiError('Failed to fetch data from API', 500, 'API_ERROR', {
           details: 'This is a simulated API error',
-        });
+        })
       }
-    };
+    }
 
-    fetchData();
-  }, [hasError]);
+    fetchData()
+  }, [hasError])
 
-  return <div>Loading API data...</div>;
-};
+  return <div>Loading API data...</div>
+}
 
 // Component that throws a validation error
 const ValidationErrorComponent = () => {
-  const [hasError, setHasError] = useState(false);
+  const [hasError, setHasError] = useState(false)
 
   React.useEffect(() => {
     const validateForm = async () => {
       // Simulate a validation error
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       if (!hasError) {
-        setHasError(true);
+        setHasError(true)
         throw new ValidationError('Form validation failed', 'VALIDATION_ERROR', {
           name: 'Name is required',
           email: 'Email is invalid',
           password: 'Password must be at least 8 characters',
-        });
+        })
       }
-    };
+    }
 
-    validateForm();
-  }, [hasError]);
+    validateForm()
+  }, [hasError])
 
-  return <div>Validating form...</div>;
-};
+  return <div>Validating form...</div>
+}
 
 // Component that logs errors
 const LoggingExample = () => {
-  const [logCount, setLogCount] = useState(0);
+  const [logCount, setLogCount] = useState(0)
 
   const handleLogDebug = () => {
-    logger.debug('This is a debug message', { count: logCount });
-    setLogCount((prev) => prev + 1);
-  };
+    logger.debug('This is a debug message', { count: logCount })
+    setLogCount(prev => prev + 1)
+  }
 
   const handleLogInfo = () => {
-    logger.info('This is an info message', { count: logCount });
-    setLogCount((prev) => prev + 1);
-  };
+    logger.info('This is an info message', { count: logCount })
+    setLogCount(prev => prev + 1)
+  }
 
   const handleLogWarn = () => {
-    logger.warn('This is a warning message', { count: logCount });
-    setLogCount((prev) => prev + 1);
-  };
+    logger.warn('This is a warning message', { count: logCount })
+    setLogCount(prev => prev + 1)
+  }
 
   const handleLogError = () => {
     logger.error('This is an error message', new Error('Test error'), { count: logCount }, [
       'test',
       'error',
-    ]);
-    setLogCount((prev) => prev + 1);
-  };
+    ])
+    setLogCount(prev => prev + 1)
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
@@ -157,17 +157,17 @@ const LoggingExample = () => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
 /**
  * Error handling example page
  */
 export default function ErrorHandlingPage() {
-  const [showRenderError, setShowRenderError] = useState(false);
-  const [showAsyncError, setShowAsyncError] = useState(false);
-  const [showApiError, setShowApiError] = useState(false);
-  const [showValidationError, setShowValidationError] = useState(false);
+  const [showRenderError, setShowRenderError] = useState(false)
+  const [showAsyncError, setShowAsyncError] = useState(false)
+  const [showApiError, setShowApiError] = useState(false)
+  const [showValidationError, setShowValidationError] = useState(false)
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -207,7 +207,7 @@ export default function ErrorHandlingPage() {
             </p>
 
             <button
-              onClick={() => setShowRenderError((prev) => !prev)}
+              onClick={() => setShowRenderError(prev => !prev)}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 mb-4"
             >
               {showRenderError ? 'Hide' : 'Show'} Render Error
@@ -230,7 +230,7 @@ export default function ErrorHandlingPage() {
             </p>
 
             <button
-              onClick={() => setShowAsyncError((prev) => !prev)}
+              onClick={() => setShowAsyncError(prev => !prev)}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 mb-4"
             >
               {showAsyncError ? 'Hide' : 'Show'} Async Error
@@ -253,7 +253,7 @@ export default function ErrorHandlingPage() {
             </p>
 
             <button
-              onClick={() => setShowApiError((prev) => !prev)}
+              onClick={() => setShowApiError(prev => !prev)}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 mb-4"
             >
               {showApiError ? 'Hide' : 'Show'} API Error
@@ -276,7 +276,7 @@ export default function ErrorHandlingPage() {
             </p>
 
             <button
-              onClick={() => setShowValidationError((prev) => !prev)}
+              onClick={() => setShowValidationError(prev => !prev)}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 mb-4"
             >
               {showValidationError ? 'Hide' : 'Show'} Validation Error
@@ -302,5 +302,5 @@ export default function ErrorHandlingPage() {
         </ul>
       </div>
     </div>
-  );
+  )
 }

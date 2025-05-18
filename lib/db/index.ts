@@ -1,6 +1,6 @@
-import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv'
 
-import * as schema from '../../drizzle/schema';
+import * as schema from '../../drizzle/schema'
 
 import {
   connectionManager,
@@ -8,17 +8,17 @@ import {
   initializeDatabase,
   closeDatabase,
   getDatabaseStatus,
-} from './connection-manager';
-import { DatabaseConnectionError } from './error-handler';
+} from './connection-manager'
+import { DatabaseConnectionError } from './error-handler'
 
 // Load environment variables
-dotenv.config();
+dotenv.config()
 
 // Initialize the database connection
 try {
   // This will be executed when this module is imported
   // We use a self-invoking async function to handle the async initialization
-  (async () => {
+  ;(async () => {
     try {
       await initializeDatabase(process.env.DATABASE_URL, {
         ssl: process.env.NODE_ENV === 'production',
@@ -27,35 +27,35 @@ try {
         connect_timeout: 10, // 10 seconds
         max_lifetime: 60 * 60, // 1 hour
         healthCheckIntervalMs: 30000, // 30 seconds
-      });
+      })
     } catch (error) {
-      console.error('Database initialization error:', error);
+      console.error('Database initialization error:', error)
       // We don't throw here to allow the application to start
       // The connection manager will attempt to reconnect
     }
-  })();
+  })()
 } catch (error) {
-  console.error('Error in database initialization:', error);
+  console.error('Error in database initialization:', error)
 }
 
 // Export the database client
 // This will throw an error if the connection is not available
 // Consumers should handle this error appropriately
-export const db = getDb();
+export const db = getDb()
 
 // Export schema for convenience
-export { schema };
+export { schema }
 
 // Export connection management functions
-export { initializeDatabase, closeDatabase, getDatabaseStatus };
+export { initializeDatabase, closeDatabase, getDatabaseStatus }
 
 /**
  * Check if the database connection is healthy
  * @returns True if the connection is healthy, false otherwise
  */
 export function isDatabaseHealthy(): boolean {
-  const status = getDatabaseStatus();
-  return status.status === 'CONNECTED';
+  const status = getDatabaseStatus()
+  return status.status === 'CONNECTED'
 }
 
 /**
@@ -65,12 +65,12 @@ export function isDatabaseHealthy(): boolean {
  */
 export function getDatabase(throwOnError = true) {
   try {
-    return getDb();
+    return getDb()
   } catch (error) {
     if (throwOnError) {
-      throw error;
+      throw error
     }
-    return null;
+    return null
   }
 }
 
@@ -84,33 +84,33 @@ export async function withDatabase<T>(
   fn: (db: ReturnType<typeof getDb>) => Promise<T>,
   retries = 3
 ): Promise<T> {
-  let lastError: Error | null = null;
+  let lastError: Error | null = null
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const database = getDb();
-      return await fn(database);
+      const database = getDb()
+      return await fn(database)
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
+      lastError = error instanceof Error ? error : new Error(String(error))
 
       // If it's not a connection error, just throw it
       if (!(error instanceof DatabaseConnectionError)) {
-        throw error;
+        throw error
       }
 
       // Don't retry if we've reached max retries
       if (attempt === retries) {
-        break;
+        break
       }
 
       // Wait before retrying
-      const delay = 1000 * Math.pow(2, attempt);
-      console.log(`Database connection failed, retrying in ${delay}ms...`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      const delay = 1000 * Math.pow(2, attempt)
+      console.log(`Database connection failed, retrying in ${delay}ms...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
 
   throw (
     lastError || new DatabaseConnectionError('Failed to execute database operation after retries')
-  );
+  )
 }

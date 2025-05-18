@@ -1,19 +1,19 @@
 // components/forms/TextField.tsx
-import React from 'react';
+import React from 'react'
 
-import FormField from './FormField';
+import FormField from './FormField'
 
 interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  id: string;
-  name: string;
-  label: string;
-  error?: string;
-  touched?: boolean;
-  required?: boolean;
-  helpText?: string;
-  type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'number';
-  className?: string;
-  inputClassName?: string;
+  id: string
+  name: string
+  label: string
+  error?: string
+  touched?: boolean
+  required?: boolean
+  helpText?: string
+  type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'number'
+  className?: string
+  inputClassName?: string
 }
 
 /**
@@ -32,7 +32,7 @@ const TextField: React.FC<TextFieldProps> = ({
   inputClassName = '',
   ...props
 }) => {
-  const showError = error && touched;
+  const showError = error && touched
 
   return (
     <FormField
@@ -60,7 +60,7 @@ const TextField: React.FC<TextFieldProps> = ({
         {...props}
       />
     </FormField>
-  );
-};
+  )
+}
 
-export default TextField;
+export default TextField

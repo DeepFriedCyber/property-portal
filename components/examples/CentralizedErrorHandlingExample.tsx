@@ -1,17 +1,17 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import { useCentralizedErrorHandler } from '@/hooks/useCentralizedErrorHandler';
-import { ApiError } from '@/lib/api/error-handling';
-import { ValidationError } from '@/lib/api/validation';
-import { ErrorType, ErrorSeverity } from '@/lib/error/error-service';
+import { useCentralizedErrorHandler } from '@/hooks/useCentralizedErrorHandler'
+import { ApiError } from '@/lib/api/error-handling'
+import { ValidationError } from '@/lib/api/validation'
+import { ErrorType, ErrorSeverity } from '@/lib/error/error-service'
 
 /**
  * Example component that demonstrates the centralized error handling
  */
 const CentralizedErrorHandlingExample: React.FC = () => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   // Use the centralized error handler hook
   const {
@@ -30,78 +30,78 @@ const CentralizedErrorHandlingExample: React.FC = () => {
   } = useCentralizedErrorHandler({
     component: 'CentralizedErrorHandlingExample',
     tags: ['example', 'error-handling'],
-  });
+  })
 
   // Function that throws a regular error
   const throwError = () => {
-    throw new Error('This is a regular error');
-  };
+    throw new Error('This is a regular error')
+  }
 
   // Function that throws an API error
   const throwApiError = () => {
     throw new ApiError('This is an API error', 500, 'API_ERROR', {
       details: 'Some API error details',
-    });
-  };
+    })
+  }
 
   // Function that throws a validation error
   const throwValidationError = () => {
     throw new ValidationError('This is a validation error', 'VALIDATION_ERROR', {
       name: 'Name is required',
       email: 'Email is invalid',
-    });
-  };
+    })
+  }
 
   // Async function that throws an error
   const throwAsyncError = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    throw new Error('This is an async error');
-  };
+    await new Promise(resolve => setTimeout(resolve, 500))
+    throw new Error('This is an async error')
+  }
 
   // Safe versions of the error-throwing functions
   const safeThrowError = withErrorHandling(throwError, {
     action: 'throwRegularError',
     severity: ErrorSeverity.MEDIUM,
-  });
+  })
 
   const safeThrowApiError = withErrorHandling(throwApiError, {
     action: 'throwApiError',
     severity: ErrorSeverity.HIGH,
-  });
+  })
 
   const safeThrowValidationError = withErrorHandling(throwValidationError, {
     action: 'throwValidationError',
     severity: ErrorSeverity.LOW,
-  });
+  })
 
   const safeThrowAsyncError = withAsyncErrorHandling(throwAsyncError, {
     action: 'throwAsyncError',
     severity: ErrorSeverity.CRITICAL,
-  });
+  })
 
   // Safe function that doesn't throw
   const safeIncrement = withErrorHandling(
     () => {
-      setCount((prev) => prev + 1);
+      setCount(prev => prev + 1)
     },
     { action: 'increment' }
-  );
+  )
 
   // Get the appropriate color for the error severity
   const getSeverityColor = () => {
     switch (errorSeverity) {
       case ErrorSeverity.LOW:
-        return 'text-yellow-600';
+        return 'text-yellow-600'
       case ErrorSeverity.MEDIUM:
-        return 'text-orange-600';
+        return 'text-orange-600'
       case ErrorSeverity.HIGH:
-        return 'text-red-600';
+        return 'text-red-600'
       case ErrorSeverity.CRITICAL:
-        return 'text-purple-600';
+        return 'text-purple-600'
       default:
-        return 'text-gray-600';
+        return 'text-gray-600'
     }
-  };
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
@@ -221,7 +221,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
         </ul>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CentralizedErrorHandlingExample;
+export default CentralizedErrorHandlingExample

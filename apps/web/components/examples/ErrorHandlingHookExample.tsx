@@ -1,43 +1,43 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { useErrorHandler } from '@/hooks/useErrorHandler'
 
 /**
  * Example component demonstrating the use of an error handling hook
  */
 const ErrorHandlingHookExample: React.FC = () => {
-  const [loading, setLoading] = useState(false);
-  const { error, handleError, clearError } = useErrorHandler();
+  const [loading, setLoading] = useState(false)
+  const { error, handleError, clearError } = useErrorHandler()
 
   // Simulate a successful API call
   const handleSuccess = () => {
-    setLoading(true);
+    setLoading(true)
     setTimeout(() => {
-      setLoading(false);
-      clearError();
-      alert('Operation completed successfully!');
-    }, 1000);
-  };
+      setLoading(false)
+      clearError()
+      alert('Operation completed successfully!')
+    }, 1000)
+  }
 
   // Simulate a failed API call
   const handleFailure = () => {
-    setLoading(true);
+    setLoading(true)
     setTimeout(() => {
-      setLoading(false);
-      handleError(new Error('Failed to complete the operation'));
-    }, 1000);
-  };
+      setLoading(false)
+      handleError(new Error('Failed to complete the operation'))
+    }, 1000)
+  }
 
   // Simulate a network error
   const handleNetworkError = () => {
-    setLoading(true);
+    setLoading(true)
     setTimeout(() => {
-      setLoading(false);
-      handleError(new Error('Network error: Unable to connect to the server'));
-    }, 1000);
-  };
+      setLoading(false)
+      handleError(new Error('Network error: Unable to connect to the server'))
+    }, 1000)
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
@@ -86,7 +86,7 @@ const ErrorHandlingHookExample: React.FC = () => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ErrorHandlingHookExample;
+export default ErrorHandlingHookExample

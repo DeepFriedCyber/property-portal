@@ -1,24 +1,24 @@
 // components/error-handling/RouteErrorBoundary.tsx
-'use client';
+'use client'
 
-import { useRouter } from 'next/navigation';
-import React from 'react';
+import { useRouter } from 'next/navigation'
+import React from 'react'
 
-import EnhancedErrorBoundary from './EnhancedErrorBoundary';
+import EnhancedErrorBoundary from './EnhancedErrorBoundary'
 
-import logger from '@/lib/logging/logger';
+import logger from '@/lib/logging/logger'
 
 interface RouteErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode | ((error: Error, resetError: () => void) => React.ReactNode);
-  onError?: (error: Error) => void;
+  children: React.ReactNode
+  fallback?: React.ReactNode | ((error: Error, resetError: () => void) => React.ReactNode)
+  onError?: (error: Error) => void
 }
 
 /**
  * Error boundary specifically for handling route errors
  */
 const RouteErrorBoundary: React.FC<RouteErrorBoundaryProps> = ({ children, fallback, onError }) => {
-  const router = useRouter();
+  const router = useRouter()
 
   // Default fallback UI for route errors
   const defaultFallback = (error: Error, resetError: () => void) => {
@@ -52,8 +52,8 @@ const RouteErrorBoundary: React.FC<RouteErrorBoundaryProps> = ({ children, fallb
           </button>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   // Handle route errors
   const handleError = (error: Error) => {
@@ -66,19 +66,19 @@ const RouteErrorBoundary: React.FC<RouteErrorBoundaryProps> = ({ children, fallb
         pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
       },
       ['error-boundary', 'route-error']
-    );
+    )
 
     // Call the optional onError callback
     if (onError) {
-      onError(error);
+      onError(error)
     }
-  };
+  }
 
   return (
     <EnhancedErrorBoundary fallback={fallback || defaultFallback} onError={handleError}>
       {children}
     </EnhancedErrorBoundary>
-  );
-};
+  )
+}
 
-export default RouteErrorBoundary;
+export default RouteErrorBoundary

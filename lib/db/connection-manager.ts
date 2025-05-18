@@ -1,25 +1,25 @@
 // db/connection-manager.ts
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
 
-import * as schema from '../../drizzle/schema';
+import * as schema from '../../drizzle/schema'
 
-import { DatabaseConnectionError } from './error-handler';
+import { DatabaseConnectionError } from './error-handler'
 
 // Connection pool status
-type ConnectionStatus = 'INITIALIZING' | 'CONNECTED' | 'DISCONNECTED' | 'ERROR';
+type ConnectionStatus = 'INITIALIZING' | 'CONNECTED' | 'DISCONNECTED' | 'ERROR'
 
 // Connection manager singleton
 class ConnectionManager {
-  private static instance: ConnectionManager;
-  private client: postgres.Sql<{}> | null = null;
-  private status: ConnectionStatus = 'INITIALIZING';
-  private connectionError: Error | null = null;
-  private reconnectAttempts = 0;
-  private maxReconnectAttempts = 10;
-  private reconnectDelay = 1000; // Start with 1 second
-  private reconnectTimer: NodeJS.Timeout | null = null;
-  private healthCheckInterval: NodeJS.Timeout | null = null;
+  private static instance: ConnectionManager
+  private client: postgres.Sql<{}> | null = null
+  private status: ConnectionStatus = 'INITIALIZING'
+  private connectionError: Error | null = null
+  private reconnectAttempts = 0
+  private maxReconnectAttempts = 10
+  private reconnectDelay = 1000 // Start with 1 second
+  private reconnectTimer: NodeJS.Timeout | null = null
+  private healthCheckInterval: NodeJS.Timeout | null = null
 
   private constructor() {
     // Private constructor to enforce singleton pattern
@@ -27,9 +27,9 @@ class ConnectionManager {
 
   public static getInstance(): ConnectionManager {
     if (!ConnectionManager.instance) {
-      ConnectionManager.instance = new ConnectionManager();
+      ConnectionManager.instance = new ConnectionManager()
     }
-    return ConnectionManager.instance;
+    return ConnectionManager.instance
   }
 
   /**
@@ -40,20 +40,20 @@ class ConnectionManager {
   public async initialize(
     connectionString: string = process.env.DATABASE_URL || '',
     options: {
-      ssl?: boolean;
-      max?: number;
-      idle_timeout?: number;
-      connect_timeout?: number;
-      max_lifetime?: number;
-      healthCheckIntervalMs?: number;
+      ssl?: boolean
+      max?: number
+      idle_timeout?: number
+      connect_timeout?: number
+      max_lifetime?: number
+      healthCheckIntervalMs?: number
     } = {}
   ): Promise<void> {
     if (!connectionString) {
-      throw new DatabaseConnectionError('DATABASE_URL is not defined');
+      throw new DatabaseConnectionError('DATABASE_URL is not defined')
     }
 
     try {
-      this.status = 'INITIALIZING';
+      this.status = 'INITIALIZING'
 
       // Create postgres connection with connection pooling
       this.client = postgres(connectionString, {
@@ -63,37 +63,37 @@ class ConnectionManager {
         connect_timeout: options.connect_timeout ?? 10,
         max_lifetime: options.max_lifetime ?? 60 * 60,
         debug: process.env.NODE_ENV === 'development' ? console.log : undefined,
-        onnotice: (notice) => console.log('Database notice:', notice),
+        onnotice: notice => console.log('Database notice:', notice),
         onclose: () => {
-          console.log('Database connection closed');
-          this.status = 'DISCONNECTED';
-          this.scheduleReconnect();
+          console.log('Database connection closed')
+          this.status = 'DISCONNECTED'
+          this.scheduleReconnect()
         },
-      });
+      })
 
       // Test the connection
-      await this.client`SELECT 1`;
+      await this.client`SELECT 1`
 
-      this.status = 'CONNECTED';
-      this.connectionError = null;
-      this.reconnectAttempts = 0;
-      console.log('Database connection established successfully');
+      this.status = 'CONNECTED'
+      this.connectionError = null
+      this.reconnectAttempts = 0
+      console.log('Database connection established successfully')
 
       // Start health check interval
-      this.startHealthCheck(options.healthCheckIntervalMs ?? 30000);
+      this.startHealthCheck(options.healthCheckIntervalMs ?? 30000)
     } catch (error) {
-      this.status = 'ERROR';
-      this.connectionError = error instanceof Error ? error : new Error(String(error));
+      this.status = 'ERROR'
+      this.connectionError = error instanceof Error ? error : new Error(String(error))
 
       // Use detailed error message for better debugging
-      console.error('Failed to initialize database connection:', error);
+      console.error('Failed to initialize database connection:', error)
 
       // Schedule reconnect
-      this.scheduleReconnect();
+      this.scheduleReconnect()
 
       // The DatabaseConnectionError constructor will use createDetailedDbConnectionErrorMessage
       // to generate a detailed error message that includes connection details
-      throw new DatabaseConnectionError('Failed to initialize database connection', error);
+      throw new DatabaseConnectionError('Failed to initialize database connection', error)
     }
   }
 
@@ -106,10 +106,10 @@ class ConnectionManager {
       throw new DatabaseConnectionError(
         'Database connection is not available',
         this.connectionError || undefined
-      );
+      )
     }
 
-    return drizzle(this.client, { schema });
+    return drizzle(this.client, { schema })
   }
 
   /**
@@ -121,10 +121,10 @@ class ConnectionManager {
       throw new DatabaseConnectionError(
         'Database connection is not available',
         this.connectionError || undefined
-      );
+      )
     }
 
-    return this.client;
+    return this.client
   }
 
   /**
@@ -132,7 +132,7 @@ class ConnectionManager {
    * @returns Connection status
    */
   public getStatus(): ConnectionStatus {
-    return this.status;
+    return this.status
   }
 
   /**
@@ -140,29 +140,29 @@ class ConnectionManager {
    * @returns Connection error or null
    */
   public getError(): Error | null {
-    return this.connectionError;
+    return this.connectionError
   }
 
   /**
    * Close the database connection
    */
   public async close(): Promise<void> {
-    this.stopHealthCheck();
+    this.stopHealthCheck()
 
     if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
     }
 
     if (this.client) {
       try {
-        await this.client.end();
-        console.log('Database connection closed');
+        await this.client.end()
+        console.log('Database connection closed')
       } catch (error) {
-        console.error('Error closing database connection:', error);
+        console.error('Error closing database connection:', error)
       } finally {
-        this.client = null;
-        this.status = 'DISCONNECTED';
+        this.client = null
+        this.status = 'DISCONNECTED'
       }
     }
   }
@@ -172,33 +172,31 @@ class ConnectionManager {
    */
   private scheduleReconnect(): void {
     if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
+      clearTimeout(this.reconnectTimer)
     }
 
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error(`Max reconnect attempts (${this.maxReconnectAttempts}) reached. Giving up.`);
-      return;
+      console.error(`Max reconnect attempts (${this.maxReconnectAttempts}) reached. Giving up.`)
+      return
     }
 
-    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts);
-    console.log(
-      `Scheduling database reconnect attempt ${this.reconnectAttempts + 1} in ${delay}ms`
-    );
+    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts)
+    console.log(`Scheduling database reconnect attempt ${this.reconnectAttempts + 1} in ${delay}ms`)
 
     this.reconnectTimer = setTimeout(async () => {
-      this.reconnectAttempts++;
+      this.reconnectAttempts++
 
       try {
         console.log(
           `Attempting to reconnect to database (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`
-        );
-        await this.initialize();
-        console.log('Database reconnection successful');
+        )
+        await this.initialize()
+        console.log('Database reconnection successful')
       } catch (error) {
-        console.error('Database reconnection failed:', error);
-        this.scheduleReconnect();
+        console.error('Database reconnection failed:', error)
+        this.scheduleReconnect()
       }
-    }, delay);
+    }, delay)
   }
 
   /**
@@ -206,26 +204,26 @@ class ConnectionManager {
    * @param intervalMs Interval in milliseconds
    */
   private startHealthCheck(intervalMs: number): void {
-    this.stopHealthCheck();
+    this.stopHealthCheck()
 
     this.healthCheckInterval = setInterval(async () => {
       if (this.status !== 'CONNECTED' || !this.client) {
-        return;
+        return
       }
 
       try {
         // Simple query to check connection
-        await this.client`SELECT 1`;
+        await this.client`SELECT 1`
       } catch (error) {
-        console.error('Database health check failed:', error);
-        this.status = 'ERROR';
-        this.connectionError = error instanceof Error ? error : new Error(String(error));
+        console.error('Database health check failed:', error)
+        this.status = 'ERROR'
+        this.connectionError = error instanceof Error ? error : new Error(String(error))
 
         // Try to close the connection and reconnect
-        await this.close();
-        this.scheduleReconnect();
+        await this.close()
+        this.scheduleReconnect()
       }
-    }, intervalMs);
+    }, intervalMs)
   }
 
   /**
@@ -233,14 +231,14 @@ class ConnectionManager {
    */
   private stopHealthCheck(): void {
     if (this.healthCheckInterval) {
-      clearInterval(this.healthCheckInterval);
-      this.healthCheckInterval = null;
+      clearInterval(this.healthCheckInterval)
+      this.healthCheckInterval = null
     }
   }
 }
 
 // Export the singleton instance
-export const connectionManager = ConnectionManager.getInstance();
+export const connectionManager = ConnectionManager.getInstance()
 
 /**
  * Initialize the database connection
@@ -250,15 +248,15 @@ export const connectionManager = ConnectionManager.getInstance();
 export async function initializeDatabase(
   connectionString?: string,
   options?: {
-    ssl?: boolean;
-    max?: number;
-    idle_timeout?: number;
-    connect_timeout?: number;
-    max_lifetime?: number;
-    healthCheckIntervalMs?: number;
+    ssl?: boolean
+    max?: number
+    idle_timeout?: number
+    connect_timeout?: number
+    max_lifetime?: number
+    healthCheckIntervalMs?: number
   }
 ): Promise<void> {
-  await connectionManager.initialize(connectionString, options);
+  await connectionManager.initialize(connectionString, options)
 }
 
 /**
@@ -266,14 +264,14 @@ export async function initializeDatabase(
  * @returns Drizzle ORM instance
  */
 export function getDb() {
-  return connectionManager.getDb();
+  return connectionManager.getDb()
 }
 
 /**
  * Close the database connection
  */
 export async function closeDatabase(): Promise<void> {
-  await connectionManager.close();
+  await connectionManager.close()
 }
 
 /**
@@ -281,11 +279,11 @@ export async function closeDatabase(): Promise<void> {
  * @returns Connection status
  */
 export function getDatabaseStatus(): {
-  status: 'INITIALIZING' | 'CONNECTED' | 'DISCONNECTED' | 'ERROR';
-  error: Error | null;
+  status: 'INITIALIZING' | 'CONNECTED' | 'DISCONNECTED' | 'ERROR'
+  error: Error | null
 } {
   return {
     status: connectionManager.getStatus(),
     error: connectionManager.getError(),
-  };
+  }
 }

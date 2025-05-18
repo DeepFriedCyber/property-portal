@@ -1,14 +1,14 @@
-import React from 'react';
+import React from 'react'
 
-import { Button } from '../../src/ui';
+import { Button } from '../../src/ui'
 
 export interface CallToActionProps {
-  title: string;
-  description: string;
-  primaryButtonText: string;
-  secondaryButtonText: string;
-  onPrimaryClick: () => void;
-  onSecondaryClick: () => void;
+  title: string
+  description: string
+  primaryButtonText: string
+  secondaryButtonText: string
+  onPrimaryClick: () => void
+  onSecondaryClick: () => void
 }
 
 export default function CallToAction({
@@ -32,5 +32,5 @@ export default function CallToAction({
         </Button>
       </div>
     </section>
-  );
+  )
 }

@@ -1,11 +1,11 @@
 // PropertyCardSkeleton.tsx
-import React from 'react';
+import React from 'react'
 
-import styles from './PropertyCardSkeleton.module.css';
-import Skeleton from './Skeleton';
+import styles from './PropertyCardSkeleton.module.css'
+import Skeleton from './Skeleton'
 
 interface PropertyCardSkeletonProps {
-  count?: number;
+  count?: number
 }
 
 const PropertyCardSkeleton: React.FC<PropertyCardSkeletonProps> = ({ count = 1 }) => {
@@ -38,7 +38,7 @@ const PropertyCardSkeleton: React.FC<PropertyCardSkeletonProps> = ({ count = 1 }
         </div>
       ))}
     </>
-  );
-};
+  )
+}
 
-export default PropertyCardSkeleton;
+export default PropertyCardSkeleton

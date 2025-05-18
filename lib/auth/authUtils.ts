@@ -1,5 +1,5 @@
-import { auth } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
 /**
  * Checks if a user has any of the allowed roles
@@ -8,8 +8,8 @@ import { NextResponse } from 'next/server';
  * @returns Boolean indicating if the user has any of the allowed roles
  */
 export function userHasRole(sessionClaims: any, allowed: string[]): boolean {
-  const roles = (sessionClaims?.roles as string[]) || [];
-  return roles.some((role) => allowed.includes(role));
+  const roles = (sessionClaims?.roles as string[]) || []
+  return roles.some(role => allowed.includes(role))
 }
 
 /**
@@ -19,13 +19,13 @@ export function userHasRole(sessionClaims: any, allowed: string[]): boolean {
  */
 export async function validateUserRoles(requiredRoles: string[] = ['agent', 'admin']) {
   // Get the user ID and authentication data from Clerk
-  const authResult = await auth();
-  const userId = authResult.userId;
-  const { sessionClaims } = authResult;
+  const authResult = await auth()
+  const userId = authResult.userId
+  const { sessionClaims } = authResult
 
   // Check if user is authenticated
   if (!userId) {
-    console.warn('Unauthorized access attempt');
+    console.warn('Unauthorized access attempt')
     return {
       isAuthorized: false,
       userId: null,
@@ -33,14 +33,14 @@ export async function validateUserRoles(requiredRoles: string[] = ['agent', 'adm
         { message: 'Unauthorized - Authentication required' },
         { status: 401 }
       ),
-    };
+    }
   }
 
   // Check if user has any of the required roles
-  const hasRequiredRole = userHasRole(sessionClaims, requiredRoles);
+  const hasRequiredRole = userHasRole(sessionClaims, requiredRoles)
 
   if (!hasRequiredRole) {
-    console.warn(`User ${userId} attempted access without required role`);
+    console.warn(`User ${userId} attempted access without required role`)
     return {
       isAuthorized: false,
       userId,
@@ -51,14 +51,14 @@ export async function validateUserRoles(requiredRoles: string[] = ['agent', 'adm
         },
         { status: 403 }
       ),
-    };
+    }
   }
 
   return {
     isAuthorized: true,
     userId,
     response: null,
-  };
+  }
 }
 
 /**
@@ -67,5 +67,5 @@ export async function validateUserRoles(requiredRoles: string[] = ['agent', 'adm
  */
 export async function validateUserAuth() {
   // Use the more generic validateUserRoles function with default roles for property uploads
-  return validateUserRoles(['agent', 'admin']);
+  return validateUserRoles(['agent', 'admin'])
 }

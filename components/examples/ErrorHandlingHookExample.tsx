@@ -1,16 +1,16 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { ApiError } from '@/lib/api/error-handling';
-import { ValidationError } from '@/lib/api/validation';
+import { useErrorHandler } from '@/hooks/useErrorHandler'
+import { ApiError } from '@/lib/api/error-handling'
+import { ValidationError } from '@/lib/api/validation'
 
 /**
  * Example component that demonstrates the useErrorHandler hook
  */
 const ErrorHandlingHookExample: React.FC = () => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   // Use the error handler hook
   const {
@@ -24,46 +24,46 @@ const ErrorHandlingHookExample: React.FC = () => {
     resetError,
     withErrorHandling,
     withAsyncErrorHandling,
-  } = useErrorHandler();
+  } = useErrorHandler()
 
   // Function that throws a regular error
   const throwError = () => {
-    throw new Error('This is a regular error');
-  };
+    throw new Error('This is a regular error')
+  }
 
   // Function that throws an API error
   const throwApiError = () => {
     throw new ApiError('This is an API error', 500, 'API_ERROR', {
       details: 'Some API error details',
-    });
-  };
+    })
+  }
 
   // Function that throws a validation error
   const throwValidationError = () => {
     throw new ValidationError('This is a validation error', 'VALIDATION_ERROR', {
       name: 'Name is required',
       email: 'Email is invalid',
-    });
-  };
+    })
+  }
 
   // Async function that throws an error
   const throwAsyncError = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    throw new Error('This is an async error');
-  };
+    await new Promise(resolve => setTimeout(resolve, 500))
+    throw new Error('This is an async error')
+  }
 
   // Safe versions of the error-throwing functions
-  const safeThrowError = withErrorHandling(throwError, { source: 'regular' });
-  const safeThrowApiError = withErrorHandling(throwApiError, { source: 'api' });
+  const safeThrowError = withErrorHandling(throwError, { source: 'regular' })
+  const safeThrowApiError = withErrorHandling(throwApiError, { source: 'api' })
   const safeThrowValidationError = withErrorHandling(throwValidationError, {
     source: 'validation',
-  });
-  const safeThrowAsyncError = withAsyncErrorHandling(throwAsyncError, { source: 'async' });
+  })
+  const safeThrowAsyncError = withAsyncErrorHandling(throwAsyncError, { source: 'async' })
 
   // Safe function that doesn't throw
   const safeIncrement = withErrorHandling(() => {
-    setCount((prev) => prev + 1);
-  });
+    setCount(prev => prev + 1)
+  })
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
@@ -150,7 +150,7 @@ const ErrorHandlingHookExample: React.FC = () => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ErrorHandlingHookExample;
+export default ErrorHandlingHookExample

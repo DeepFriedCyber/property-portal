@@ -1,7 +1,7 @@
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from 'react/jsx-runtime';
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from 'react/jsx-runtime'
 
-import { Button } from './Button';
-import './header.css';
+import { Button } from './Button'
+import './header.css'
 export const Header = ({ user, onLogin, onLogout, onCreateAccount }) =>
   _jsx('header', {
     children: _jsxs('div', {
@@ -61,5 +61,5 @@ export const Header = ({ user, onLogin, onLogout, onCreateAccount }) =>
         }),
       ],
     }),
-  });
+  })
 //# sourceMappingURL=Header.js.map

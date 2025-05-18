@@ -12,10 +12,10 @@ When handling database errors, generic error messages like `Database connection 
 
 ```typescript
 try {
-  await db.connect();
+  await db.connect()
 } catch (err) {
-  console.error(`Database connection error: ${err.message}`);
-  throw new Error(`Database connection error: ${err.message}`);
+  console.error(`Database connection error: ${err.message}`)
+  throw new Error(`Database connection error: ${err.message}`)
 }
 ```
 
@@ -24,14 +24,14 @@ try {
 ### ✅ Detailed Error Messages
 
 ```typescript
-import { createDetailedDbConnectionErrorMessage } from '../lib/db/error-utils';
+import { createDetailedDbConnectionErrorMessage } from '../lib/db/error-utils'
 
 try {
-  await db.connect();
+  await db.connect()
 } catch (err) {
-  const detailedErrorMessage = createDetailedDbConnectionErrorMessage(err);
-  console.error(detailedErrorMessage);
-  throw new Error(detailedErrorMessage);
+  const detailedErrorMessage = createDetailedDbConnectionErrorMessage(err)
+  console.error(detailedErrorMessage)
+  throw new Error(detailedErrorMessage)
 }
 ```
 
@@ -54,14 +54,14 @@ Database connection error: connect ECONNREFUSED 127.0.0.1:5432 (Code: ECONNREFUS
 For logging systems or error tracking services, create structured error objects:
 
 ```typescript
-import { createDbConnectionErrorObject } from '../lib/db/error-utils';
+import { createDbConnectionErrorObject } from '../lib/db/error-utils'
 
 try {
-  await db.connect();
+  await db.connect()
 } catch (err) {
-  const errorObject = createDbConnectionErrorObject(err);
-  logger.error('database_connection_failed', errorObject);
-  throw new Error(errorObject.message);
+  const errorObject = createDbConnectionErrorObject(err)
+  logger.error('database_connection_failed', errorObject)
+  throw new Error(errorObject.message)
 }
 ```
 
@@ -70,17 +70,17 @@ try {
 For user-facing applications, translate technical errors into user-friendly messages:
 
 ```typescript
-import { getUserFriendlyDbErrorMessage } from '../lib/db/error-utils';
+import { getUserFriendlyDbErrorMessage } from '../lib/db/error-utils'
 
 try {
-  await db.connect();
+  await db.connect()
 } catch (err) {
   // Log the detailed technical error
-  console.error(createDetailedDbConnectionErrorMessage(err));
+  console.error(createDetailedDbConnectionErrorMessage(err))
 
   // Return a user-friendly message
-  const userFriendlyMessage = getUserFriendlyDbErrorMessage(err);
-  throw new Error(userFriendlyMessage);
+  const userFriendlyMessage = getUserFriendlyDbErrorMessage(err)
+  throw new Error(userFriendlyMessage)
 }
 ```
 
@@ -110,20 +110,20 @@ try {
 ```typescript
 async function connectToDatabase(config) {
   try {
-    const connection = await db.connect(config);
-    return connection;
+    const connection = await db.connect(config)
+    return connection
   } catch (err) {
     // Log detailed technical error for developers/operations
-    const detailedError = createDetailedDbConnectionErrorMessage(err);
-    logger.error(detailedError);
+    const detailedError = createDetailedDbConnectionErrorMessage(err)
+    logger.error(detailedError)
 
     // For monitoring/analytics systems
-    const errorObject = createDbConnectionErrorObject(err);
-    errorTracker.captureException(errorObject);
+    const errorObject = createDbConnectionErrorObject(err)
+    errorTracker.captureException(errorObject)
 
     // For user-facing applications
-    const userMessage = getUserFriendlyDbErrorMessage(err);
-    throw new Error(userMessage);
+    const userMessage = getUserFriendlyDbErrorMessage(err)
+    throw new Error(userMessage)
   }
 }
 ```

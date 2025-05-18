@@ -1,25 +1,25 @@
 // components/forms/SelectField.tsx
-import React from 'react';
+import React from 'react'
 
-import FormField from './FormField';
+import FormField from './FormField'
 
 interface SelectOption {
-  value: string;
-  label: string;
+  value: string
+  label: string
 }
 
 interface SelectFieldProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'options'> {
-  id: string;
-  name: string;
-  label: string;
-  options: SelectOption[];
-  error?: string;
-  touched?: boolean;
-  required?: boolean;
-  helpText?: string;
-  placeholder?: string;
-  className?: string;
-  selectClassName?: string;
+  id: string
+  name: string
+  label: string
+  options: SelectOption[]
+  error?: string
+  touched?: boolean
+  required?: boolean
+  helpText?: string
+  placeholder?: string
+  className?: string
+  selectClassName?: string
 }
 
 /**
@@ -39,7 +39,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   selectClassName = '',
   ...props
 }) => {
-  const showError = error && touched;
+  const showError = error && touched
 
   return (
     <FormField
@@ -71,14 +71,14 @@ const SelectField: React.FC<SelectFieldProps> = ({
           </option>
         )}
 
-        {options.map((option) => (
+        {options.map(option => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
         ))}
       </select>
     </FormField>
-  );
-};
+  )
+}
 
-export default SelectField;
+export default SelectField

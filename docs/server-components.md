@@ -18,6 +18,7 @@ We follow a specific pattern for organizing our server and client components:
 ### 1. Page Component (Server)
 
 The page component is the entry point for a route. It's a server component that:
+
 - Handles the overall layout
 - Sets up error boundaries and suspense boundaries
 - Delegates data fetching to specialized server components
@@ -25,11 +26,7 @@ The page component is the entry point for a route. It's a server component that:
 Example: `src/app/(properties)/[id]/page.tsx`
 
 ```tsx
-export default async function PropertyDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function PropertyDetailPage({ params }: { params: { id: string } }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <ErrorBoundary>
@@ -38,13 +35,14 @@ export default async function PropertyDetailPage({
         </Suspense>
       </ErrorBoundary>
     </div>
-  );
+  )
 }
 ```
 
 ### 2. Data Fetching Component (Server)
 
 A specialized server component that:
+
 - Handles data fetching
 - Handles error cases (e.g., notFound())
 - Passes data to client components
@@ -53,15 +51,16 @@ Example: `src/app/(properties)/[id]/PropertyDetailData.tsx`
 
 ```tsx
 export default async function PropertyDetailData({ id }: { id: string }) {
-  const result = await getProperty(id);
-  if (!result.success) notFound();
-  return <PropertyDetailContent property={result.data} />;
+  const result = await getProperty(id)
+  if (!result.success) notFound()
+  return <PropertyDetailContent property={result.data} />
 }
 ```
 
 ### 3. Content Component (Client)
 
 A client component that:
+
 - Receives data from server components
 - Handles user interactions
 - Manages client-side state

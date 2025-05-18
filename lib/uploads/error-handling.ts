@@ -1,31 +1,31 @@
 /**
  * Error handling utilities for upload processing
  */
-import { normalizeError } from '../error/error-utils';
+import { normalizeError } from '../error/error-utils'
 
 /**
  * Interface for upload data
  */
 export interface UploadData {
-  id: string;
-  fileName?: string;
-  fileSize?: number;
-  uploaderId?: string;
-  status?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  propertyCount?: number;
-  [key: string]: any; // Allow for additional properties
+  id: string
+  fileName?: string
+  fileSize?: number
+  uploaderId?: string
+  status?: string
+  createdAt?: Date
+  updatedAt?: Date
+  propertyCount?: number
+  [key: string]: any // Allow for additional properties
 }
 
 /**
  * Interface for error context
  */
 export interface ErrorContext {
-  operation: string;
-  uploadId?: string;
-  fileName?: string;
-  additionalInfo?: Record<string, any>;
+  operation: string
+  uploadId?: string
+  fileName?: string
+  additionalInfo?: Record<string, any>
 }
 
 /**
@@ -47,21 +47,21 @@ export function logUploadError(
     fileName: context.fileName || 'unknown',
     timestamp: new Date().toISOString(),
     ...context.additionalInfo,
-  };
+  }
 
   // Remove sensitive information if not explicitly included
   if (!includeUploaderId && context.additionalInfo && 'uploaderId' in context.additionalInfo) {
     // Use type assertion or index notation to avoid TypeScript error
-    delete (errorObj as Record<string, any>)['uploaderId'];
+    delete (errorObj as Record<string, any>)['uploaderId']
   }
 
   // Log differently based on environment
   if (process.env.NODE_ENV === 'development') {
     // In development, include more details including the stack trace
-    console.error(`[UPLOAD ERROR] ${context.operation}:`, errorObj, error);
+    console.error(`[UPLOAD ERROR] ${context.operation}:`, errorObj, error)
   } else {
     // In production, log a structured object without the full error
-    console.error(`[UPLOAD ERROR] ${context.operation}:`, JSON.stringify(errorObj));
+    console.error(`[UPLOAD ERROR] ${context.operation}:`, JSON.stringify(errorObj))
   }
 }
 
@@ -84,7 +84,7 @@ export function createPropertyCountFallback(
       fileSize: upload?.fileSize,
       status: upload?.status,
     },
-  });
+  })
 
   // Return a sanitized object with fallback values
   return {
@@ -97,7 +97,7 @@ export function createPropertyCountFallback(
       process.env.NODE_ENV === 'development'
         ? normalizeError(error)
         : 'Failed to determine property count',
-  };
+  }
 }
 
 /**
@@ -117,7 +117,7 @@ export function createUploadErrorResponse(
     operation,
     uploadId: upload?.id,
     fileName: upload?.fileName,
-  });
+  })
 
   // Return a sanitized object with error information
   return {
@@ -130,7 +130,7 @@ export function createUploadErrorResponse(
         ? normalizeError(error)
         : `Failed to process upload: ${operation}`,
     uploaderId: undefined, // Remove uploader ID for privacy
-  };
+  }
 }
 
 /**
@@ -144,7 +144,7 @@ export function sanitizeUploadData(
   includePrivateData = false
 ): Partial<UploadData> {
   if (!upload) {
-    return { id: 'unknown' };
+    return { id: 'unknown' }
   }
 
   // Create a base object with non-sensitive data
@@ -156,13 +156,13 @@ export function sanitizeUploadData(
     createdAt: upload.createdAt,
     updatedAt: upload.updatedAt,
     propertyCount: upload.propertyCount,
-  };
+  }
 
   // Include private data if explicitly requested
   if (includePrivateData) {
-    sanitized.uploaderId = upload.uploaderId;
+    sanitized.uploaderId = upload.uploaderId
     // Add other private fields as needed
   }
 
-  return sanitized;
+  return sanitized
 }

@@ -1,22 +1,22 @@
-import Link from 'next/link';
-import React, { useState } from 'react';
+import Link from 'next/link'
+import React, { useState } from 'react'
 
-import { Button } from '../../src/ui';
+import { Button } from '../../src/ui'
 
 export interface NavLink {
-  id: string;
-  label: string;
-  href: string;
+  id: string
+  label: string
+  href: string
 }
 
 export interface HeaderProps {
-  logoText?: string;
-  navLinks: NavLink[];
-  isLoggedIn?: boolean;
-  onLogin?: () => void;
-  onSignup?: () => void;
-  onLogout?: () => void;
-  userName?: string;
+  logoText?: string
+  navLinks: NavLink[]
+  isLoggedIn?: boolean
+  onLogin?: () => void
+  onSignup?: () => void
+  onLogout?: () => void
+  userName?: string
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
   userName,
 }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <header className="bg-white shadow-sm">
@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
+            {navLinks.map(link => (
               <Link
                 key={link.id}
                 href={link.href}
@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col space-y-4 mb-4">
-              {navLinks.map((link) => (
+              {navLinks.map(link => (
                 <Link
                   key={link.id}
                   href={link.href}
@@ -137,8 +137,8 @@ export const Header: React.FC<HeaderProps> = ({
                   <Button
                     variant="secondary"
                     onClick={() => {
-                      onLogout?.();
-                      setIsMobileMenuOpen(false);
+                      onLogout?.()
+                      setIsMobileMenuOpen(false)
                     }}
                     className="w-full"
                   >
@@ -150,8 +150,8 @@ export const Header: React.FC<HeaderProps> = ({
                   <Button
                     variant="secondary"
                     onClick={() => {
-                      onLogin?.();
-                      setIsMobileMenuOpen(false);
+                      onLogin?.()
+                      setIsMobileMenuOpen(false)
                     }}
                     className="w-full"
                   >
@@ -160,8 +160,8 @@ export const Header: React.FC<HeaderProps> = ({
                   <Button
                     variant="primary"
                     onClick={() => {
-                      onSignup?.();
-                      setIsMobileMenuOpen(false);
+                      onSignup?.()
+                      setIsMobileMenuOpen(false)
                     }}
                     className="w-full"
                   >
@@ -174,7 +174,7 @@ export const Header: React.FC<HeaderProps> = ({
         )}
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

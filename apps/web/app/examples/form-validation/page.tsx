@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import React from 'react';
+import React from 'react'
 
 /**
  * Form validation example page
@@ -19,5 +19,5 @@ export default function FormValidationPage() {
         <p>Form validation examples will be implemented soon.</p>
       </div>
     </div>
-  );
+  )
 }

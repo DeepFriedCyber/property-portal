@@ -1,21 +1,21 @@
 // PropertyCard.tsx
-import React from 'react';
+import React from 'react'
 
-import AccessibleButton from './AccessibleButton';
+import AccessibleButton from './AccessibleButton'
 
 interface PropertyCardProps {
-  id: string;
-  title: string;
-  price: number;
-  address: string;
-  bedrooms: number;
-  bathrooms: number;
-  area: number;
-  imageUrl?: string;
-  onViewDetails: (id: string) => void;
-  onSaveProperty?: (id: string) => void;
-  isSaved?: boolean;
-  className?: string;
+  id: string
+  title: string
+  price: number
+  address: string
+  bedrooms: number
+  bathrooms: number
+  area: number
+  imageUrl?: string
+  onViewDetails: (id: string) => void
+  onSaveProperty?: (id: string) => void
+  isSaved?: boolean
+  className?: string
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -37,20 +37,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     style: 'currency',
     currency: 'USD',
     maximumFractionDigits: 0,
-  });
+  })
 
   // Handle view details click
   const handleViewDetails = () => {
-    onViewDetails(id);
-  };
+    onViewDetails(id)
+  }
 
   // Handle save property click
   const handleSaveProperty = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering the card click
+    e.stopPropagation() // Prevent triggering the card click
     if (onSaveProperty) {
-      onSaveProperty(id);
+      onSaveProperty(id)
     }
-  };
+  }
 
   return (
     <article className={`property-card ${className}`} aria-labelledby={`property-title-${id}`}>
@@ -125,7 +125,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         </AccessibleButton>
       </div>
     </article>
-  );
-};
+  )
+}
 
-export default PropertyCard;
+export default PropertyCard

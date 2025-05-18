@@ -2,7 +2,7 @@
  * Database error handling utilities
  */
 
-import { normalizeError } from '../error/error-utils';
+import { normalizeError } from '../error/error-utils'
 
 /**
  * Error codes that might be present in database connection errors
@@ -21,16 +21,16 @@ export enum DbErrorCode {
  * Interface for database error details
  */
 export interface DbErrorDetails {
-  message: string;
-  code?: string;
-  errno?: number;
-  sqlState?: string;
-  host?: string;
-  port?: number;
-  database?: string;
-  user?: string;
-  query?: string;
-  stack?: string;
+  message: string
+  code?: string
+  errno?: number
+  sqlState?: string
+  host?: string
+  port?: number
+  database?: string
+  user?: string
+  query?: string
+  stack?: string
 }
 
 /**
@@ -41,10 +41,10 @@ export interface DbErrorDetails {
 export function createDetailedDbConnectionErrorMessage(err: unknown): string {
   // Handle case where err is not an object
   if (!err || typeof err !== 'object') {
-    return `Database connection error: ${normalizeError(err)}`;
+    return `Database connection error: ${normalizeError(err)}`
   }
 
-  const errorObj = err as Record<string, any>;
+  const errorObj = err as Record<string, any>
   const details: DbErrorDetails = {
     message: errorObj.message || 'Unknown error',
     code: errorObj.code,
@@ -54,33 +54,33 @@ export function createDetailedDbConnectionErrorMessage(err: unknown): string {
     port: errorObj.port,
     database: errorObj.database,
     user: errorObj.user,
-  };
+  }
 
   // Build a detailed error message
-  let errorMessage = `Database connection error: ${details.message}`;
+  let errorMessage = `Database connection error: ${details.message}`
 
   // Add error code if available
   if (details.code) {
-    errorMessage += ` (Code: ${details.code})`;
+    errorMessage += ` (Code: ${details.code})`
   }
 
   // Add connection details if available
-  const connectionDetails = [];
-  if (details.host) connectionDetails.push(`Host: ${details.host}`);
-  if (details.port) connectionDetails.push(`Port: ${details.port}`);
-  if (details.database) connectionDetails.push(`Database: ${details.database}`);
-  if (details.user) connectionDetails.push(`User: ${details.user}`);
+  const connectionDetails = []
+  if (details.host) connectionDetails.push(`Host: ${details.host}`)
+  if (details.port) connectionDetails.push(`Port: ${details.port}`)
+  if (details.database) connectionDetails.push(`Database: ${details.database}`)
+  if (details.user) connectionDetails.push(`User: ${details.user}`)
 
   if (connectionDetails.length > 0) {
-    errorMessage += ` | Connection details: ${connectionDetails.join(', ')}`;
+    errorMessage += ` | Connection details: ${connectionDetails.join(', ')}`
   }
 
   // Add SQL state if available (useful for SQL standard errors)
   if (details.sqlState) {
-    errorMessage += ` | SQL State: ${details.sqlState}`;
+    errorMessage += ` | SQL State: ${details.sqlState}`
   }
 
-  return errorMessage;
+  return errorMessage
 }
 
 /**
@@ -96,10 +96,10 @@ export function createDbConnectionErrorObject(
     return {
       message: `Database connection error: ${normalizeError(err)}`,
       originalError: err,
-    };
+    }
   }
 
-  const errorObj = err as Record<string, any>;
+  const errorObj = err as Record<string, any>
   const details: DbErrorDetails = {
     message: errorObj.message || 'Unknown error',
     code: errorObj.code,
@@ -110,13 +110,13 @@ export function createDbConnectionErrorObject(
     database: errorObj.database,
     user: errorObj.user,
     stack: errorObj.stack,
-  };
+  }
 
   // Add the original error for reference
   return {
     ...details,
     originalError: err,
-  };
+  }
 }
 
 /**
@@ -127,11 +127,11 @@ export function createDbConnectionErrorObject(
  */
 export function isDbErrorOfType(err: unknown, errorCode: DbErrorCode): boolean {
   if (!err || typeof err !== 'object') {
-    return false;
+    return false
   }
 
-  const errorObj = err as Record<string, any>;
-  return errorObj.code === errorCode;
+  const errorObj = err as Record<string, any>
+  return errorObj.code === errorCode
 }
 
 /**
@@ -141,28 +141,28 @@ export function isDbErrorOfType(err: unknown, errorCode: DbErrorCode): boolean {
  */
 export function getUserFriendlyDbErrorMessage(err: unknown): string {
   if (!err || typeof err !== 'object') {
-    return 'Unable to connect to the database. Please try again later.';
+    return 'Unable to connect to the database. Please try again later.'
   }
 
-  const errorObj = err as Record<string, any>;
-  const code = errorObj.code;
+  const errorObj = err as Record<string, any>
+  const code = errorObj.code
 
   switch (code) {
     case DbErrorCode.CONNECTION_REFUSED:
-      return 'Database server is not accepting connections. Please check if the database server is running.';
+      return 'Database server is not accepting connections. Please check if the database server is running.'
     case DbErrorCode.CONNECTION_RESET:
-      return 'Database connection was reset. This might be due to network issues or server restart.';
+      return 'Database connection was reset. This might be due to network issues or server restart.'
     case DbErrorCode.CONNECTION_TIMEOUT:
-      return 'Database connection timed out. Please check network connectivity and server load.';
+      return 'Database connection timed out. Please check network connectivity and server load.'
     case DbErrorCode.HOST_NOT_FOUND:
-      return 'Database host not found. Please check the hostname and DNS configuration.';
+      return 'Database host not found. Please check the hostname and DNS configuration.'
     case DbErrorCode.AUTHENTICATION_FAILED:
-      return 'Failed to authenticate with the database. Please check credentials.';
+      return 'Failed to authenticate with the database. Please check credentials.'
     case DbErrorCode.PERMISSION_DENIED:
-      return 'Permission denied when connecting to database. Please check user permissions.';
+      return 'Permission denied when connecting to database. Please check user permissions.'
     case DbErrorCode.DATABASE_NOT_FOUND:
-      return 'The specified database was not found on the server.';
+      return 'The specified database was not found on the server.'
     default:
-      return `Database error: ${errorObj.message || 'Unknown error'}`;
+      return `Database error: ${errorObj.message || 'Unknown error'}`
   }
 }

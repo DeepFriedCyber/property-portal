@@ -59,5 +59,11 @@ yarn-error.log*
 next-env.d.ts
 *storybook.log
 
-# drizzle
-drizzle/migrations/
+# experimental/test directories
+apps/web/app/simple-test/
+apps/web/app/standalone/
+apps/web/app/test-page/
+src/app/theme-demo/
+
+# duplicate config files
+src/app/next.config.js

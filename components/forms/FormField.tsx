@@ -1,16 +1,16 @@
 // components/forms/FormField.tsx
-import React from 'react';
+import React from 'react'
 
 interface FormFieldProps {
-  id: string;
-  name: string;
-  label: string;
-  error?: string;
-  touched?: boolean;
-  required?: boolean;
-  children: React.ReactNode;
-  helpText?: string;
-  className?: string;
+  id: string
+  name: string
+  label: string
+  error?: string
+  touched?: boolean
+  required?: boolean
+  children: React.ReactNode
+  helpText?: string
+  className?: string
 }
 
 /**
@@ -27,7 +27,7 @@ const FormField: React.FC<FormFieldProps> = ({
   helpText,
   className = '',
 }) => {
-  const showError = error && touched;
+  const showError = error && touched
 
   return (
     <div className={`mb-4 ${className}`}>
@@ -46,7 +46,7 @@ const FormField: React.FC<FormFieldProps> = ({
         </p>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default FormField;
+export default FormField

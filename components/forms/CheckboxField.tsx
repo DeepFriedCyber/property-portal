@@ -1,16 +1,16 @@
 // components/forms/CheckboxField.tsx
-import React from 'react';
+import React from 'react'
 
 interface CheckboxFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
-  id: string;
-  name: string;
-  label: string;
-  error?: string;
-  touched?: boolean;
-  required?: boolean;
-  helpText?: string;
-  className?: string;
-  labelClassName?: string;
+  id: string
+  name: string
+  label: string
+  error?: string
+  touched?: boolean
+  required?: boolean
+  helpText?: string
+  className?: string
+  labelClassName?: string
 }
 
 /**
@@ -28,7 +28,7 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
   labelClassName = '',
   ...props
 }) => {
-  const showError = error && touched;
+  const showError = error && touched
 
   return (
     <div className={`mb-4 ${className}`}>
@@ -65,7 +65,7 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
         </p>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default CheckboxField;
+export default CheckboxField

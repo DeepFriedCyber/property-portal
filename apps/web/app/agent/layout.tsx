@@ -1,26 +1,26 @@
-'use client';
+'use client'
 
-import { useUser, UserButton } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useUser, UserButton } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function AgentLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const { isLoaded, isSignedIn, user } = useUser();
+  const router = useRouter()
+  const { isLoaded, isSignedIn, user } = useUser()
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       // Redirect to sign-in page if not signed in
-      router.push('/sign-in?redirect=/agent/dashboard');
+      router.push('/sign-in?redirect=/agent/dashboard')
     }
-  }, [isLoaded, isSignedIn, router]);
+  }, [isLoaded, isSignedIn, router])
 
   if (!isLoaded || !isSignedIn) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700"></div>
       </div>
-    );
+    )
   }
 
   return (
@@ -61,5 +61,5 @@ export default function AgentLayout({ children }: { children: React.ReactNode })
 
       <main className="py-10">{children}</main>
     </div>
-  );
+  )
 }

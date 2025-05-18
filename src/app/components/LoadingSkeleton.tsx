@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import { Skeleton } from '@/app/components/ui/Skeleton';
+import { Skeleton } from '@/app/components/ui/Skeleton'
 
 export default function LoadingSkeleton() {
   return (
@@ -23,7 +23,7 @@ export default function LoadingSkeleton() {
         <Skeleton className="h-10 w-64" />
       </div>
     </div>
-  );
+  )
 }
 
 function PropertyCardSkeleton() {
@@ -33,22 +33,22 @@ function PropertyCardSkeleton() {
       <div className="aspect-w-16 aspect-h-9">
         <Skeleton className="w-full h-full" />
       </div>
-      
+
       {/* Content skeleton */}
       <div className="p-4 space-y-3">
         <Skeleton className="h-6 w-3/4" />
         <Skeleton className="h-4 w-full" />
-        
+
         <div className="flex justify-between items-center">
           <Skeleton className="h-6 w-1/3" />
           <Skeleton className="h-4 w-1/4" />
         </div>
-        
+
         <div className="flex space-x-2">
           <Skeleton className="h-6 rounded-full w-20" />
           <Skeleton className="h-6 rounded-full w-20" />
         </div>
       </div>
     </div>
-  );
+  )
 }

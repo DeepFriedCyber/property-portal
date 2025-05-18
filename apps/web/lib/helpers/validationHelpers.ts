@@ -8,8 +8,8 @@
  * @returns Boolean indicating if the string is a valid UUID
  */
 export function isValidUuid(id: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  return uuidRegex.test(id)
 }
 
 /**
@@ -18,7 +18,7 @@ export function isValidUuid(id: string): boolean {
  * @returns Boolean indicating if the string is a valid integer
  */
 export function isValidInteger(value: string): boolean {
-  return /^-?\d+$/.test(value);
+  return /^-?\d+$/.test(value)
 }
 
 /**
@@ -27,7 +27,7 @@ export function isValidInteger(value: string): boolean {
  * @returns Boolean indicating if the string is a valid positive integer
  */
 export function isValidPositiveInteger(value: string): boolean {
-  return /^\d+$/.test(value) && parseInt(value, 10) > 0;
+  return /^\d+$/.test(value) && parseInt(value, 10) > 0
 }
 
 /**
@@ -37,7 +37,7 @@ export function isValidPositiveInteger(value: string): boolean {
  * @returns Boolean indicating if the ID is valid
  */
 export function isValidId(id: string | null, format: 'uuid' | 'integer' = 'uuid'): boolean {
-  if (!id) return false;
+  if (!id) return false
 
-  return format === 'uuid' ? isValidUuid(id) : isValidInteger(id);
+  return format === 'uuid' ? isValidUuid(id) : isValidInteger(id)
 }

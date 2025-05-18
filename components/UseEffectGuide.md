@@ -11,8 +11,8 @@ useEffect(() => {
   // Optional cleanup function
   return () => {
     // Cleanup code
-  };
-}, [dependencies]); // Optional dependency array
+  }
+}, [dependencies]) // Optional dependency array
 ```
 
 ## Common Use Cases
@@ -22,20 +22,20 @@ useEffect(() => {
 ```jsx
 useEffect(() => {
   const fetchData = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const response = await fetch('https://api.example.com/data');
-      const data = await response.json();
-      setData(data);
+      const response = await fetch('https://api.example.com/data')
+      const data = await response.json()
+      setData(data)
     } catch (error) {
-      setError(error);
+      setError(error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  fetchData();
-}, []); // Empty array means this runs once on mount
+  fetchData()
+}, []) // Empty array means this runs once on mount
 ```
 
 ### 2. Subscriptions (Event Listeners)
@@ -43,32 +43,32 @@ useEffect(() => {
 ```jsx
 useEffect(() => {
   const handleResize = () => {
-    setWindowWidth(window.innerWidth);
-  };
+    setWindowWidth(window.innerWidth)
+  }
 
-  window.addEventListener('resize', handleResize);
+  window.addEventListener('resize', handleResize)
 
   // Cleanup: remove the event listener when component unmounts
   return () => {
-    window.removeEventListener('resize', handleResize);
-  };
-}, []);
+    window.removeEventListener('resize', handleResize)
+  }
+}, [])
 ```
 
 ### 3. Dependent Data Fetching
 
 ```jsx
 useEffect(() => {
-  if (!userId) return; // Skip if no userId
+  if (!userId) return // Skip if no userId
 
   const fetchUserData = async () => {
-    const response = await fetch(`https://api.example.com/users/${userId}`);
-    const userData = await response.json();
-    setUser(userData);
-  };
+    const response = await fetch(`https://api.example.com/users/${userId}`)
+    const userData = await response.json()
+    setUser(userData)
+  }
 
-  fetchUserData();
-}, [userId]); // Re-run when userId changes
+  fetchUserData()
+}, [userId]) // Re-run when userId changes
 ```
 
 ### 4. Timers and Intervals
@@ -76,14 +76,14 @@ useEffect(() => {
 ```jsx
 useEffect(() => {
   const timer = setInterval(() => {
-    setCount((c) => c + 1);
-  }, 1000);
+    setCount(c => c + 1)
+  }, 1000)
 
   // Cleanup: clear the interval when component unmounts
   return () => {
-    clearInterval(timer);
-  };
-}, []);
+    clearInterval(timer)
+  }
+}, [])
 ```
 
 ## Dependency Array Behaviors
@@ -93,7 +93,7 @@ useEffect(() => {
   ```jsx
   useEffect(() => {
     // Runs after every render
-  });
+  })
   ```
 
 - **Empty dependency array `[]`**: Effect runs once after initial render
@@ -101,14 +101,14 @@ useEffect(() => {
   ```jsx
   useEffect(() => {
     // Runs once after initial render
-  }, []);
+  }, [])
   ```
 
 - **With dependencies `[dep1, dep2]`**: Effect runs when any dependency changes
   ```jsx
   useEffect(() => {
     // Runs when dep1 or dep2 changes
-  }, [dep1, dep2]);
+  }, [dep1, dep2])
   ```
 
 ## Cleanup Function
@@ -118,14 +118,14 @@ The cleanup function runs before the component unmounts and before the effect ru
 ```jsx
 useEffect(() => {
   // Subscribe to something
-  const subscription = someAPI.subscribe();
+  const subscription = someAPI.subscribe()
 
   // Cleanup function
   return () => {
     // Unsubscribe when component unmounts or before effect runs again
-    subscription.unsubscribe();
-  };
-}, [dependencies]);
+    subscription.unsubscribe()
+  }
+}, [dependencies])
 ```
 
 ## Best Practices
@@ -142,23 +142,23 @@ useEffect(() => {
 
    ```jsx
    useEffect(() => {
-     let isMounted = true;
+     let isMounted = true
 
      const fetchData = async () => {
-       const response = await fetch('/api/data');
-       const data = await response.json();
+       const response = await fetch('/api/data')
+       const data = await response.json()
 
        if (isMounted) {
-         setData(data); // Only update state if component is still mounted
+         setData(data) // Only update state if component is still mounted
        }
-     };
+     }
 
-     fetchData();
+     fetchData()
 
      return () => {
-       isMounted = false; // Set flag when component unmounts
-     };
-   }, []);
+       isMounted = false // Set flag when component unmounts
+     }
+   }, [])
    ```
 
 ## Next.js Considerations

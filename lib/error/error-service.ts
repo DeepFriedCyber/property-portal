@@ -1,7 +1,7 @@
 // lib/error/error-service.ts
-import { ApiError } from '@/lib/api/error-handling';
-import { ValidationError } from '@/lib/api/validation';
-import logger from '@/lib/logging/logger';
+import { ApiError } from '@/lib/api/error-handling'
+import { ValidationError } from '@/lib/api/validation'
+import logger from '@/lib/logging/logger'
 
 /**
  * Error types for categorization
@@ -32,32 +32,32 @@ export enum ErrorSeverity {
  * Error context interface
  */
 export interface ErrorContext {
-  type?: ErrorType;
-  severity?: ErrorSeverity;
-  userId?: string;
-  requestId?: string;
-  url?: string;
-  component?: string;
-  action?: string;
-  metadata?: Record<string, unknown>;
-  tags?: string[];
+  type?: ErrorType
+  severity?: ErrorSeverity
+  userId?: string
+  requestId?: string
+  url?: string
+  component?: string
+  action?: string
+  metadata?: Record<string, unknown>
+  tags?: string[]
 }
 
 /**
  * Centralized error service for handling errors consistently across the application
  */
 export class ErrorService {
-  private static instance: ErrorService;
-  private errorHandlers: Array<(error: Error, context?: ErrorContext) => void> = [];
+  private static instance: ErrorService
+  private errorHandlers: Array<(error: Error, context?: ErrorContext) => void> = []
 
   /**
    * Get the singleton instance of the error service
    */
   public static getInstance(): ErrorService {
     if (!ErrorService.instance) {
-      ErrorService.instance = new ErrorService();
+      ErrorService.instance = new ErrorService()
     }
-    return ErrorService.instance;
+    return ErrorService.instance
   }
 
   /**
@@ -65,7 +65,7 @@ export class ErrorService {
    */
   private constructor() {
     // Initialize default error handlers
-    this.registerErrorHandler(this.logError);
+    this.registerErrorHandler(this.logError)
   }
 
   /**
@@ -73,7 +73,7 @@ export class ErrorService {
    * @param handler Error handler function
    */
   public registerErrorHandler(handler: (error: Error, context?: ErrorContext) => void): void {
-    this.errorHandlers.push(handler);
+    this.errorHandlers.push(handler)
   }
 
   /**
@@ -83,25 +83,25 @@ export class ErrorService {
    */
   public handleError(error: Error, context?: ErrorContext): void {
     // Determine error type if not provided
-    const errorType = context?.type || this.determineErrorType(error);
+    const errorType = context?.type || this.determineErrorType(error)
 
     // Determine error severity if not provided
-    const errorSeverity = context?.severity || this.determineErrorSeverity(error, errorType);
+    const errorSeverity = context?.severity || this.determineErrorSeverity(error, errorType)
 
     // Create complete context
     const completeContext: ErrorContext = {
       ...context,
       type: errorType,
       severity: errorSeverity,
-    };
+    }
 
     // Execute all registered error handlers
     for (const handler of this.errorHandlers) {
       try {
-        handler(error, completeContext);
+        handler(error, completeContext)
       } catch (handlerError) {
         // If an error handler throws, log it but continue with other handlers
-        console.error('Error in error handler:', handlerError);
+        console.error('Error in error handler:', handlerError)
       }
     }
   }
@@ -116,8 +116,8 @@ export class ErrorService {
       this.handleError(error, {
         ...defaultContext,
         ...additionalContext,
-      });
-    };
+      })
+    }
   }
 
   /**
@@ -132,12 +132,12 @@ export class ErrorService {
   ): (...args: T) => R | undefined {
     return (...args: T): R | undefined => {
       try {
-        return fn(...args);
+        return fn(...args)
       } catch (error) {
-        this.handleError(error instanceof Error ? error : new Error(String(error)), context);
-        return undefined;
+        this.handleError(error instanceof Error ? error : new Error(String(error)), context)
+        return undefined
       }
-    };
+    }
   }
 
   /**
@@ -152,12 +152,12 @@ export class ErrorService {
   ): (...args: T) => Promise<R | undefined> {
     return async (...args: T): Promise<R | undefined> => {
       try {
-        return await fn(...args);
+        return await fn(...args)
       } catch (error) {
-        this.handleError(error instanceof Error ? error : new Error(String(error)), context);
-        return undefined;
+        this.handleError(error instanceof Error ? error : new Error(String(error)), context)
+        return undefined
       }
-    };
+    }
   }
 
   /**
@@ -167,7 +167,7 @@ export class ErrorService {
    */
   private logError(error: Error, context?: ErrorContext): void {
     const { type, severity, userId, requestId, url, component, action, metadata, tags } =
-      context || {};
+      context || {}
 
     // Create log context
     const logContext: Record<string, unknown> = {
@@ -180,36 +180,36 @@ export class ErrorService {
       url,
       component,
       action,
-    };
+    }
 
     // Add metadata if available
     if (metadata) {
       Object.entries(metadata).forEach(([key, value]) => {
-        logContext[key] = value;
-      });
+        logContext[key] = value
+      })
     }
 
     // Create log tags
-    const logTags = ['error', type || 'unknown'];
+    const logTags = ['error', type || 'unknown']
     if (tags) {
-      logTags.push(...tags);
+      logTags.push(...tags)
     }
 
     // Log with appropriate level based on severity
     switch (severity) {
       case ErrorSeverity.CRITICAL:
-        logger.fatal('Critical error occurred', error, logContext, logTags);
-        break;
+        logger.fatal('Critical error occurred', error, logContext, logTags)
+        break
       case ErrorSeverity.HIGH:
-        logger.error('Serious error occurred', error, logContext, logTags);
-        break;
+        logger.error('Serious error occurred', error, logContext, logTags)
+        break
       case ErrorSeverity.MEDIUM:
-        logger.warn('Error occurred', error, logContext, logTags);
-        break;
+        logger.warn('Error occurred', error, logContext, logTags)
+        break
       case ErrorSeverity.LOW:
       default:
-        logger.info('Minor error occurred', error, logContext, logTags);
-        break;
+        logger.info('Minor error occurred', error, logContext, logTags)
+        break
     }
   }
 
@@ -220,40 +220,40 @@ export class ErrorService {
    */
   private determineErrorType(error: Error): ErrorType {
     if (error instanceof ApiError) {
-      return ErrorType.API;
+      return ErrorType.API
     } else if (error instanceof ValidationError) {
-      return ErrorType.VALIDATION;
+      return ErrorType.VALIDATION
     } else if (error.name === 'DatabaseError' || error.message.includes('database')) {
-      return ErrorType.DATABASE;
+      return ErrorType.DATABASE
     } else if (
       error.name === 'AuthenticationError' ||
       error.message.toLowerCase().includes('authentication') ||
       error.message.toLowerCase().includes('unauthenticated')
     ) {
-      return ErrorType.AUTHENTICATION;
+      return ErrorType.AUTHENTICATION
     } else if (
       error.name === 'AuthorizationError' ||
       error.message.toLowerCase().includes('authorization') ||
       error.message.toLowerCase().includes('unauthorized') ||
       error.message.toLowerCase().includes('forbidden')
     ) {
-      return ErrorType.AUTHORIZATION;
+      return ErrorType.AUTHORIZATION
     } else if (
       error.name === 'NetworkError' ||
       error.message.toLowerCase().includes('network') ||
       error.message.toLowerCase().includes('fetch') ||
       error.message.toLowerCase().includes('connection')
     ) {
-      return ErrorType.NETWORK;
+      return ErrorType.NETWORK
     } else if (
       error.name === 'ExternalServiceError' ||
       error.message.toLowerCase().includes('external') ||
       error.message.toLowerCase().includes('service')
     ) {
-      return ErrorType.EXTERNAL;
+      return ErrorType.EXTERNAL
     }
 
-    return ErrorType.UNKNOWN;
+    return ErrorType.UNKNOWN
   }
 
   /**
@@ -270,7 +270,7 @@ export class ErrorService {
       error.message.toLowerCase().includes('critical') ||
       error.message.toLowerCase().includes('fatal')
     ) {
-      return ErrorSeverity.CRITICAL;
+      return ErrorSeverity.CRITICAL
     }
 
     // High severity errors
@@ -284,7 +284,7 @@ export class ErrorService {
       error.message.toLowerCase().includes('security') ||
       error.message.toLowerCase().includes('breach')
     ) {
-      return ErrorSeverity.HIGH;
+      return ErrorSeverity.HIGH
     }
 
     // Medium severity errors
@@ -293,16 +293,16 @@ export class ErrorService {
       type === ErrorType.NETWORK ||
       type === ErrorType.EXTERNAL
     ) {
-      return ErrorSeverity.MEDIUM;
+      return ErrorSeverity.MEDIUM
     }
 
     // Default to low severity
-    return ErrorSeverity.LOW;
+    return ErrorSeverity.LOW
   }
 }
 
 // Export singleton instance
-export const errorService = ErrorService.getInstance();
+export const errorService = ErrorService.getInstance()
 
 /**
  * Create a React error handler hook
@@ -310,7 +310,7 @@ export const errorService = ErrorService.getInstance();
  * @returns Error handler function
  */
 export function createErrorHandler(defaultContext?: ErrorContext) {
-  return errorService.createErrorHandler(defaultContext);
+  return errorService.createErrorHandler(defaultContext)
 }
 
 /**
@@ -323,7 +323,7 @@ export function withErrorHandling<T extends Array<unknown>, R>(
   fn: (...args: T) => R,
   context?: ErrorContext
 ): (...args: T) => R | undefined {
-  return errorService.withErrorHandling(fn, context);
+  return errorService.withErrorHandling(fn, context)
 }
 
 /**
@@ -336,7 +336,7 @@ export function withAsyncErrorHandling<T extends Array<unknown>, R>(
   fn: (...args: T) => Promise<R>,
   context?: ErrorContext
 ): (...args: T) => Promise<R | undefined> {
-  return errorService.withAsyncErrorHandling(fn, context);
+  return errorService.withAsyncErrorHandling(fn, context)
 }
 
 /**
@@ -345,7 +345,7 @@ export function withAsyncErrorHandling<T extends Array<unknown>, R>(
  * @param context Error context
  */
 export function handleError(error: Error, context?: ErrorContext): void {
-  errorService.handleError(error, context);
+  errorService.handleError(error, context)
 }
 
 // Export default object for convenience
@@ -356,4 +356,4 @@ export default {
   withAsyncErrorHandling,
   ErrorType,
   ErrorSeverity,
-};
+}

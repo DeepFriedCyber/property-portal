@@ -6,25 +6,25 @@
  * File information interface
  */
 export interface FileInfo {
-  name: string;
-  size: number;
-  type: string;
-  lastModified?: number;
-  path?: string;
-  webkitRelativePath?: string;
+  name: string
+  size: number
+  type: string
+  lastModified?: number
+  path?: string
+  webkitRelativePath?: string
 }
 
 /**
  * Safe file information with fallback values
  */
 export interface SafeFileInfo {
-  fileName: string;
-  fileSize: number | string;
-  fileType: string;
-  lastModified?: Date | string;
-  filePath?: string;
-  relativePath?: string;
-  extension?: string;
+  fileName: string
+  fileSize: number | string
+  fileType: string
+  lastModified?: Date | string
+  filePath?: string
+  relativePath?: string
+  extension?: string
 }
 
 /**
@@ -40,11 +40,11 @@ export function getSafeFileInfo(file: FileInfo | File | null | undefined): SafeF
       fileType: 'unknown',
       lastModified: 'unknown',
       extension: 'unknown',
-    };
+    }
   }
 
   // Extract file extension from name
-  const extension = file.name.includes('.') ? file.name.split('.').pop()?.toLowerCase() : 'unknown';
+  const extension = file.name.includes('.') ? file.name.split('.').pop()?.toLowerCase() : 'unknown'
 
   return {
     fileName: file.name,
@@ -54,7 +54,7 @@ export function getSafeFileInfo(file: FileInfo | File | null | undefined): SafeF
     filePath: 'path' in file ? file.path : undefined,
     relativePath: 'webkitRelativePath' in file ? file.webkitRelativePath : undefined,
     extension,
-  };
+  }
 }
 
 /**
@@ -74,7 +74,7 @@ export function createFileErrorLog(
     ...getSafeFileInfo(file),
     error: error ? String(error) : undefined,
     timestamp: new Date().toISOString(),
-  };
+  }
 }
 
 /**
@@ -87,31 +87,31 @@ export function isAllowedFileType(
   file: FileInfo | File | null | undefined,
   allowedTypes: string[]
 ): boolean {
-  if (!file) return false;
+  if (!file) return false
 
-  const fileInfo = getSafeFileInfo(file);
+  const fileInfo = getSafeFileInfo(file)
 
   // Check MIME type
   if (fileInfo.fileType !== 'unknown') {
-    if (allowedTypes.some((type) => fileInfo.fileType.includes(type))) {
-      return true;
+    if (allowedTypes.some(type => fileInfo.fileType.includes(type))) {
+      return true
     }
   }
 
   // Check extension
   if (fileInfo.extension !== 'unknown') {
     if (
-      allowedTypes.some((type) =>
+      allowedTypes.some(type =>
         type.startsWith('.')
           ? fileInfo.extension === type.substring(1)
           : fileInfo.extension === type
       )
     ) {
-      return true;
+      return true
     }
   }
 
-  return false;
+  return false
 }
 
 /**
@@ -124,9 +124,9 @@ export function isFileSizeValid(
   file: FileInfo | File | null | undefined,
   maxSizeBytes: number
 ): boolean {
-  if (!file) return false;
+  if (!file) return false
 
-  return typeof file.size === 'number' && file.size <= maxSizeBytes;
+  return typeof file.size === 'number' && file.size <= maxSizeBytes
 }
 
 /**
@@ -135,10 +135,10 @@ export function isFileSizeValid(
  * @returns Formatted file size string (e.g., "1.5 MB")
  */
 export function formatFileSize(sizeInBytes: number | string): string {
-  if (typeof sizeInBytes !== 'number') return 'unknown';
+  if (typeof sizeInBytes !== 'number') return 'unknown'
 
-  if (sizeInBytes < 1024) return `${sizeInBytes} B`;
-  if (sizeInBytes < 1024 * 1024) return `${(sizeInBytes / 1024).toFixed(1)} KB`;
-  if (sizeInBytes < 1024 * 1024 * 1024) return `${(sizeInBytes / (1024 * 1024)).toFixed(1)} MB`;
-  return `${(sizeInBytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  if (sizeInBytes < 1024) return `${sizeInBytes} B`
+  if (sizeInBytes < 1024 * 1024) return `${(sizeInBytes / 1024).toFixed(1)} KB`
+  if (sizeInBytes < 1024 * 1024 * 1024) return `${(sizeInBytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${(sizeInBytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
 }

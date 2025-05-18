@@ -1,14 +1,14 @@
 // app/api/health/route.ts
-import { isDatabaseHealthy, getDatabaseStatus } from '@your-org/db';
-import { NextRequest, NextResponse } from 'next/server';
+import { isDatabaseHealthy, getDatabaseStatus } from '@your-org/db'
+import { NextRequest, NextResponse } from 'next/server'
 
 /**
  * Health check endpoint
  * GET /api/health
  */
 export async function GET(req: NextRequest) {
-  const dbStatus = getDatabaseStatus();
-  const isDbHealthy = isDatabaseHealthy();
+  const dbStatus = getDatabaseStatus()
+  const isDbHealthy = isDatabaseHealthy()
 
   const health = {
     status: isDbHealthy ? 'healthy' : 'unhealthy',
@@ -24,10 +24,10 @@ export async function GET(req: NextRequest) {
         healthy: true,
       },
     },
-  };
+  }
 
   // Return 503 if any service is unhealthy
-  const statusCode = isDbHealthy ? 200 : 503;
+  const statusCode = isDbHealthy ? 200 : 503
 
-  return NextResponse.json(health, { status: statusCode });
+  return NextResponse.json(health, { status: statusCode })
 }

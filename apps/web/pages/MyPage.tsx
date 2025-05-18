@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'react'
 
-import { Button } from '../src/ui';
+import { Button } from '../src/ui'
 
 export default function MyPage() {
   return (
@@ -10,5 +10,5 @@ export default function MyPage() {
         Click Me
       </Button>
     </div>
-  );
+  )
 }

@@ -51,7 +51,7 @@ const nextConfig = {
       },
     ],
   },
-};
+}
 ```
 
 ## Additional Performance Optimizations

@@ -1,12 +1,12 @@
-'use client';
+'use client'
 
-import React, { useEffect } from 'react';
+import React, { useEffect } from 'react'
 
-import logger from '@/lib/logging/logger';
+import logger from '@/lib/logging/logger'
 
 interface ErrorPageProps {
-  error: Error & { digest?: string };
-  reset: () => void;
+  error: Error & { digest?: string }
+  reset: () => void
 }
 
 /**
@@ -25,8 +25,8 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
       },
       ['next-error', 'route-error']
-    );
-  }, [error]);
+    )
+  }, [error])
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
@@ -79,5 +79,5 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

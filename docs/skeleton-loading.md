@@ -18,19 +18,19 @@ We've implemented a reusable `Skeleton` component that provides a consistent loa
 
 ```tsx
 // src/app/components/ui/Skeleton.tsx
-'use client';
+'use client'
 
 interface SkeletonProps {
-  className?: string;
-  shimmer?: boolean;
+  className?: string
+  shimmer?: boolean
 }
 
-export function Skeleton({ className = "", shimmer = true }: SkeletonProps) {
-  const baseClasses = "relative rounded bg-gray-200 dark:bg-gray-800";
-  const shimmerClasses = shimmer 
-    ? "overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent" 
-    : "";
-  
+export function Skeleton({ className = '', shimmer = true }: SkeletonProps) {
+  const baseClasses = 'relative rounded bg-gray-200 dark:bg-gray-800'
+  const shimmerClasses = shimmer
+    ? 'overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent'
+    : ''
+
   return (
     <div
       className={`${baseClasses} ${shimmerClasses} ${className}`}
@@ -39,12 +39,12 @@ export function Skeleton({ className = "", shimmer = true }: SkeletonProps) {
           '--shimmer-animation': 'shimmer 1.5s infinite',
           '@keyframes shimmer': {
             '0%': { transform: 'translateX(-100%)' },
-            '100%': { transform: 'translateX(100%)' }
-          }
-        })
+            '100%': { transform: 'translateX(100%)' },
+          },
+        }),
       }}
     />
-  );
+  )
 }
 ```
 
@@ -60,12 +60,12 @@ module.exports = {
       keyframes: {
         shimmer: {
           '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(100%)' }
-        }
+          '100%': { transform: 'translateX(100%)' },
+        },
       },
       animation: {
-        shimmer: 'shimmer 1.5s infinite'
-      }
+        shimmer: 'shimmer 1.5s infinite',
+      },
     },
   },
 }
@@ -90,11 +90,11 @@ function PropertyDetailSkeleton() {
       <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0 space-y-6">
         <Skeleton className="h-8 w-3/4" />
         <Skeleton className="h-8 w-1/3" />
-        
+
         {/* Additional skeleton elements... */}
       </div>
     </div>
-  );
+  )
 }
 ```
 
@@ -124,7 +124,7 @@ function LoadingSkeleton() {
         <Skeleton className="h-10 w-64" />
       </div>
     </div>
-  );
+  )
 }
 ```
 
@@ -151,6 +151,7 @@ Our application uses all these approaches to provide a consistent loading experi
 ### Skeleton Loading vs. Spinners
 
 Skeleton loading provides a better user experience than spinners because:
+
 - It gives users a preview of the content structure
 - It reduces perceived loading time
 - It prevents layout shifts when content loads
@@ -158,6 +159,7 @@ Skeleton loading provides a better user experience than spinners because:
 ### Skeleton Loading vs. Progress Bars
 
 Skeleton loading is often better than progress bars for content-heavy pages because:
+
 - It doesn't require calculating actual progress
 - It provides more context about what's loading
 - It creates a smoother transition to the final content

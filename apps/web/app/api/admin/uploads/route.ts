@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
 
 // Mock data - would be replaced with database queries
 const mockUploads = [
@@ -47,7 +47,7 @@ const mockUploads = [
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
     propertyCount: 31,
   },
-];
+]
 
 export async function GET(request: NextRequest) {
   try {
@@ -60,22 +60,22 @@ export async function GET(request: NextRequest) {
     // Sort by date (newest first)
     const sortedUploads = [...mockUploads].sort(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-    );
+    )
 
     // Calculate stats
     const stats = {
       totalProperties: mockUploads.reduce((sum, upload) => sum + upload.propertyCount, 0),
-      pendingUploads: mockUploads.filter((upload) => upload.status === 'pending').length,
-      approvedUploads: mockUploads.filter((upload) => upload.status === 'approved').length,
-      rejectedUploads: mockUploads.filter((upload) => upload.status === 'rejected').length,
-    };
+      pendingUploads: mockUploads.filter(upload => upload.status === 'pending').length,
+      approvedUploads: mockUploads.filter(upload => upload.status === 'approved').length,
+      rejectedUploads: mockUploads.filter(upload => upload.status === 'rejected').length,
+    }
 
     return NextResponse.json({
       uploads: sortedUploads,
       stats,
-    });
+    })
   } catch (error) {
-    console.error('Error fetching admin uploads:', error);
-    return NextResponse.json({ message: 'Failed to fetch uploads' }, { status: 500 });
+    console.error('Error fetching admin uploads:', error)
+    return NextResponse.json({ message: 'Failed to fetch uploads' }, { status: 500 })
   }
 }

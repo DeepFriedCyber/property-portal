@@ -1,4 +1,4 @@
-import { Button } from '../components/Button';
+import { Button } from '../components/Button'
 const meta = {
   title: 'UI/Button',
   component: Button,
@@ -16,30 +16,30 @@ const meta = {
     },
     onClick: { action: 'clicked' },
   },
-};
-export default meta;
+}
+export default meta
 export const Primary = {
   args: {
     variant: 'primary',
     children: 'Primary Button',
   },
-};
+}
 export const Secondary = {
   args: {
     variant: 'secondary',
     children: 'Secondary Button',
   },
-};
+}
 export const Disabled = {
   args: {
     disabled: true,
     children: 'Disabled Button',
   },
-};
+}
 export const WithCustomClassName = {
   args: {
     className: 'w-full max-w-xs',
     children: 'Custom Width Button',
   },
-};
+}
 //# sourceMappingURL=ButtonComponent.stories.js.map

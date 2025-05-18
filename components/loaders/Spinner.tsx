@@ -1,12 +1,12 @@
 // Spinner.tsx
-import React from 'react';
+import React from 'react'
 
-import styles from './Spinner.module.css';
+import styles from './Spinner.module.css'
 
 interface SpinnerProps {
-  size?: 'small' | 'medium' | 'large';
-  color?: string;
-  className?: string;
+  size?: 'small' | 'medium' | 'large'
+  color?: string
+  className?: string
 }
 
 const Spinner: React.FC<SpinnerProps> = ({
@@ -14,7 +14,7 @@ const Spinner: React.FC<SpinnerProps> = ({
   color = '#3b82f6', // Default to blue
   className = '',
 }) => {
-  const sizeClass = `spinner--${size}`;
+  const sizeClass = `spinner--${size}`
 
   return (
     <div
@@ -25,7 +25,7 @@ const Spinner: React.FC<SpinnerProps> = ({
     >
       <span className={styles.visuallyHidden}>Loading...</span>
     </div>
-  );
-};
+  )
+}
 
-export default Spinner;
+export default Spinner

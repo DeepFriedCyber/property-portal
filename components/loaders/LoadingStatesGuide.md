@@ -62,57 +62,57 @@ import PropertyCardSkeleton from './loaders/PropertyCardSkeleton';
 
 ```jsx
 const MyComponent = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
-        const response = await fetch('/api/data');
-        const result = await response.json();
-        setData(result);
+        const response = await fetch('/api/data')
+        const result = await response.json()
+        setData(result)
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
   if (loading) {
-    return <Spinner size="large" />;
+    return <Spinner size="large" />
   }
 
-  return <div>{/* Render your data */}</div>;
-};
+  return <div>{/* Render your data */}</div>
+}
 ```
 
 ### Skeleton Loading Pattern
 
 ```jsx
 const MyComponent = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
-        const response = await fetch('/api/data');
-        const result = await response.json();
-        setData(result);
+        const response = await fetch('/api/data')
+        const result = await response.json()
+        setData(result)
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
   return (
     <div>
@@ -133,8 +133,8 @@ const MyComponent = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 ```
 
 ### Advanced Loading States

@@ -1,23 +1,23 @@
-import { CsvRecord } from '@root/lib/csv/csvUtils';
-import { db, schema } from '@root/lib/db';
-import { processUploadEmbeddings } from '@root/lib/db/property-processor';
+import { CsvRecord } from '@root/lib/csv/csvUtils'
+import { db, schema } from '@root/lib/db'
+import { processUploadEmbeddings } from '@root/lib/db/property-processor'
 import {
   createUploadRecord,
   createProperty,
   getUploadRecordsByUploader,
-} from '@root/lib/db/queries';
-import logger from '@root/lib/logging/logger';
-import { eq } from 'drizzle-orm';
-import { v4 as uuidv4 } from 'uuid';
+} from '@root/lib/db/queries'
+import logger from '@root/lib/logging/logger'
+import { eq } from 'drizzle-orm'
+import { v4 as uuidv4 } from 'uuid'
 
 export interface PropertyUploadResult {
-  success: boolean;
+  success: boolean
   upload: {
-    id: string;
-    status: string;
-  };
-  propertiesCreated: number;
-  error?: string;
+    id: string
+    status: string
+  }
+  propertiesCreated: number
+  error?: string
 }
 
 /**
@@ -28,9 +28,9 @@ export interface PropertyUploadResult {
  * @returns Object containing upload ID and property count
  */
 export async function saveProperties(userId: string, fileName: string, records: CsvRecord[]) {
-  logger.info(`Starting to save ${records.length} properties for user ${userId}`);
+  logger.info(`Starting to save ${records.length} properties for user ${userId}`)
 
-  const uploadId = uuidv4();
+  const uploadId = uuidv4()
 
   // Create the upload record
   const upload = await createUploadRecord({
@@ -39,10 +39,10 @@ export async function saveProperties(userId: string, fileName: string, records: 
     filename: fileName,
     status: 'pending',
     createdAt: new Date(),
-  });
+  })
 
   // Save each property record
-  let savedCount = 0;
+  let savedCount = 0
   for (const record of records) {
     await createProperty({
       id: uuidv4(),
@@ -59,17 +59,17 @@ export async function saveProperties(userId: string, fileName: string, records: 
       parkingSpaces: record.parkingSpaces ? parseInt(record.parkingSpaces, 10) : null,
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
+    })
 
-    savedCount++;
+    savedCount++
   }
 
-  logger.info(`Successfully saved ${savedCount} properties for upload ${uploadId}`);
+  logger.info(`Successfully saved ${savedCount} properties for upload ${uploadId}`)
 
   return {
     uploadId,
     propertyCount: records.length,
-  };
+  }
 }
 
 /**
@@ -84,38 +84,38 @@ export async function processPropertyUpload(
   userId: string,
   filename: string
 ): Promise<PropertyUploadResult> {
-  logger.info(`Starting database transaction for ${records.length} properties`);
+  logger.info(`Starting database transaction for ${records.length} properties`)
 
   try {
     const result = await db.transaction(async (tx: typeof db) => {
       // Use the saveProperties function to handle the database operations
-      const { uploadId, propertyCount } = await saveProperties(userId, filename, records);
+      const { uploadId, propertyCount } = await saveProperties(userId, filename, records)
 
       // Update upload status to complete
       await tx
         .update(schema.uploadRecord)
         .set({ status: 'complete' })
         .where(eq(schema.uploadRecord.id, uploadId))
-        .execute();
+        .execute()
 
-      logger.info(`Successfully processed ${propertyCount} properties for upload ${uploadId}`);
+      logger.info(`Successfully processed ${propertyCount} properties for upload ${uploadId}`)
 
       // Get the upload record to return
       const upload = await tx
         .select()
         .from(schema.uploadRecord)
         .where(eq(schema.uploadRecord.id, uploadId))
-        .then((rows) => rows[0]);
+        .then(rows => rows[0])
 
       return {
         upload,
         propertiesCreated: propertyCount,
-      };
-    });
+      }
+    })
 
     // Trigger embedding generation in the background
     // We don't await this to avoid blocking the response
-    triggerEmbeddingGeneration(result.upload.id);
+    triggerEmbeddingGeneration(result.upload.id)
 
     return {
       success: true,
@@ -124,13 +124,13 @@ export async function processPropertyUpload(
         status: 'complete',
       },
       propertiesCreated: result.propertiesCreated,
-    };
+    }
   } catch (error) {
     logger.error('Error processing property upload', error as Error, {
       userId,
       filename,
       recordCount: records.length,
-    });
+    })
 
     return {
       success: false,
@@ -140,7 +140,7 @@ export async function processPropertyUpload(
       },
       propertiesCreated: 0,
       error: error instanceof Error ? error.message : 'Unknown error occurred',
-    };
+    }
   }
 }
 
@@ -153,7 +153,7 @@ function triggerEmbeddingGeneration(uploadId: string): void {
     logger.error(`Error generating embeddings for upload ${uploadId}`, err, {
       uploadId,
       timestamp: new Date().toISOString(),
-    });
+    })
 
     // Update upload status to reflect embedding failure
     db.update(schema.uploadRecord)
@@ -163,13 +163,13 @@ function triggerEmbeddingGeneration(uploadId: string): void {
       .catch((updateErr: Error) => {
         logger.error(`Failed to update upload status for ${uploadId}`, updateErr, {
           uploadId,
-        });
-      });
+        })
+      })
 
     // TODO: Implement a notification system or retry mechanism
     // For example, you could add this failed upload to a queue for retry
     // or send a notification to the user or admin
-  });
+  })
 }
 
 /**
@@ -179,21 +179,21 @@ function triggerEmbeddingGeneration(uploadId: string): void {
  */
 export async function checkUserUploadHistory(userId: string): Promise<boolean> {
   try {
-    const previousUploads = await getUploadRecordsByUploader(userId);
+    const previousUploads = await getUploadRecordsByUploader(userId)
 
     // If this is the user's first upload, log it for monitoring
     if (previousUploads.length === 0) {
-      logger.info(`First-time upload from user ${userId}`, { userId, firstUpload: true });
-      return false;
+      logger.info(`First-time upload from user ${userId}`, { userId, firstUpload: true })
+      return false
     }
 
-    return true;
+    return true
   } catch (userCheckError) {
     logger.error(`Error checking user upload history for ${userId}`, userCheckError as Error, {
       userId,
-    });
+    })
     // We'll continue processing even if this check fails
     // It's just for monitoring purposes
-    return false;
+    return false
   }
 }

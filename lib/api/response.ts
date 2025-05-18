@@ -1,14 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server'
 
 export type ApiResponse<T = any> = {
-  success: boolean;
-  data?: T;
+  success: boolean
+  data?: T
   error?: {
-    message: string;
-    code?: string;
-    details?: any;
-  };
-};
+    message: string
+    code?: string
+    details?: any
+  }
+}
 
 /**
  * Create a successful API response
@@ -19,7 +19,7 @@ export function successResponse<T>(data: T): NextResponse<ApiResponse<T>> {
   return NextResponse.json({
     success: true,
     data,
-  });
+  })
 }
 
 /**
@@ -46,7 +46,7 @@ export function errorResponse(
       },
     },
     { status }
-  );
+  )
 }
 
 /**
@@ -65,4 +65,4 @@ export const HttpStatus = {
   UNPROCESSABLE_ENTITY: 422,
   INTERNAL_SERVER_ERROR: 500,
   SERVICE_UNAVAILABLE: 503,
-} as const;
+} as const

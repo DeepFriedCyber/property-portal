@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import ErrorDisplay from '@/app/components/ErrorDisplay';
+import ErrorDisplay from '@/app/components/ErrorDisplay'
 
 export default function PropertiesError({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  error: Error & { digest?: string }
+  reset: () => void
 }) {
-  return <ErrorDisplay error={error} reset={reset} />;
+  return <ErrorDisplay error={error} reset={reset} />
 }

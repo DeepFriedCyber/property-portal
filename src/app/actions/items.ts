@@ -26,10 +26,8 @@ export async function createItem(
 ): Promise<ActionResponse> {
   try {
     // Handle both FormData and direct object input
-    const rawData = formData instanceof FormData 
-      ? Object.fromEntries(formData.entries())
-      : formData
-    
+    const rawData = formData instanceof FormData ? Object.fromEntries(formData.entries()) : formData
+
     // Validate the input data
     const validationResult = createItemSchema.safeParse(rawData)
 
@@ -53,12 +51,12 @@ export async function createItem(
       // eslint-disable-next-line no-console
       console.log('Received valid data:', validatedData)
     }
-    
+
     itemsDb.push(validatedData) // In a real app, you'd interact with your database here
-    
+
     // Revalidate any paths that display items
     revalidatePath('/items')
-    
+
     // Return standardized success response
     return {
       success: true,

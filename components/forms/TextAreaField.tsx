@@ -1,18 +1,18 @@
 // components/forms/TextAreaField.tsx
-import React from 'react';
+import React from 'react'
 
-import FormField from './FormField';
+import FormField from './FormField'
 
 interface TextAreaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  id: string;
-  name: string;
-  label: string;
-  error?: string;
-  touched?: boolean;
-  required?: boolean;
-  helpText?: string;
-  className?: string;
-  textareaClassName?: string;
+  id: string
+  name: string
+  label: string
+  error?: string
+  touched?: boolean
+  required?: boolean
+  helpText?: string
+  className?: string
+  textareaClassName?: string
 }
 
 /**
@@ -30,7 +30,7 @@ const TextAreaField: React.FC<TextAreaFieldProps> = ({
   textareaClassName = '',
   ...props
 }) => {
-  const showError = error && touched;
+  const showError = error && touched
 
   return (
     <FormField
@@ -57,7 +57,7 @@ const TextAreaField: React.FC<TextAreaFieldProps> = ({
         {...props}
       />
     </FormField>
-  );
-};
+  )
+}
 
-export default TextAreaField;
+export default TextAreaField

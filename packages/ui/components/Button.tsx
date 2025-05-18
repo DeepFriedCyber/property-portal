@@ -1,14 +1,14 @@
-import clsx from 'clsx';
-import React from 'react';
+import clsx from 'clsx'
+import React from 'react'
 
 export interface ButtonProps {
-  children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'success' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
-  onClick?: () => void;
-  className?: string;
-  disabled?: boolean;
-  type?: 'button' | 'submit' | 'reset';
+  children: React.ReactNode
+  variant?: 'primary' | 'secondary' | 'success' | 'danger'
+  size?: 'sm' | 'md' | 'lg'
+  onClick?: () => void
+  className?: string
+  disabled?: boolean
+  type?: 'button' | 'submit' | 'reset'
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -40,11 +40,11 @@ export const Button: React.FC<ButtonProps> = ({
       'bg-gray-300 text-gray-500 cursor-not-allowed': disabled,
     },
     className
-  );
+  )
 
   return (
     <button onClick={onClick} className={buttonClassName} disabled={disabled} type={type}>
       {children}
     </button>
-  );
-};
+  )
+}

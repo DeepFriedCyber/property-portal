@@ -1,21 +1,21 @@
-import * as csvParse from 'csv-parse/sync';
-import { NextResponse } from 'next/server';
+import * as csvParse from 'csv-parse/sync'
+import { NextResponse } from 'next/server'
 
-import logger from '../../lib/logging/logger';
+import logger from '../../lib/logging/logger'
 
 // Security constants
-export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-export const VALID_FILENAME_REGEX = /^[\w\.-]+$/; // Only allow alphanumeric, underscore, dot, and hyphen
-export const STREAMING_THRESHOLD = 5 * 1024 * 1024; // 5MB threshold for streaming
+export const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+export const VALID_FILENAME_REGEX = /^[\w\.-]+$/ // Only allow alphanumeric, underscore, dot, and hyphen
+export const STREAMING_THRESHOLD = 5 * 1024 * 1024 // 5MB threshold for streaming
 
 export interface CsvRecord {
-  [key: string]: string | number | boolean | null;
+  [key: string]: string | number | boolean | null
 }
 
 export interface CsvValidationResult {
-  isValid: boolean;
-  records?: CsvRecord[];
-  response?: NextResponse;
+  isValid: boolean
+  records?: CsvRecord[]
+  response?: NextResponse
 }
 
 /**
@@ -29,13 +29,13 @@ export function validateCsvFile(file: File): { isValid: boolean; response?: Next
     return {
       isValid: false,
       response: NextResponse.json({ message: 'No file provided' }, { status: 400 }),
-    };
+    }
   }
 
   // Validate filename to prevent path traversal attacks
-  const fileName = file.name;
+  const fileName = file.name
   if (!fileName.match(VALID_FILENAME_REGEX)) {
-    console.warn(`Rejected file with invalid filename: ${fileName}`);
+    console.warn(`Rejected file with invalid filename: ${fileName}`)
     return {
       isValid: false,
       response: NextResponse.json(
@@ -45,12 +45,12 @@ export function validateCsvFile(file: File): { isValid: boolean; response?: Next
         },
         { status: 400 }
       ),
-    };
+    }
   }
 
   // Validate file size
   if (file.size > MAX_FILE_SIZE) {
-    console.warn(`Rejected oversized file: ${fileName} (${file.size} bytes)`);
+    console.warn(`Rejected oversized file: ${fileName} (${file.size} bytes)`)
     return {
       isValid: false,
       response: NextResponse.json(
@@ -63,12 +63,12 @@ export function validateCsvFile(file: File): { isValid: boolean; response?: Next
         },
         { status: 400 }
       ),
-    };
+    }
   }
 
   // Check file type
   if (!file.name.endsWith('.csv')) {
-    console.warn(`Rejected non-CSV file: ${fileName} (${file.type})`);
+    console.warn(`Rejected non-CSV file: ${fileName} (${file.type})`)
     return {
       isValid: false,
       response: NextResponse.json(
@@ -78,12 +78,12 @@ export function validateCsvFile(file: File): { isValid: boolean; response?: Next
         },
         { status: 400 }
       ),
-    };
+    }
   }
 
   // Verify the file is not empty
   if (file.size === 0) {
-    console.warn(`Rejected empty file: ${fileName} (0 bytes)`);
+    console.warn(`Rejected empty file: ${fileName} (0 bytes)`)
     return {
       isValid: false,
       response: NextResponse.json(
@@ -93,13 +93,13 @@ export function validateCsvFile(file: File): { isValid: boolean; response?: Next
         },
         { status: 400 }
       ),
-    };
+    }
   }
 
   // Basic size validation
   if (file.size < 10) {
     // Arbitrary minimum for a valid CSV with headers
-    console.warn(`Rejected file with insufficient content: ${fileName} (${file.size} bytes)`);
+    console.warn(`Rejected file with insufficient content: ${fileName} (${file.size} bytes)`)
     return {
       isValid: false,
       response: NextResponse.json(
@@ -109,10 +109,10 @@ export function validateCsvFile(file: File): { isValid: boolean; response?: Next
         },
         { status: 400 }
       ),
-    };
+    }
   }
 
-  return { isValid: true };
+  return { isValid: true }
 }
 
 /**
@@ -121,43 +121,43 @@ export function validateCsvFile(file: File): { isValid: boolean; response?: Next
  * @returns Parsed records or error response
  */
 export async function parseCsvFile(file: File): Promise<CsvValidationResult> {
-  logger.info(`Starting to process CSV file: ${file.name} (${file.size} bytes)`);
+  logger.info(`Starting to process CSV file: ${file.name} (${file.size} bytes)`)
 
   try {
-    let records: CsvRecord[] = [];
+    let records: CsvRecord[] = []
 
     // For files under the threshold, use the direct parsing approach
     if (file.size < STREAMING_THRESHOLD) {
       // Use the direct parsing approach for smaller files
-      const fileBuffer = await file.arrayBuffer();
-      const fileContent = new TextDecoder().decode(fileBuffer);
+      const fileBuffer = await file.arrayBuffer()
+      const fileContent = new TextDecoder().decode(fileBuffer)
 
       // Parse CSV
-      records = parseCsv(fileContent);
-      logger.info(`Parsed ${records.length} records from CSV file using direct parsing`);
+      records = parseCsv(fileContent)
+      logger.info(`Parsed ${records.length} records from CSV file using direct parsing`)
     } else {
       // For larger files, use a chunked processing approach
-      records = await parseChunkedCsvFile(file);
+      records = await parseChunkedCsvFile(file)
     }
 
     // Log successful parsing
-    logger.info(`Successfully parsed CSV with ${records.length} records from file: ${file.name}`);
+    logger.info(`Successfully parsed CSV with ${records.length} records from file: ${file.name}`)
 
     // Validate CSV structure
     if (records.length === 0) {
-      logger.warn(`Rejected empty CSV file: ${file.name}`);
+      logger.warn(`Rejected empty CSV file: ${file.name}`)
       return {
         isValid: false,
         response: NextResponse.json(
           { message: 'CSV file is empty. Please provide a file with at least one record.' },
           { status: 400 }
         ),
-      };
+      }
     }
 
-    return { isValid: true, records };
+    return { isValid: true, records }
   } catch (error) {
-    logger.error(`Error parsing CSV file: ${file.name}`, error as Error);
+    logger.error(`Error parsing CSV file: ${file.name}`, error as Error)
     return {
       isValid: false,
       response: NextResponse.json(
@@ -167,7 +167,7 @@ export async function parseCsvFile(file: File): Promise<CsvValidationResult> {
         },
         { status: 400 }
       ),
-    };
+    }
   }
 }
 
@@ -181,7 +181,7 @@ export function parseCsv(content: string): CsvRecord[] {
     columns: true,
     skipEmptyLines: true,
     trim: true,
-  });
+  })
 }
 
 /**
@@ -192,18 +192,18 @@ export function parseCsv(content: string): CsvRecord[] {
  */
 export function validateCsvHeaders(record: CsvRecord, requiredFields: string[]): string[] {
   if (!record || typeof record !== 'object') {
-    return requiredFields; // All fields are missing if record is invalid
+    return requiredFields // All fields are missing if record is invalid
   }
 
-  const missingFields: string[] = [];
+  const missingFields: string[] = []
 
   for (const field of requiredFields) {
     if (!(field in record)) {
-      missingFields.push(field);
+      missingFields.push(field)
     }
   }
 
-  return missingFields;
+  return missingFields
 }
 
 /**
@@ -217,10 +217,10 @@ export function validateCsvRecords(
   requiredFields: string[]
 ): { isValid: boolean; response?: NextResponse } {
   // First, check if all required fields exist in the CSV structure (using first record)
-  const firstRecord = records[0];
+  const firstRecord = records[0]
 
   // Log the first record structure for debugging (excluding sensitive data)
-  logger.info('First record structure:', { fields: Object.keys(firstRecord) });
+  logger.info('First record structure:', { fields: Object.keys(firstRecord) })
 
   // Check if all required fields exist in the CSV structure
   for (const field of requiredFields) {
@@ -228,7 +228,7 @@ export function validateCsvRecords(
       logger.warn(`CSV missing required field: ${field}`, {
         availableFields: Object.keys(firstRecord),
         requiredFields,
-      });
+      })
       return {
         isValid: false,
         response: NextResponse.json(
@@ -239,15 +239,15 @@ export function validateCsvRecords(
           },
           { status: 400 }
         ),
-      };
+      }
     }
   }
 
   // Now validate all records to ensure consistency throughout the file
-  logger.info(`Validating all ${records.length} records for required fields...`);
+  logger.info(`Validating all ${records.length} records for required fields...`)
 
   for (let i = 0; i < records.length; i++) {
-    const record = records[i];
+    const record = records[i]
 
     for (const field of requiredFields) {
       if (
@@ -259,7 +259,7 @@ export function validateCsvRecords(
         logger.warn(`Record at index ${i} is missing required field "${field}"`, {
           recordIndex: i,
           fieldName: field,
-        });
+        })
         return {
           isValid: false,
           response: NextResponse.json(
@@ -273,7 +273,7 @@ export function validateCsvRecords(
             },
             { status: 400 }
           ),
-        };
+        }
       }
     }
 
@@ -282,7 +282,7 @@ export function validateCsvRecords(
       logger.warn(`Record at index ${i} has invalid price value`, {
         recordIndex: i,
         priceValue: record.price,
-      });
+      })
       return {
         isValid: false,
         response: NextResponse.json(
@@ -293,12 +293,12 @@ export function validateCsvRecords(
           },
           { status: 400 }
         ),
-      };
+      }
     }
   }
 
-  logger.info('All records successfully validated for required fields');
-  return { isValid: true };
+  logger.info('All records successfully validated for required fields')
+  return { isValid: true }
 }
 
 /**
@@ -307,45 +307,45 @@ export function validateCsvRecords(
  * @returns Array of parsed records
  */
 async function parseChunkedCsvFile(file: File): Promise<CsvRecord[]> {
-  logger.info(`Using chunked processing for large file: ${file.name} (${file.size} bytes)`);
+  logger.info(`Using chunked processing for large file: ${file.name} (${file.size} bytes)`)
 
   // Get the file as an ArrayBuffer but process it in chunks
-  const fileBuffer = await file.arrayBuffer();
-  const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
-  const decoder = new TextDecoder();
+  const fileBuffer = await file.arrayBuffer()
+  const CHUNK_SIZE = 1024 * 1024 // 1MB chunks
+  const decoder = new TextDecoder()
 
-  let csvContent = '';
-  let processedBytes = 0;
-  let records: CsvRecord[] = [];
+  let csvContent = ''
+  let processedBytes = 0
+  let records: CsvRecord[] = []
 
   // Process the first chunk to extract headers
-  const firstChunkSize = Math.min(CHUNK_SIZE, fileBuffer.byteLength);
-  const firstChunk = new Uint8Array(fileBuffer, 0, firstChunkSize);
-  const firstChunkText = decoder.decode(firstChunk, { stream: true });
+  const firstChunkSize = Math.min(CHUNK_SIZE, fileBuffer.byteLength)
+  const firstChunk = new Uint8Array(fileBuffer, 0, firstChunkSize)
+  const firstChunkText = decoder.decode(firstChunk, { stream: true })
 
   // Extract the header row
-  const headerEndIndex = firstChunkText.indexOf('\n');
+  const headerEndIndex = firstChunkText.indexOf('\n')
   if (headerEndIndex === -1) {
-    throw new Error('Could not find header row in CSV file');
+    throw new Error('Could not find header row in CSV file')
   }
 
   // We only need to extract the header to validate the file structure
-  const headerLine = firstChunkText.substring(0, headerEndIndex).trim();
-  logger.debug('CSV header line extracted', { headerLine });
+  const headerLine = firstChunkText.substring(0, headerEndIndex).trim()
+  logger.debug('CSV header line extracted', { headerLine })
 
-  csvContent = firstChunkText;
-  processedBytes = firstChunkSize;
+  csvContent = firstChunkText
+  processedBytes = firstChunkSize
 
   // Process the rest of the file in chunks
   while (processedBytes < fileBuffer.byteLength) {
-    const chunkSize = Math.min(CHUNK_SIZE, fileBuffer.byteLength - processedBytes);
-    const chunk = new Uint8Array(fileBuffer, processedBytes, chunkSize);
+    const chunkSize = Math.min(CHUNK_SIZE, fileBuffer.byteLength - processedBytes)
+    const chunk = new Uint8Array(fileBuffer, processedBytes, chunkSize)
     const chunkText = decoder.decode(chunk, {
       stream: processedBytes + chunkSize < fileBuffer.byteLength,
-    });
+    })
 
-    csvContent += chunkText;
-    processedBytes += chunkSize;
+    csvContent += chunkText
+    processedBytes += chunkSize
 
     // Log progress for very large files
     if (processedBytes % (10 * CHUNK_SIZE) === 0) {
@@ -353,28 +353,28 @@ async function parseChunkedCsvFile(file: File): Promise<CsvRecord[]> {
         processedBytes,
         totalBytes: fileBuffer.byteLength,
         percentComplete: Math.round((processedBytes / fileBuffer.byteLength) * 100),
-      });
+      })
     }
 
     // If we've accumulated enough data, parse and clear the buffer
     if (csvContent.length > 5 * CHUNK_SIZE) {
       // Make sure we break at a newline to avoid splitting records
-      const lastNewlineIndex = csvContent.lastIndexOf('\n');
+      const lastNewlineIndex = csvContent.lastIndexOf('\n')
       if (lastNewlineIndex !== -1) {
-        const contentToParse = csvContent.substring(0, lastNewlineIndex + 1);
-        csvContent = csvContent.substring(lastNewlineIndex + 1);
+        const contentToParse = csvContent.substring(0, lastNewlineIndex + 1)
+        csvContent = csvContent.substring(lastNewlineIndex + 1)
 
         // Parse this chunk of CSV data
         try {
-          const chunkRecords = parseCsv(contentToParse);
-          records = records.concat(chunkRecords);
+          const chunkRecords = parseCsv(contentToParse)
+          records = records.concat(chunkRecords)
           logger.info(`Parsed records from chunk`, {
             chunkRecords: chunkRecords.length,
             totalRecords: records.length,
-          });
+          })
         } catch (chunkError) {
-          logger.error('Error parsing CSV chunk', chunkError as Error);
-          throw chunkError;
+          logger.error('Error parsing CSV chunk', chunkError as Error)
+          throw chunkError
         }
       }
     }
@@ -383,17 +383,17 @@ async function parseChunkedCsvFile(file: File): Promise<CsvRecord[]> {
   // Parse any remaining content
   if (csvContent.length > 0) {
     try {
-      const finalRecords = parseCsv(csvContent);
-      records = records.concat(finalRecords);
+      const finalRecords = parseCsv(csvContent)
+      records = records.concat(finalRecords)
       logger.info(`Parsed records from final chunk`, {
         finalRecords: finalRecords.length,
         totalRecords: records.length,
-      });
+      })
     } catch (finalError) {
-      logger.error('Error parsing final CSV chunk', finalError as Error);
-      throw finalError;
+      logger.error('Error parsing final CSV chunk', finalError as Error)
+      throw finalError
     }
   }
 
-  return records;
+  return records
 }

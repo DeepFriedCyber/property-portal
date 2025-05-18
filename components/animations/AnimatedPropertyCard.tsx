@@ -1,23 +1,23 @@
 // components/animations/AnimatedPropertyCard.tsx
-import { motion } from 'framer-motion';
-import React from 'react';
+import { motion } from 'framer-motion'
+import React from 'react'
 
-import { useScrollAnimation } from '@/hooks/useAnimation';
+import { useScrollAnimation } from '@/hooks/useAnimation'
 
 interface Property {
-  id: string;
-  address: string;
-  price: number;
-  bedrooms: number;
-  type: string;
-  image?: string;
+  id: string
+  address: string
+  price: number
+  bedrooms: number
+  type: string
+  image?: string
 }
 
 interface AnimatedPropertyCardProps {
-  property: Property;
-  index: number;
-  onClick?: (property: Property) => void;
-  className?: string;
+  property: Property
+  index: number
+  onClick?: (property: Property) => void
+  className?: string
 }
 
 // Animation variants
@@ -48,7 +48,7 @@ const cardVariants = {
       ease: 'easeOut',
     },
   },
-};
+}
 
 /**
  * Animated property card component with scroll-triggered animation
@@ -66,13 +66,13 @@ const AnimatedPropertyCard: React.FC<AnimatedPropertyCardProps> = ({
     custom: index,
     threshold: 0.1,
     rootMargin: '0px 0px -100px 0px',
-  });
+  })
 
   const handleClick = () => {
     if (onClick) {
-      onClick(property);
+      onClick(property)
     }
-  };
+  }
 
   return (
     <motion.div
@@ -131,7 +131,7 @@ const AnimatedPropertyCard: React.FC<AnimatedPropertyCardProps> = ({
         </div>
       </div>
     </motion.div>
-  );
-};
+  )
+}
 
-export default AnimatedPropertyCard;
+export default AnimatedPropertyCard

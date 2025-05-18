@@ -7,7 +7,7 @@ import {
   sanitizeUploadData,
   logUploadError,
   UploadData,
-} from '../lib/uploads/error-handling';
+} from '../lib/uploads/error-handling'
 
 /**
  * Example function to get property count for an upload
@@ -15,8 +15,8 @@ import {
 async function getPropertyCountForUpload(uploadId: string): Promise<number> {
   try {
     // Simulated database query to get property count
-    const count = await simulatePropertyCountQuery(uploadId);
-    return count;
+    const count = await simulatePropertyCountQuery(uploadId)
+    return count
   } catch (error) {
     // ❌ BAD: Inconsistent error handling with potential privacy issues
     /*
@@ -36,10 +36,10 @@ async function getPropertyCountForUpload(uploadId: string): Promise<number> {
       operation: 'getPropertyCount',
       uploadId,
       additionalInfo: { attemptedOperation: 'database query' },
-    });
+    })
 
     // Re-throw to be handled by the caller
-    throw error;
+    throw error
   }
 }
 
@@ -49,15 +49,15 @@ async function getPropertyCountForUpload(uploadId: string): Promise<number> {
 async function getUploadWithPropertyCount(uploadId: string): Promise<UploadData> {
   try {
     // Get basic upload information
-    const upload = await simulateGetUpload(uploadId);
+    const upload = await simulateGetUpload(uploadId)
 
     // Get property count
     try {
-      const propertyCount = await getPropertyCountForUpload(uploadId);
+      const propertyCount = await getPropertyCountForUpload(uploadId)
       return {
         ...upload,
         propertyCount,
-      };
+      }
     } catch (error) {
       // ❌ BAD: Inconsistent error handling
       /*
@@ -71,7 +71,7 @@ async function getUploadWithPropertyCount(uploadId: string): Promise<UploadData>
       */
 
       // ✅ GOOD: Use the utility function for consistent fallback
-      return createPropertyCountFallback(upload, error);
+      return createPropertyCountFallback(upload, error)
     }
   } catch (error) {
     // ❌ BAD: Inconsistent error handling
@@ -85,7 +85,7 @@ async function getUploadWithPropertyCount(uploadId: string): Promise<UploadData>
     */
 
     // ✅ GOOD: Use the utility function for consistent error response
-    return createUploadErrorResponse({ id: uploadId }, error, 'getUploadWithPropertyCount');
+    return createUploadErrorResponse({ id: uploadId }, error, 'getUploadWithPropertyCount')
   }
 }
 
@@ -93,11 +93,11 @@ async function getUploadWithPropertyCount(uploadId: string): Promise<UploadData>
  * Example API handler for getting upload details
  */
 async function handleGetUploadRequest(req: any, res: any) {
-  const uploadId = req.params.id;
-  const isAdmin = req.user?.role === 'admin';
+  const uploadId = req.params.id
+  const isAdmin = req.user?.role === 'admin'
 
   try {
-    const upload = await getUploadWithPropertyCount(uploadId);
+    const upload = await getUploadWithPropertyCount(uploadId)
 
     // ❌ BAD: Inconsistent handling of private data
     /*
@@ -108,8 +108,8 @@ async function handleGetUploadRequest(req: any, res: any) {
     */
 
     // ✅ GOOD: Use the utility function for consistent data sanitization
-    const sanitizedUpload = sanitizeUploadData(upload, isAdmin);
-    res.json(sanitizedUpload);
+    const sanitizedUpload = sanitizeUploadData(upload, isAdmin)
+    res.json(sanitizedUpload)
   } catch (error) {
     // ❌ BAD: Inconsistent error response
     /*
@@ -122,7 +122,7 @@ async function handleGetUploadRequest(req: any, res: any) {
       operation: 'handleGetUploadRequest',
       uploadId,
       additionalInfo: { userRole: req.user?.role },
-    });
+    })
 
     res.status(500).json({
       error: true,
@@ -130,7 +130,7 @@ async function handleGetUploadRequest(req: any, res: any) {
         process.env.NODE_ENV === 'development'
           ? String(error)
           : 'Failed to retrieve upload information',
-    });
+    })
   }
 }
 
@@ -138,13 +138,13 @@ async function handleGetUploadRequest(req: any, res: any) {
 async function simulatePropertyCountQuery(uploadId: string): Promise<number> {
   // Simulate different scenarios based on uploadId
   if (uploadId === 'valid-id') {
-    return 42;
+    return 42
   } else if (uploadId === 'empty-id') {
-    return 0;
+    return 0
   } else if (uploadId === 'error-id') {
-    throw new Error('Database query failed');
+    throw new Error('Database query failed')
   } else {
-    throw new Error('Upload not found');
+    throw new Error('Upload not found')
   }
 }
 
@@ -159,12 +159,12 @@ async function simulateGetUpload(uploadId: string): Promise<UploadData> {
       status: 'processed',
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
+    }
   } else if (uploadId === 'error-id') {
-    throw new Error('Database query failed');
+    throw new Error('Database query failed')
   } else {
-    throw new Error('Upload not found');
+    throw new Error('Upload not found')
   }
 }
 
-export { getPropertyCountForUpload, getUploadWithPropertyCount, handleGetUploadRequest };
+export { getPropertyCountForUpload, getUploadWithPropertyCount, handleGetUploadRequest }

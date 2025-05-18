@@ -77,7 +77,7 @@
      updatedAt: timestamp('updated_at'),
      createdBy: text('created_by'),
      updatedBy: text('updated_by'),
-   });
+   })
    ```
 
 2. ✅ Added the missing `uploads` table to the schema:
@@ -95,7 +95,7 @@
      metadata: jsonb('metadata').$type<Record<string, any>>(),
      createdAt: timestamp('created_at').defaultNow(),
      updatedAt: timestamp('updated_at'),
-   });
+   })
    ```
 
 3. ✅ Fixed the path in `apiErrorHelpers.ts` to correctly import from the nextjs-utils file
@@ -112,11 +112,11 @@
    export async function isDatabaseHealthy(): Promise<boolean> {
      try {
        // Try to execute a simple query to check database connectivity
-       const result = await pool.query('SELECT 1');
-       return result.rows.length > 0;
+       const result = await pool.query('SELECT 1')
+       return result.rows.length > 0
      } catch (error) {
-       console.error('Database health check failed:', error);
-       return false;
+       console.error('Database health check failed:', error)
+       return false
      }
    }
 
@@ -125,27 +125,27 @@
     * @returns Promise<object> - Object containing database status information
     */
    export async function getDatabaseStatus(): Promise<{
-     healthy: boolean;
-     poolSize: number;
-     idleConnections: number;
-     waitingClients: number;
-     error?: string;
+     healthy: boolean
+     poolSize: number
+     idleConnections: number
+     waitingClients: number
+     error?: string
    }> {
      try {
        // Check if the database is healthy
-       const healthy = await isDatabaseHealthy();
+       const healthy = await isDatabaseHealthy()
 
        // Get pool statistics
        const poolStats = {
          poolSize: pool.totalCount,
          idleConnections: pool.idleCount,
          waitingClients: pool.waitingCount,
-       };
+       }
 
        return {
          healthy,
          ...poolStats,
-       };
+       }
      } catch (error) {
        return {
          healthy: false,
@@ -153,7 +153,7 @@
          idleConnections: 0,
          waitingClients: 0,
          error: error instanceof Error ? error.message : String(error),
-       };
+       }
      }
    }
    ```
@@ -165,14 +165,14 @@
    const updateData = {
      ...data,
      updatedAt: data.updatedAt ? new Date(data.updatedAt) : new Date(),
-   };
+   }
 
    // In apps/web/app/api/properties/route.ts - Changed from string to Date object
    const propertyData = {
      ...validatedData,
      updatedBy: user.userId,
      updatedAt: new Date(),
-   };
+   }
    ```
 
 ## Remaining Fixes Needed

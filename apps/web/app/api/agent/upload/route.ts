@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
 
 /**
  * Placeholder API handler for property CSV uploads
@@ -11,5 +11,5 @@ export async function POST(_req: NextRequest) {
       propertyCount: 0,
     },
     { status: 200 }
-  );
+  )
 }

@@ -1,12 +1,12 @@
 // PropertySearchForm.tsx
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
-import AccessibleForm from './AccessibleForm';
+import AccessibleForm from './AccessibleForm'
 
 interface PropertySearchFormProps {
-  onSearch: (searchParams: Record<string, string>) => void;
-  loading?: boolean;
-  className?: string;
+  onSearch: (searchParams: Record<string, string>) => void
+  loading?: boolean
+  className?: string
 }
 
 const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
@@ -25,9 +25,9 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
       helpText: 'Enter a city, neighborhood, or ZIP code to search for properties',
       validation: (value: string) => {
         if (value.length < 2) {
-          return 'Location must be at least 2 characters';
+          return 'Location must be at least 2 characters'
         }
-        return undefined;
+        return undefined
       },
       autoComplete: 'address-level2',
     },
@@ -39,9 +39,9 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
       helpText: 'Enter the minimum price for properties',
       validation: (value: string) => {
         if (value && parseInt(value) < 0) {
-          return 'Price cannot be negative';
+          return 'Price cannot be negative'
         }
-        return undefined;
+        return undefined
       },
       min: 0,
     },
@@ -53,9 +53,9 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
       helpText: 'Enter the maximum price for properties',
       validation: (value: string) => {
         if (value && parseInt(value) < 0) {
-          return 'Price cannot be negative';
+          return 'Price cannot be negative'
         }
-        return undefined;
+        return undefined
       },
       min: 0,
     },
@@ -84,7 +84,7 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
       placeholder: 'Any property type',
       helpText: 'Enter the type of property you are looking for (e.g., house, apartment, condo)',
     },
-  ];
+  ]
 
   // Handle form submission
   const handleSubmit = (formData: Record<string, string>) => {
@@ -92,15 +92,15 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
     const filteredData = Object.entries(formData).reduce(
       (acc, [key, value]) => {
         if (value) {
-          acc[key] = value;
+          acc[key] = value
         }
-        return acc;
+        return acc
       },
       {} as Record<string, string>
-    );
+    )
 
-    onSearch(filteredData);
-  };
+    onSearch(filteredData)
+  }
 
   return (
     <div className={`property-search-form ${className}`}>
@@ -113,7 +113,7 @@ const PropertySearchForm: React.FC<PropertySearchFormProps> = ({
         loading={loading}
       />
     </div>
-  );
-};
+  )
+}
 
-export default PropertySearchForm;
+export default PropertySearchForm

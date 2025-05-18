@@ -1,129 +1,129 @@
-'use client';
+'use client'
 
-import { useUser } from '@clerk/nextjs';
-import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs'
+import { useState, useEffect } from 'react'
 
-import UploadZone from '@components/common/UploadZone';
+import UploadZone from '@components/common/UploadZone'
 
-import { Button } from '../../../src/ui';
+import { Button } from '../../../src/ui'
 
 interface UploadRecord {
-  id: string;
-  filename: string;
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt: Date;
-  propertyCount: number;
+  id: string
+  filename: string
+  status: 'pending' | 'approved' | 'rejected'
+  createdAt: Date
+  propertyCount: number
 }
 
 interface Property {
-  id: string;
-  uploadId: string;
-  address: string;
-  price: number;
-  bedrooms?: number;
-  type?: string;
-  dateSold?: Date;
+  id: string
+  uploadId: string
+  address: string
+  price: number
+  bedrooms?: number
+  type?: string
+  dateSold?: Date
 }
 
 export default function AgentDashboard() {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const [uploads, setUploads] = useState<UploadRecord[]>([]);
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { isLoaded, isSignedIn, user } = useUser()
+  const [uploads, setUploads] = useState<UploadRecord[]>([])
+  const [properties, setProperties] = useState<Property[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [uploadStatus, setUploadStatus] = useState<{
-    isUploading: boolean;
-    success: boolean | null;
-    message: string | null;
+    isUploading: boolean
+    success: boolean | null
+    message: string | null
   }>({
     isUploading: false,
     success: null,
     message: null,
-  });
+  })
 
   useEffect(() => {
     // Fetch agent's uploads and properties
     const fetchAgentData = async () => {
       try {
-        setLoading(true);
+        setLoading(true)
         // This would be replaced with actual API calls
-        const uploadsResponse = await fetch('/api/agent/uploads');
-        const propertiesResponse = await fetch('/api/agent/properties');
+        const uploadsResponse = await fetch('/api/agent/uploads')
+        const propertiesResponse = await fetch('/api/agent/properties')
 
         if (!uploadsResponse.ok || !propertiesResponse.ok) {
-          throw new Error('Failed to fetch data');
+          throw new Error('Failed to fetch data')
         }
 
-        const uploadsData = await uploadsResponse.json();
-        const propertiesData = await propertiesResponse.json();
+        const uploadsData = await uploadsResponse.json()
+        const propertiesData = await propertiesResponse.json()
 
-        setUploads(uploadsData.uploads);
-        setProperties(propertiesData.properties);
+        setUploads(uploadsData.uploads)
+        setProperties(propertiesData.properties)
       } catch (err) {
-        console.error('Error fetching agent data:', err);
-        setError('Failed to load your data. Please try again.');
+        console.error('Error fetching agent data:', err)
+        setError('Failed to load your data. Please try again.')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchAgentData();
-  }, []);
+    fetchAgentData()
+  }, [])
 
   const handleFileUpload = async (file: File) => {
     setUploadStatus({
       isUploading: true,
       success: null,
       message: 'Uploading file...',
-    });
+    })
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const formData = new FormData()
+      formData.append('file', file)
 
       const response = await fetch('/api/agent/upload', {
         method: 'POST',
         body: formData,
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Upload failed');
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Upload failed')
       }
 
-      const data = await response.json();
+      const data = await response.json()
 
       // Add the new upload to the list
-      setUploads([data.upload, ...uploads]);
+      setUploads([data.upload, ...uploads])
 
       setUploadStatus({
         isUploading: false,
         success: true,
         message: `Successfully uploaded ${file.name}`,
-      });
+      })
 
       // Clear success message after 5 seconds
       setTimeout(() => {
-        setUploadStatus((prev) => ({
+        setUploadStatus(prev => ({
           ...prev,
           success: null,
           message: null,
-        }));
-      }, 5000);
+        }))
+      }, 5000)
     } catch (err: any) {
-      console.error('Upload error:', err);
+      console.error('Upload error:', err)
       setUploadStatus({
         isUploading: false,
         success: false,
         message: err.message || 'Failed to upload file. Please try again.',
-      });
+      })
     }
-  };
+  }
 
   const viewUploadDetails = (uploadId: string) => {
     // Navigate to upload details page
-    window.location.href = `/agent/uploads/${uploadId}`;
-  };
+    window.location.href = `/agent/uploads/${uploadId}`
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -215,7 +215,7 @@ export default function AgentDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {uploads.map((upload) => (
+                {uploads.map(upload => (
                   <tr key={upload.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{upload.filename}</div>
@@ -304,7 +304,7 @@ export default function AgentDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {properties.slice(0, 5).map((property) => (
+                {properties.slice(0, 5).map(property => (
                   <tr key={property.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{property.address}</div>
@@ -348,5 +348,5 @@ export default function AgentDashboard() {
         )}
       </div>
     </div>
-  );
+  )
 }

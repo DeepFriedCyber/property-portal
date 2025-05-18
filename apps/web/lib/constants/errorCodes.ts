@@ -27,7 +27,7 @@ export const ErrorCode = {
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
-} as const;
+} as const
 
 /**
  * Default error messages for error codes
@@ -53,4 +53,4 @@ export const ErrorMessage = {
   [ErrorCode.INTERNAL_SERVER_ERROR]: 'An unexpected error occurred',
   [ErrorCode.SERVICE_UNAVAILABLE]: 'Service temporarily unavailable',
   [ErrorCode.RATE_LIMIT_EXCEEDED]: 'Rate limit exceeded, please try again later',
-} as const;
+} as const

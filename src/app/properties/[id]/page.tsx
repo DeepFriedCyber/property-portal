@@ -1,189 +1,52 @@
+import { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
-import ErrorBoundary from '@/app/components/ErrorBoundary'
-import PropertyTimestamps from '@/app/components/PropertyTimestamps'
-import { formatCurrency, formatSquareFootage, capitalize } from '@/lib/utils/formatters'
-import { Property } from '@/types/property'
-import { fetchPropertyById } from '@/lib/api'
+import { fetchPropertyById, fetchNearbyProperties } from '@/lib/api'
+import PropertyCard from '@/components/PropertyCard'
 
 export const dynamic = 'force-dynamic'
 
-// Generate metadata for SEO
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const { property } = await fetchPropertyById(params.id)
-  if (!property) return {}
+interface PropertyPageProps {
+  params: { id: string }
+}
 
-  const metadata = property.metadata || {}
-  const title = metadata.title || property.address
-  const description = property.description || `View details for ${title} - ${property.bedrooms} bedroom ${property.type} in ${property.city}`
-  const imageUrl = metadata.mainImageUrl || 'https://property-portal.com/images/property-placeholder.jpg'
-  const listingType = metadata.listingType === 'rent' ? 'For Rent' : 'For Sale'
-  
+// Generate metadata for SEO
+export async function generateMetadata({ params }: PropertyPageProps): Promise<Metadata> {
+  const { property } = await fetchPropertyById(params.id)
+
+  if (!property) {
+    return {
+      title: 'Property Not Found',
+    }
+  }
+
   return {
-    title: `${title} - ${listingType}`,
-    description: description,
-    keywords: `${property.type}, ${listingType.toLowerCase()}, ${property.bedrooms} bedroom, ${property.city}, property, real estate`,
+    title: `${property.title} | Property Portal`,
+    description: `View details for ${property.title} located in ${property.location}`,
+    keywords: `property, real estate, ${property.location}`,
     openGraph: {
-      title: `${title} - ${listingType} | Property Portal`,
-      description: description,
+      title: `${property.title} | Property Portal`,
+      description: `View details for ${property.title} at ${property.location}`,
       images: [
         {
-          url: imageUrl,
+          url: property.imageUrl,
           width: 1200,
           height: 630,
-          alt: title,
-        }
+          alt: property.title,
+        },
       ],
       type: 'article',
-      locale: 'en_GB',
-      publishedTime: property.createdAt,
-      modifiedTime: property.updatedAt,
-      section: 'Properties',
-      tags: [property.type, listingType.toLowerCase(), `${property.bedrooms} bedroom`, property.city],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} - ${listingType}`,
-      description: description,
-      images: [imageUrl],
+      title: `${property.title} | Property Portal`,
+      description: `View details for ${property.title} at ${property.location}`,
+      images: [property.imageUrl],
     },
   }
-}
-
-// Using the centralized Property type from @/types/property
-
-// Property detail content component
-function PropertyDetailContent({ property }: { property: Property }) {
-  const metadata = property.metadata || {}
-
-  return (
-    <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
-      {/* Image gallery */}
-      <div className="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden relative">
-        {metadata.mainImageUrl ? (
-          <Image
-            src={metadata.mainImageUrl}
-            alt={metadata.title || property.address}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority
-            className="object-center object-cover"
-            style={{ objectFit: 'cover' }}
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400">No image available</span>
-          </div>
-        )}
-      </div>
-
-      {/* Property info */}
-      <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-          {metadata.title || property.address}
-        </h1>
-
-        <div className="mt-3">
-          <h2 className="sr-only">Property information</h2>
-          <p className="text-3xl text-gray-900">
-            {formatCurrency(property.price)}
-            {metadata.listingType === 'rent' && <span className="text-lg font-normal"> pcm</span>}
-          </p>
-        </div>
-
-        <div className="mt-6">
-          <h3 className="sr-only">Description</h3>
-          <div className="text-base text-gray-700 space-y-6">
-            <p>{property.description}</p>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <div className="flex items-center">
-            <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                metadata.listingType === 'sale'
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-blue-100 text-blue-800'
-              }`}
-            >
-              {metadata.listingType === 'sale' ? 'For Sale' : 'For Rent'}
-            </span>
-            <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-              {capitalize(property.type)}
-            </span>
-            <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-              {capitalize(property.status.replace('_', ' '))}
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-          <div>
-            <h3 className="text-sm font-medium text-gray-900">Address</h3>
-            <div className="mt-2 text-sm text-gray-500">
-              <p>{property.address}</p>
-              {metadata.addressLine2 && <p>{metadata.addressLine2}</p>}
-              <p>
-                {property.city}, {property.state}
-              </p>
-              <p>{property.zipCode}</p>
-              <p>{property.country}</p>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-medium text-gray-900">Property Details</h3>
-            <div className="mt-2 text-sm text-gray-500">
-              <p>
-                {property.bedrooms} {property.bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}
-              </p>
-              <p>
-                {property.bathrooms} {property.bathrooms === 1 ? 'Bathroom' : 'Bathrooms'}
-              </p>
-              {metadata.receptionRooms && (
-                <p>
-                  {metadata.receptionRooms}{' '}
-                  {metadata.receptionRooms === 1 ? 'Reception Room' : 'Reception Rooms'}
-                </p>
-              )}
-              {property.squareFeet && property.squareFeet > 0 && (
-                <p>{formatSquareFootage(property.squareFeet)}</p>
-              )}
-              {metadata.tenure && <p>Tenure: {capitalize(metadata.tenure.replace('_', ' '))}</p>}
-              {metadata.councilTaxBand && <p>Council Tax Band: {metadata.councilTaxBand}</p>}
-              {metadata.epcRating && <p>EPC Rating: {metadata.epcRating}</p>}
-            </div>
-          </div>
-        </div>
-
-        {property.features && property.features.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-sm font-medium text-gray-900">Features</h3>
-            <div className="mt-2">
-              <ul className="pl-4 list-disc text-sm space-y-2">
-                {property.features.map((feature: string, index: number) => (
-                  <li key={index} className="text-gray-500">
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {/* Display the timestamps */}
-        <section aria-label="Timestamps" className="mt-6">
-          <PropertyTimestamps
-            createdAt={new Date(property.createdAt)}
-            updatedAt={property.updatedAt ? new Date(property.updatedAt) : null}
-          />
-        </section>
-      </div>
-    </div>
-  )
 }
 
 // Loading skeleton for property detail
@@ -202,26 +65,17 @@ function PropertyDetailSkeleton() {
           <div className="h-4 bg-gray-200 rounded w-full"></div>
           <div className="h-4 bg-gray-200 rounded w-2/3"></div>
         </div>
-        <div className="flex space-x-2">
-          <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-          <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-          <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-        </div>
         <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
           <div>
             <div className="h-4 bg-gray-200 rounded w-1/2"></div>
             <div className="mt-2 space-y-2">
               <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
             </div>
           </div>
           <div>
             <div className="h-4 bg-gray-200 rounded w-1/2"></div>
             <div className="mt-2 space-y-2">
               <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
             </div>
           </div>
         </div>
@@ -238,18 +92,115 @@ async function PropertyDetailData({ id }: { id: string }) {
     notFound()
   }
 
-  return <PropertyDetailContent property={property} />
+  // Format price with commas
+  const formattedPrice = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(property.price)
+
+  // Fetch nearby properties
+  const nearbyProperties = await fetchNearbyProperties(
+    property.id,
+    property.lat,
+    property.lng,
+    20, // 20km radius
+    3 // 3 properties
+  )
+
+  return (
+    <>
+      <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
+        {/* Image gallery */}
+        <div className="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden relative">
+          {property.imageUrl ? (
+            <Image
+              src={property.imageUrl}
+              alt={`Property image of ${property.title} at ${property.location}`}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority
+              className="object-center object-cover"
+              style={{ objectFit: 'cover' }}
+            />
+          ) : (
+            <div
+              className="w-full h-full bg-gray-200 flex items-center justify-center"
+              aria-label="No property image available"
+            >
+              <span className="text-gray-400">No image available</span>
+            </div>
+          )}
+        </div>
+
+        {/* Property info */}
+        <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">{property.title}</h1>
+
+          <div className="mt-3">
+            <h2 className="sr-only">Property information</h2>
+            <p className="text-3xl text-gray-900">{formattedPrice}</p>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="sr-only">Location</h3>
+            <div className="text-base text-gray-700 space-y-6">
+              <p>{property.location}</p>
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+            <div>
+              <h3 className="text-sm font-medium text-gray-900">Location</h3>
+              <div className="mt-2 text-sm text-gray-500">
+                <p>{property.location}</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-gray-900">Coordinates</h3>
+              <div className="mt-2 text-sm text-gray-500">
+                <p>Latitude: {property.lat.toFixed(6)}</p>
+                <p>Longitude: {property.lng.toFixed(6)}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Map section */}
+          <section aria-label="Map" className="mt-6">
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Map Location</h3>
+            <div className="h-64 bg-gray-200 rounded-md flex items-center justify-center">
+              <p className="text-gray-500">Map view would be displayed here</p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      {nearbyProperties.length > 0 && (
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6">Nearby Properties</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {nearbyProperties.map(nearbyProperty => (
+              <PropertyCard key={nearbyProperty.id} property={nearbyProperty} />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  )
 }
 
 // Main page component
-export default async function PropertyDetailPage({ params }: { params: { id: string } }) {
+export default async function PropertyDetailPage({ params }: PropertyPageProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <ErrorBoundary>
-        <Suspense fallback={<PropertyDetailSkeleton />}>
-          <PropertyDetailData id={params.id} />
-        </Suspense>
-      </ErrorBoundary>
+      <Link href="/properties" className="text-blue-600 hover:underline mb-6 inline-block">
+        &larr; Back to all properties
+      </Link>
+
+      <Suspense fallback={<PropertyDetailSkeleton />}>
+        <PropertyDetailData id={params.id} />
+      </Suspense>
     </div>
   )
 }

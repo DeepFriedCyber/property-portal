@@ -13,11 +13,11 @@ When handling errors in upload processing, inconsistent approaches can lead to:
 
 ```typescript
 // Inconsistent error logging
-console.error('Failed to get property count for upload:', upload?.id, error);
+console.error('Failed to get property count for upload:', upload?.id, error)
 
 // Environment-specific logging with string concatenation
 if (process.env.NODE_ENV === 'development') {
-  console.error('Property count error (uploadId: ' + upload?.id + '):', error);
+  console.error('Property count error (uploadId: ' + upload?.id + '):', error)
 }
 
 // Inconsistent fallback response
@@ -26,7 +26,7 @@ return {
   propertyCount: 0,
   countError: true,
   uploaderId: undefined, // Privacy concern handled inconsistently
-};
+}
 ```
 
 ## Standardized Error Handling Approach
@@ -34,7 +34,7 @@ return {
 ### ✅ Consistent Error Logging
 
 ```typescript
-import { logUploadError } from '../lib/uploads/error-handling';
+import { logUploadError } from '../lib/uploads/error-handling'
 
 // Structured error logging with consistent format
 logUploadError(error, {
@@ -45,21 +45,21 @@ logUploadError(error, {
     fileSize: upload?.fileSize,
     status: upload?.status,
   },
-});
+})
 ```
 
 ### ✅ Consistent Fallback Responses
 
 ```typescript
-import { createPropertyCountFallback } from '../lib/uploads/error-handling';
+import { createPropertyCountFallback } from '../lib/uploads/error-handling'
 
 // When property count determination fails
 try {
-  const propertyCount = await getPropertyCountForUpload(uploadId);
-  return { ...upload, propertyCount };
+  const propertyCount = await getPropertyCountForUpload(uploadId)
+  return { ...upload, propertyCount }
 } catch (error) {
   // Consistent fallback with privacy protection
-  return createPropertyCountFallback(upload, error);
+  return createPropertyCountFallback(upload, error)
 }
 ```
 
@@ -94,26 +94,26 @@ try {
 async function processUpload(uploadId: string, req: any, res: any) {
   try {
     // Get upload details
-    const upload = await getUpload(uploadId);
+    const upload = await getUpload(uploadId)
 
     // Process the upload
     try {
-      const result = await processUploadData(upload);
+      const result = await processUploadData(upload)
 
       // Return sanitized response
-      const sanitizedResult = sanitizeUploadData(result, req.user.isAdmin);
-      res.json(sanitizedResult);
+      const sanitizedResult = sanitizeUploadData(result, req.user.isAdmin)
+      res.json(sanitizedResult)
     } catch (processingError) {
       // Handle processing errors with consistent fallback
       const fallbackResponse = createUploadErrorResponse(
         upload,
         processingError,
         'processUploadData'
-      );
+      )
 
       // Return sanitized fallback
-      const sanitizedFallback = sanitizeUploadData(fallbackResponse, req.user.isAdmin);
-      res.status(500).json(sanitizedFallback);
+      const sanitizedFallback = sanitizeUploadData(fallbackResponse, req.user.isAdmin)
+      res.status(500).json(sanitizedFallback)
     }
   } catch (error) {
     // Handle upload retrieval errors
@@ -121,12 +121,12 @@ async function processUpload(uploadId: string, req: any, res: any) {
       operation: 'getUpload',
       uploadId,
       additionalInfo: { userRole: req.user?.role },
-    });
+    })
 
     res.status(404).json({
       error: true,
       message: 'Upload not found or could not be processed',
-    });
+    })
   }
 }
 ```

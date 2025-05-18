@@ -40,5 +40,5 @@ export default function PropertyDetailLoading() {
         </div>
       </div>
     </div>
-  );
+  )
 }

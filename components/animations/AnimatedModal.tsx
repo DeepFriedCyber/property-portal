@@ -1,18 +1,18 @@
 // components/animations/AnimatedModal.tsx
-import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import React, { useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'
+import React, { useEffect, useRef } from 'react'
 
 interface AnimatedModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-  ariaDescribedby?: string;
-  className?: string;
-  showCloseButton?: boolean;
-  closeOnEsc?: boolean;
-  closeOnOutsideClick?: boolean;
-  animationDuration?: number;
+  isOpen: boolean
+  onClose: () => void
+  title: string
+  children: React.ReactNode
+  ariaDescribedby?: string
+  className?: string
+  showCloseButton?: boolean
+  closeOnEsc?: boolean
+  closeOnOutsideClick?: boolean
+  animationDuration?: number
 }
 
 /**
@@ -31,125 +31,125 @@ const AnimatedModal: React.FC<AnimatedModalProps> = ({
   closeOnOutsideClick = true,
   animationDuration = 0.3,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
-  const backdropControls = useAnimation();
-  const modalControls = useAnimation();
+  const modalRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+  const backdropControls = useAnimation()
+  const modalControls = useAnimation()
 
   // Animation state tracking to prevent memory leaks
   const animationState = useRef({
     isAnimating: false,
     isMounted: false,
-  });
+  })
 
   // Store the element that had focus before opening the modal
   useEffect(() => {
-    animationState.current.isMounted = true;
+    animationState.current.isMounted = true
 
     if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
+      previousFocusRef.current = document.activeElement as HTMLElement
     }
 
     return () => {
-      animationState.current.isMounted = false;
-    };
-  }, [isOpen]);
+      animationState.current.isMounted = false
+    }
+  }, [isOpen])
 
   // Handle keyboard navigation and focus trap
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Close on ESC key
       if (closeOnEsc && event.key === 'Escape') {
-        onClose();
-        return;
+        onClose()
+        return
       }
 
       // Trap focus inside modal
       if (event.key === 'Tab') {
-        if (!modalRef.current) return;
+        if (!modalRef.current) return
 
         const focusableElements = modalRef.current.querySelectorAll(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+        )
 
-        if (focusableElements.length === 0) return;
+        if (focusableElements.length === 0) return
 
-        const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+        const firstElement = focusableElements[0] as HTMLElement
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
 
         // Shift + Tab
         if (event.shiftKey) {
           if (document.activeElement === firstElement) {
-            lastElement.focus();
-            event.preventDefault();
+            lastElement.focus()
+            event.preventDefault()
           }
         }
         // Tab
         else {
           if (document.activeElement === lastElement) {
-            firstElement.focus();
-            event.preventDefault();
+            firstElement.focus()
+            event.preventDefault()
           }
         }
       }
-    };
+    }
 
     // Set focus to the first focusable element in the modal
     const setInitialFocus = () => {
-      if (!modalRef.current || !animationState.current.isMounted) return;
+      if (!modalRef.current || !animationState.current.isMounted) return
 
       const focusableElement = modalRef.current.querySelector(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      ) as HTMLElement;
+      ) as HTMLElement
 
       if (focusableElement) {
-        focusableElement.focus();
+        focusableElement.focus()
       } else {
         // If no focusable element, focus the modal itself
-        modalRef.current.focus();
+        modalRef.current.focus()
       }
-    };
+    }
 
     // Add event listeners
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown)
 
     // Set initial focus after a short delay to ensure the modal is fully rendered
-    const focusTimer = setTimeout(setInitialFocus, 100);
+    const focusTimer = setTimeout(setInitialFocus, 100)
 
     // Prevent scrolling of the body when modal is open
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden'
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      clearTimeout(focusTimer);
+      document.removeEventListener('keydown', handleKeyDown)
+      clearTimeout(focusTimer)
 
       // Restore body scrolling when modal closes
-      document.body.style.overflow = '';
+      document.body.style.overflow = ''
 
       // Restore focus to the element that had focus before the modal was opened
       if (previousFocusRef.current && animationState.current.isMounted) {
-        previousFocusRef.current.focus();
+        previousFocusRef.current.focus()
       }
-    };
-  }, [isOpen, onClose, closeOnEsc]);
+    }
+  }, [isOpen, onClose, closeOnEsc])
 
   // Handle animations
   useEffect(() => {
     const animateModal = async () => {
-      if (!animationState.current.isMounted) return;
+      if (!animationState.current.isMounted) return
 
       if (isOpen) {
-        animationState.current.isAnimating = true;
+        animationState.current.isAnimating = true
 
         // Animate backdrop first
         await backdropControls.start({
           opacity: 1,
           transition: { duration: animationDuration * 0.5 },
-        });
+        })
 
-        if (!animationState.current.isMounted) return;
+        if (!animationState.current.isMounted) return
 
         // Then animate modal
         await modalControls.start({
@@ -162,12 +162,12 @@ const AnimatedModal: React.FC<AnimatedModalProps> = ({
             damping: 25,
             stiffness: 300,
           },
-        });
+        })
 
-        if (!animationState.current.isMounted) return;
-        animationState.current.isAnimating = false;
+        if (!animationState.current.isMounted) return
+        animationState.current.isAnimating = false
       } else {
-        animationState.current.isAnimating = true;
+        animationState.current.isAnimating = true
 
         // Animate modal out first
         await modalControls.start({
@@ -175,38 +175,38 @@ const AnimatedModal: React.FC<AnimatedModalProps> = ({
           y: 20,
           scale: 0.95,
           transition: { duration: animationDuration * 0.5 },
-        });
+        })
 
-        if (!animationState.current.isMounted) return;
+        if (!animationState.current.isMounted) return
 
         // Then animate backdrop
         await backdropControls.start({
           opacity: 0,
           transition: { duration: animationDuration * 0.5 },
-        });
+        })
 
-        if (!animationState.current.isMounted) return;
-        animationState.current.isAnimating = false;
+        if (!animationState.current.isMounted) return
+        animationState.current.isAnimating = false
       }
-    };
+    }
 
-    animateModal();
+    animateModal()
 
     return () => {
       // Stop animations on unmount to prevent memory leaks
-      backdropControls.stop();
-      modalControls.stop();
-    };
-  }, [isOpen, backdropControls, modalControls, animationDuration]);
+      backdropControls.stop()
+      modalControls.stop()
+    }
+  }, [isOpen, backdropControls, modalControls, animationDuration])
 
   // Handle outside click
   const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (closeOnOutsideClick && event.target === event.currentTarget) {
-      onClose();
+      onClose()
     }
-  };
+  }
 
-  if (!isOpen && !animationState.current.isAnimating) return null;
+  if (!isOpen && !animationState.current.isAnimating) return null
 
   return (
     <AnimatePresence>
@@ -258,7 +258,7 @@ const AnimatedModal: React.FC<AnimatedModalProps> = ({
         </motion.div>
       )}
     </AnimatePresence>
-  );
-};
+  )
+}
 
-export default AnimatedModal;
+export default AnimatedModal

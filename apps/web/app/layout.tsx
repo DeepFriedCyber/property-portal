@@ -11,7 +11,8 @@ export const metadata = {
     template: '%s | Property Portal',
     default: 'Property Portal | Find Your Dream Home',
   },
-  description: 'Discover thousands of properties for sale and rent across the UK. Find your perfect home with our easy-to-use search tools.',
+  description:
+    'Discover thousands of properties for sale and rent across the UK. Find your perfect home with our easy-to-use search tools.',
   keywords: 'property, real estate, homes for sale, houses for rent, UK property market',
   openGraph: {
     title: 'Property Portal | Find Your Dream Home',

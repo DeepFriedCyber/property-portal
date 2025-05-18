@@ -1,24 +1,26 @@
-'use client';
+'use client'
 
-import { useTheme } from '@/app/providers/ThemeProvider';
+import { useTheme } from '@/app/providers/ThemeProvider'
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  
+  const { theme, setTheme } = useTheme()
+
   // Determine if currently in dark mode
-  const isDarkMode = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  
+  const isDarkMode =
+    theme === 'dark' ||
+    (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+
   // Toggle between light and dark mode
   const toggleTheme = () => {
-    setTheme(isDarkMode ? 'light' : 'dark');
-  };
-  
+    setTheme(isDarkMode ? 'light' : 'dark')
+  }
+
   // Toggle between light, dark, and system
   const cycleTheme = () => {
-    if (theme === 'light') setTheme('dark');
-    else if (theme === 'dark') setTheme('system');
-    else setTheme('light');
-  };
+    if (theme === 'light') setTheme('dark')
+    else if (theme === 'dark') setTheme('system')
+    else setTheme('light')
+  }
 
   return (
     <div className="flex items-center space-x-2">
@@ -53,7 +55,7 @@ export default function ThemeToggle() {
           </svg>
         )}
       </button>
-      
+
       {/* Optional: Advanced theme selector with system preference option */}
       <div className="relative">
         <button
@@ -66,5 +68,5 @@ export default function ThemeToggle() {
         </button>
       </div>
     </div>
-  );
+  )
 }

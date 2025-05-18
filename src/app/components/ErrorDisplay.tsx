@@ -1,17 +1,17 @@
-'use client';
+'use client'
 
-import { useEffect } from 'react';
+import { useEffect } from 'react'
 
 interface ErrorDisplayProps {
-  error: Error;
-  reset: () => void;
+  error: Error
+  reset: () => void
 }
 
 export default function ErrorDisplay({ error, reset }: ErrorDisplayProps) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Unhandled error:', error);
-  }, [error]);
+    console.error('Unhandled error:', error)
+  }, [error])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -49,5 +49,5 @@ export default function ErrorDisplay({ error, reset }: ErrorDisplayProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,23 +1,23 @@
-import Image from 'next/image';
-import React from 'react';
+import Image from 'next/image'
+import React from 'react'
 
-import { FeatureItem } from './Features';
+import { FeatureItem } from './Features'
 
 interface FeatureCardProps {
-  feature: FeatureItem;
-  className?: string;
+  feature: FeatureItem
+  className?: string
 }
 
 export const FeatureCard: React.FC<FeatureCardProps> = ({ feature, className = '' }) => {
   const renderIcon = (icon: FeatureItem['icon']) => {
     if (React.isValidElement(icon)) {
-      return icon;
+      return icon
     } else if (typeof icon === 'string') {
       return (
         <span className="text-blue-600 text-2xl" aria-hidden="true">
           {icon}
         </span>
-      );
+      )
     } else if (icon && typeof icon === 'object' && 'src' in icon) {
       return (
         <Image
@@ -27,10 +27,10 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({ feature, className = '
           height={24}
           className="w-6 h-6"
         />
-      );
+      )
     }
-    return null;
-  };
+    return null
+  }
 
   return (
     <div
@@ -43,5 +43,5 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({ feature, className = '
       <h3 className="text-xl font-semibold mb-2 text-gray-800">{feature.title}</h3>
       <p className="text-gray-600 flex-grow">{feature.description}</p>
     </div>
-  );
-};
+  )
+}

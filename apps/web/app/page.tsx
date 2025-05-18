@@ -1,20 +1,20 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
-import Footer from '../components/layout/Footer';
-import Header from '../components/layout/Header';
-import CallToAction from '../components/sections/CallToAction';
-import Features from '../components/sections/Features';
-import Hero from '../components/sections/Hero';
-import SearchResults, { Property } from '../components/sections/SearchResults';
+import Footer from '../components/layout/Footer'
+import Header from '../components/layout/Header'
+import CallToAction from '../components/sections/CallToAction'
+import Features from '../components/sections/Features'
+import Hero from '../components/sections/Hero'
+import SearchResults, { Property } from '../components/sections/SearchResults'
 
 export default function HomePage() {
   // State for search functionality
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Property[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchError, setSearchError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<Property[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
 
   // Mock data for the components
   const navLinks = [
@@ -23,7 +23,7 @@ export default function HomePage() {
     { id: 'sell', label: 'Sell', href: '/sell' },
     { id: 'agents', label: 'Find Agents', href: '/agents' },
     { id: 'resources', label: 'Resources', href: '/resources' },
-  ];
+  ]
 
   const features = [
     {
@@ -65,7 +65,7 @@ export default function HomePage() {
       description: 'Access up-to-date market data and trends to make informed property decisions.',
       icon: '📊',
     },
-  ];
+  ]
 
   const footerColumns = [
     {
@@ -98,28 +98,28 @@ export default function HomePage() {
         { id: 'press', label: 'Press', href: '/press' },
       ],
     },
-  ];
+  ]
 
   const socialLinks = [
     { id: 'facebook', icon: '📘', href: 'https://facebook.com', label: 'Facebook' },
     { id: 'twitter', icon: '🐦', href: 'https://twitter.com', label: 'Twitter' },
     { id: 'instagram', icon: '📷', href: 'https://instagram.com', label: 'Instagram' },
     { id: 'linkedin', icon: '💼', href: 'https://linkedin.com', label: 'LinkedIn' },
-  ];
+  ]
 
   // Mock property search function
   const performSearch = (query: string) => {
     // Reset any previous errors
-    setSearchError(null);
-    setSearchQuery(query);
-    setIsSearching(true);
+    setSearchError(null)
+    setSearchQuery(query)
+    setIsSearching(true)
 
     // Simulate API call with a delay
     setTimeout(() => {
       try {
         // Simulate a random error (10% chance) for demonstration purposes
         if (Math.random() < 0.1) {
-          throw new Error('Unable to connect to search service. Please try again.');
+          throw new Error('Unable to connect to search service. Please try again.')
         }
 
         // Mock data - in a real app, this would come from an API
@@ -160,62 +160,62 @@ export default function HomePage() {
               'Stunning penthouse apartment with panoramic views of the river. Features high-end finishes and a private terrace.',
             imageUrl: 'https://placehold.co/600x400/png?text=Penthouse',
           },
-        ];
+        ]
 
         // Filter results based on query for demonstration
         const filteredResults =
           query.length > 0
             ? mockResults.filter(
-                (property) =>
+                property =>
                   property.title.toLowerCase().includes(query.toLowerCase()) ||
                   property.location.toLowerCase().includes(query.toLowerCase()) ||
                   property.description.toLowerCase().includes(query.toLowerCase())
               )
-            : mockResults;
+            : mockResults
 
-        setSearchResults(filteredResults);
+        setSearchResults(filteredResults)
       } catch (error) {
-        console.error('Search error:', error);
-        setSearchError(error instanceof Error ? error.message : 'An unexpected error occurred');
-        setSearchResults([]);
+        console.error('Search error:', error)
+        setSearchError(error instanceof Error ? error.message : 'An unexpected error occurred')
+        setSearchResults([])
       } finally {
-        setIsSearching(false);
+        setIsSearching(false)
       }
-    }, 1500);
-  };
+    }, 1500)
+  }
 
   const clearSearch = () => {
-    setSearchQuery('');
-    setSearchResults([]);
-    setSearchError(null);
-  };
+    setSearchQuery('')
+    setSearchResults([])
+    setSearchError(null)
+  }
 
   const handleViewDetails = (propertyId: string) => {
-    console.log('View details for property:', propertyId);
-    alert(`Viewing details for property ID: ${propertyId}`);
+    console.log('View details for property:', propertyId)
+    alert(`Viewing details for property ID: ${propertyId}`)
     // In a real app, you would navigate to a property details page
-  };
+  }
 
   // Event handlers
   const handleLogin = () => {
-    console.log('Login clicked');
-    alert('Login functionality disabled for testing');
-  };
+    console.log('Login clicked')
+    alert('Login functionality disabled for testing')
+  }
 
   const handleSignup = () => {
-    console.log('Signup clicked');
-    alert('Signup functionality disabled for testing');
-  };
+    console.log('Signup clicked')
+    alert('Signup functionality disabled for testing')
+  }
 
   const handlePrimaryCTA = () => {
-    console.log('Primary CTA clicked');
-    alert('Start your property journey!');
-  };
+    console.log('Primary CTA clicked')
+    alert('Start your property journey!')
+  }
 
   const handleSecondaryCTA = () => {
-    console.log('Secondary CTA clicked');
-    alert('Contact an agent!');
-  };
+    console.log('Secondary CTA clicked')
+    alert('Contact an agent!')
+  }
 
   return (
     <main>
@@ -263,5 +263,5 @@ export default function HomePage() {
         socialLinks={socialLinks}
       />
     </main>
-  );
+  )
 }

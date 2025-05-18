@@ -1,5 +1,5 @@
 // API entry point
-console.log('API server starting...');
+console.log('API server starting...')
 
 // Add your API server implementation here
 // Example:

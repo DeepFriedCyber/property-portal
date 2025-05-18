@@ -1,5 +1,5 @@
-import LoadingSkeleton from '@/app/components/LoadingSkeleton';
+import LoadingSkeleton from '@/app/components/LoadingSkeleton'
 
 export default function PropertiesLoading() {
-  return <LoadingSkeleton />;
+  return <LoadingSkeleton />
 }

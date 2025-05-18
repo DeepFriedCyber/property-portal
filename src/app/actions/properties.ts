@@ -1,12 +1,12 @@
-'use server';
+'use server'
 
-import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
+import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 
-import { createPropertySchema, updatePropertySchema } from '@/lib/schemas/propertySchemas';
-import { Property } from '@/types/property';
+import { createPropertySchema, updatePropertySchema } from '@/lib/schemas/propertySchemas'
+import { Property } from '@/types/property'
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/db'
 
 /**
  * Add a new property listing
@@ -14,11 +14,10 @@ import { prisma } from '@/lib/prisma';
 export async function addProperty(formData: FormData | z.infer<typeof createPropertySchema>) {
   try {
     // Handle both FormData and direct object input
-    const rawData =
-      formData instanceof FormData ? Object.fromEntries(formData.entries()) : formData;
+    const rawData = formData instanceof FormData ? Object.fromEntries(formData.entries()) : formData
 
     // Parse and validate the input data
-    const validationResult = createPropertySchema.safeParse(rawData);
+    const validationResult = createPropertySchema.safeParse(rawData)
 
     if (!validationResult.success) {
       return {
@@ -27,10 +26,10 @@ export async function addProperty(formData: FormData | z.infer<typeof createProp
           message: 'Validation error',
           details: validationResult.error.flatten().fieldErrors,
         },
-      };
+      }
     }
 
-    const validatedData = validationResult.data;
+    const validatedData = validationResult.data
 
     // Create the property in the database
     const property = await prisma.property.create({
@@ -64,25 +63,25 @@ export async function addProperty(formData: FormData | z.infer<typeof createProp
         },
         createdBy: 'system', // This would typically come from the authenticated user
       },
-    });
+    })
 
     // Revalidate the properties list page and the new property's detail page
-    revalidatePath('/properties');
-    revalidatePath(`/properties/${property.id}`);
+    revalidatePath('/properties')
+    revalidatePath(`/properties/${property.id}`)
 
     return {
       success: true,
       data: property,
-    };
+    }
   } catch (error) {
-    console.error('Error adding property:', error);
+    console.error('Error adding property:', error)
     return {
       success: false,
       error: {
         message: 'Failed to add property',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-    };
+    }
   }
 }
 
@@ -95,11 +94,10 @@ export async function updateProperty(
 ) {
   try {
     // Handle both FormData and direct object input
-    const rawData =
-      formData instanceof FormData ? Object.fromEntries(formData.entries()) : formData;
+    const rawData = formData instanceof FormData ? Object.fromEntries(formData.entries()) : formData
 
     // Parse and validate the input data
-    const validationResult = updatePropertySchema.safeParse(rawData);
+    const validationResult = updatePropertySchema.safeParse(rawData)
 
     if (!validationResult.success) {
       return {
@@ -108,107 +106,107 @@ export async function updateProperty(
           message: 'Validation error',
           details: validationResult.error.flatten().fieldErrors,
         },
-      };
+      }
     }
 
-    const validatedData = validationResult.data;
+    const validatedData = validationResult.data
 
     // Prepare the update data
     const updateData: Partial<{
-      address: string;
-      city: string;
-      state: string;
-      zipCode: string;
-      price: number;
-      bedrooms: number;
-      bathrooms: number;
-      squareFeet: number;
-      description: string;
-      features: string[];
-      status: string;
-      type: string;
-      metadata: Record<string, any>;
-      updatedBy: string;
-      updatedAt: Date;
-    }> = {};
+      address: string
+      city: string
+      state: string
+      zipCode: string
+      price: number
+      bedrooms: number
+      bathrooms: number
+      squareFeet: number
+      description: string
+      features: string[]
+      status: string
+      type: string
+      metadata: Record<string, any>
+      updatedBy: string
+      updatedAt: Date
+    }> = {}
 
     // Map the validated data to the database schema
-    if (validatedData.address?.line1) updateData.address = validatedData.address.line1;
-    if (validatedData.address?.town) updateData.city = validatedData.address.town;
-    if (validatedData.address?.county) updateData.state = validatedData.address.county;
-    if (validatedData.address?.postcode) updateData.zipCode = validatedData.address.postcode;
-    if (validatedData.price) updateData.price = validatedData.price;
-    if (validatedData.bedrooms !== undefined) updateData.bedrooms = validatedData.bedrooms;
-    if (validatedData.bathrooms !== undefined) updateData.bathrooms = validatedData.bathrooms;
-    if (validatedData.squareFootage) updateData.squareFeet = validatedData.squareFootage;
-    if (validatedData.description) updateData.description = validatedData.description;
-    if (validatedData.features) updateData.features = validatedData.features;
-    if (validatedData.status) updateData.status = validatedData.status;
-    if (validatedData.propertyType) updateData.type = validatedData.propertyType;
+    if (validatedData.address?.line1) updateData.address = validatedData.address.line1
+    if (validatedData.address?.town) updateData.city = validatedData.address.town
+    if (validatedData.address?.county) updateData.state = validatedData.address.county
+    if (validatedData.address?.postcode) updateData.zipCode = validatedData.address.postcode
+    if (validatedData.price) updateData.price = validatedData.price
+    if (validatedData.bedrooms !== undefined) updateData.bedrooms = validatedData.bedrooms
+    if (validatedData.bathrooms !== undefined) updateData.bathrooms = validatedData.bathrooms
+    if (validatedData.squareFootage) updateData.squareFeet = validatedData.squareFootage
+    if (validatedData.description) updateData.description = validatedData.description
+    if (validatedData.features) updateData.features = validatedData.features
+    if (validatedData.status) updateData.status = validatedData.status
+    if (validatedData.propertyType) updateData.type = validatedData.propertyType
 
     // Prepare metadata updates
     const existingProperty = await prisma.property.findUnique({
       where: { id },
       select: { metadata: true },
-    });
+    })
 
-    const currentMetadata = existingProperty?.metadata || {};
+    const currentMetadata = existingProperty?.metadata || {}
     const metadataUpdates: Record<
       string,
       string | number | boolean | Date | string[] | null | undefined
-    > = {};
+    > = {}
 
-    if (validatedData.title) metadataUpdates.title = validatedData.title;
-    if (validatedData.listingType) metadataUpdates.listingType = validatedData.listingType;
+    if (validatedData.title) metadataUpdates.title = validatedData.title
+    if (validatedData.listingType) metadataUpdates.listingType = validatedData.listingType
     if (validatedData.address?.line2 !== undefined)
-      metadataUpdates.addressLine2 = validatedData.address.line2;
-    if (validatedData.tenure) metadataUpdates.tenure = validatedData.tenure;
-    if (validatedData.councilTaxBand) metadataUpdates.councilTaxBand = validatedData.councilTaxBand;
-    if (validatedData.epcRating) metadataUpdates.epcRating = validatedData.epcRating;
-    if (validatedData.furnishingType) metadataUpdates.furnishingType = validatedData.furnishingType;
-    if (validatedData.availableFrom) metadataUpdates.availableFrom = validatedData.availableFrom;
+      metadataUpdates.addressLine2 = validatedData.address.line2
+    if (validatedData.tenure) metadataUpdates.tenure = validatedData.tenure
+    if (validatedData.councilTaxBand) metadataUpdates.councilTaxBand = validatedData.councilTaxBand
+    if (validatedData.epcRating) metadataUpdates.epcRating = validatedData.epcRating
+    if (validatedData.furnishingType) metadataUpdates.furnishingType = validatedData.furnishingType
+    if (validatedData.availableFrom) metadataUpdates.availableFrom = validatedData.availableFrom
     if (validatedData.minimumTenancy !== undefined)
-      metadataUpdates.minimumTenancy = validatedData.minimumTenancy;
+      metadataUpdates.minimumTenancy = validatedData.minimumTenancy
     if (validatedData.receptionRooms !== undefined)
-      metadataUpdates.receptionRooms = validatedData.receptionRooms;
-    if (validatedData.mainImageUrl) metadataUpdates.mainImageUrl = validatedData.mainImageUrl;
-    if (validatedData.imageUrls) metadataUpdates.imageUrls = validatedData.imageUrls;
+      metadataUpdates.receptionRooms = validatedData.receptionRooms
+    if (validatedData.mainImageUrl) metadataUpdates.mainImageUrl = validatedData.mainImageUrl
+    if (validatedData.imageUrls) metadataUpdates.imageUrls = validatedData.imageUrls
 
     // Only update metadata if there are changes
     if (Object.keys(metadataUpdates).length > 0) {
       updateData.metadata = {
         ...currentMetadata,
         ...metadataUpdates,
-      };
+      }
     }
 
     // Add updatedBy and updatedAt
-    updateData.updatedBy = 'system'; // This would typically come from the authenticated user
-    updateData.updatedAt = new Date();
+    updateData.updatedBy = 'system' // This would typically come from the authenticated user
+    updateData.updatedAt = new Date()
 
     // Update the property
     const property = await prisma.property.update({
       where: { id },
       data: updateData,
-    });
+    })
 
     // Revalidate the properties list page and the property's detail page
-    revalidatePath('/properties');
-    revalidatePath(`/properties/${id}`);
+    revalidatePath('/properties')
+    revalidatePath(`/properties/${id}`)
 
     return {
       success: true,
       data: property,
-    };
+    }
   } catch (error) {
-    console.error('Error updating property:', error);
+    console.error('Error updating property:', error)
     return {
       success: false,
       error: {
         message: 'Failed to update property',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-    };
+    }
   }
 }
 
@@ -219,23 +217,23 @@ export async function deleteProperty(id: string) {
   try {
     await prisma.property.delete({
       where: { id },
-    });
+    })
 
     // Revalidate the properties list page
-    revalidatePath('/properties');
+    revalidatePath('/properties')
 
     return {
       success: true,
-    };
+    }
   } catch (error) {
-    console.error('Error deleting property:', error);
+    console.error('Error deleting property:', error)
     return {
       success: false,
       error: {
         message: 'Failed to delete property',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-    };
+    }
   }
 }
 
@@ -243,17 +241,17 @@ export async function deleteProperty(id: string) {
  * Get a property by ID
  */
 export async function getProperty(id: string): Promise<{
-  success: boolean;
-  data?: Property;
+  success: boolean
+  data?: Property
   error?: {
-    message: string;
-    details?: string;
-  };
+    message: string
+    details?: string
+  }
 }> {
   try {
     const property = await prisma.property.findUnique({
       where: { id },
-    });
+    })
 
     if (!property) {
       return {
@@ -261,44 +259,33 @@ export async function getProperty(id: string): Promise<{
         error: {
           message: 'Property not found',
         },
-      };
+      }
     }
 
     // Convert the database model to the Property type
     const typedProperty: Property = {
       id: property.id,
       title: property.metadata?.title || property.address,
-      description: property.description,
+      location: `${property.address}, ${property.city}, ${property.state}`,
       price: property.price,
-      type: property.type,
-      status: property.status,
-      bedrooms: property.bedrooms,
-      bathrooms: property.bathrooms,
-      squareFeet: property.squareFeet,
-      address: property.address,
-      city: property.city,
-      state: property.state,
-      zipCode: property.zipCode,
-      country: property.country,
-      features: property.features || [],
-      createdAt: property.createdAt.toISOString(),
-      updatedAt: property.updatedAt ? property.updatedAt.toISOString() : undefined,
-      metadata: property.metadata || {},
-    };
+      imageUrl: property.metadata?.mainImageUrl || 'https://placehold.co/600x400/png?text=Property',
+      lat: property.latitude || 51.505,
+      lng: property.longitude || -0.09,
+    }
 
     return {
       success: true,
       data: typedProperty,
-    };
+    }
   } catch (error) {
-    console.error('Error fetching property:', error);
+    console.error('Error fetching property:', error)
     return {
       success: false,
       error: {
         message: 'Failed to fetch property',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-    };
+    }
   }
 }
 
@@ -306,59 +293,59 @@ export async function getProperty(id: string): Promise<{
  * Get all properties with optional filtering
  */
 export async function getProperties(options?: {
-  listingType?: 'sale' | 'rent';
-  minPrice?: number;
-  maxPrice?: number;
-  bedrooms?: number;
-  propertyType?: string;
-  location?: string;
-  status?: string;
-  limit?: number;
-  offset?: number;
+  listingType?: 'sale' | 'rent'
+  minPrice?: number
+  maxPrice?: number
+  bedrooms?: number
+  propertyType?: string
+  location?: string
+  status?: string
+  limit?: number
+  offset?: number
 }): Promise<{
-  success: boolean;
+  success: boolean
   data?: {
-    properties: Property[];
-    totalCount: number;
-  };
+    properties: Property[]
+    totalCount: number
+  }
   error?: {
-    message: string;
-    details?: string;
-  };
+    message: string
+    details?: string
+  }
 }> {
   try {
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = {}
 
     // Apply filters
     if (options?.listingType) {
       where.metadata = {
         path: ['listingType'],
         equals: options.listingType,
-      };
+      }
     }
 
     if (options?.minPrice) {
       where.price = {
         ...where.price,
         gte: options.minPrice,
-      };
+      }
     }
 
     if (options?.maxPrice) {
       where.price = {
         ...where.price,
         lte: options.maxPrice,
-      };
+      }
     }
 
     if (options?.bedrooms) {
       where.bedrooms = {
         gte: options.bedrooms,
-      };
+      }
     }
 
     if (options?.propertyType) {
-      where.type = options.propertyType;
+      where.type = options.propertyType
     }
 
     if (options?.location) {
@@ -367,15 +354,15 @@ export async function getProperties(options?: {
         { city: { contains: options.location, mode: 'insensitive' } },
         { state: { contains: options.location, mode: 'insensitive' } },
         { zipCode: { contains: options.location, mode: 'insensitive' } },
-      ];
+      ]
     }
 
     if (options?.status) {
-      where.status = options.status;
+      where.status = options.status
     }
 
     // Get total count for pagination
-    const totalCount = await prisma.property.count({ where });
+    const totalCount = await prisma.property.count({ where })
 
     // Get properties with pagination
     const properties = await prisma.property.findMany({
@@ -383,29 +370,18 @@ export async function getProperties(options?: {
       take: options?.limit || 10,
       skip: options?.offset || 0,
       orderBy: { createdAt: 'desc' },
-    });
+    })
 
     // Convert the database models to the Property type
-    const typedProperties: Property[] = properties.map((property) => ({
+    const typedProperties: Property[] = properties.map(property => ({
       id: property.id,
       title: property.metadata?.title || property.address,
-      description: property.description,
+      location: `${property.address}, ${property.city}, ${property.state}`,
       price: property.price,
-      type: property.type,
-      status: property.status,
-      bedrooms: property.bedrooms,
-      bathrooms: property.bathrooms,
-      squareFeet: property.squareFeet,
-      address: property.address,
-      city: property.city,
-      state: property.state,
-      zipCode: property.zipCode,
-      country: property.country,
-      features: property.features || [],
-      createdAt: property.createdAt.toISOString(),
-      updatedAt: property.updatedAt ? property.updatedAt.toISOString() : undefined,
-      metadata: property.metadata || {},
-    }));
+      imageUrl: property.metadata?.mainImageUrl || 'https://placehold.co/600x400/png?text=Property',
+      lat: property.latitude || 51.505,
+      lng: property.longitude || -0.09,
+    }))
 
     return {
       success: true,
@@ -413,15 +389,15 @@ export async function getProperties(options?: {
         properties: typedProperties,
         totalCount,
       },
-    };
+    }
   } catch (error) {
-    console.error('Error fetching properties:', error);
+    console.error('Error fetching properties:', error)
     return {
       success: false,
       error: {
         message: 'Failed to fetch properties',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-    };
+    }
   }
 }

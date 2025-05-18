@@ -1,118 +1,118 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
-import { Button } from '../../../src/ui';
+import { Button } from '../../../src/ui'
 
 interface UploadRecord {
-  id: string;
-  uploaderId: string;
-  uploaderName: string; // Added for display purposes
-  filename: string;
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt: Date;
-  propertyCount: number; // Added to show how many properties in this upload
+  id: string
+  uploaderId: string
+  uploaderName: string // Added for display purposes
+  filename: string
+  status: 'pending' | 'approved' | 'rejected'
+  createdAt: Date
+  propertyCount: number // Added to show how many properties in this upload
 }
 
 export default function AdminDashboard() {
-  const [uploads, setUploads] = useState<UploadRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [uploads, setUploads] = useState<UploadRecord[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [stats, setStats] = useState({
     totalProperties: 0,
     pendingUploads: 0,
     approvedUploads: 0,
     rejectedUploads: 0,
-  });
+  })
 
   useEffect(() => {
     // Fetch uploads data
     const fetchUploads = async () => {
       try {
-        setLoading(true);
+        setLoading(true)
         // This would be replaced with an actual API call
-        const response = await fetch('/api/admin/uploads');
+        const response = await fetch('/api/admin/uploads')
 
         if (!response.ok) {
-          throw new Error('Failed to fetch uploads');
+          throw new Error('Failed to fetch uploads')
         }
 
-        const data = await response.json();
-        setUploads(data.uploads);
-        setStats(data.stats);
+        const data = await response.json()
+        setUploads(data.uploads)
+        setStats(data.stats)
       } catch (err) {
-        console.error('Error fetching uploads:', err);
-        setError('Failed to load uploads. Please try again.');
+        console.error('Error fetching uploads:', err)
+        setError('Failed to load uploads. Please try again.')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchUploads();
-  }, []);
+    fetchUploads()
+  }, [])
 
   const handleApprove = async (uploadId: string) => {
     try {
       const response = await fetch(`/api/admin/uploads/${uploadId}/approve`, {
         method: 'POST',
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to approve upload');
+        throw new Error('Failed to approve upload')
       }
 
       // Update local state to reflect the change
       setUploads(
-        uploads.map((upload) =>
+        uploads.map(upload =>
           upload.id === uploadId ? { ...upload, status: 'approved' as const } : upload
         )
-      );
+      )
 
       // Update stats
       setStats({
         ...stats,
         pendingUploads: stats.pendingUploads - 1,
         approvedUploads: stats.approvedUploads + 1,
-      });
+      })
     } catch (err) {
-      console.error('Error approving upload:', err);
-      setError('Failed to approve upload. Please try again.');
+      console.error('Error approving upload:', err)
+      setError('Failed to approve upload. Please try again.')
     }
-  };
+  }
 
   const handleReject = async (uploadId: string) => {
     try {
       const response = await fetch(`/api/admin/uploads/${uploadId}/reject`, {
         method: 'POST',
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to reject upload');
+        throw new Error('Failed to reject upload')
       }
 
       // Update local state to reflect the change
       setUploads(
-        uploads.map((upload) =>
+        uploads.map(upload =>
           upload.id === uploadId ? { ...upload, status: 'rejected' as const } : upload
         )
-      );
+      )
 
       // Update stats
       setStats({
         ...stats,
         pendingUploads: stats.pendingUploads - 1,
         rejectedUploads: stats.rejectedUploads + 1,
-      });
+      })
     } catch (err) {
-      console.error('Error rejecting upload:', err);
-      setError('Failed to reject upload. Please try again.');
+      console.error('Error rejecting upload:', err)
+      setError('Failed to reject upload. Please try again.')
     }
-  };
+  }
 
   const viewUploadDetails = (uploadId: string) => {
     // Navigate to upload details page
-    window.location.href = `/admin/uploads/${uploadId}`;
-  };
+    window.location.href = `/admin/uploads/${uploadId}`
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {uploads.map((upload) => (
+                {uploads.map(upload => (
                   <tr key={upload.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{upload.filename}</div>
@@ -252,5 +252,5 @@ export default function AdminDashboard() {
         )}
       </div>
     </div>
-  );
+  )
 }

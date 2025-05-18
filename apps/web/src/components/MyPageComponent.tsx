@@ -1,12 +1,12 @@
-import React from 'react';
+import React from 'react'
 
-import { Button } from '../ui';
+import { Button } from '../ui'
 
 const MyPageComponent = () => {
   const handleClick = () => {
     // eslint-disable-next-line no-console
-    console.log('Button clicked in web app!');
-  };
+    console.log('Button clicked in web app!')
+  }
 
   return (
     <div>
@@ -25,7 +25,7 @@ const MyPageComponent = () => {
         Processing...
       </Button>
     </div>
-  );
-};
+  )
+}
 
-export default MyPageComponent;
+export default MyPageComponent

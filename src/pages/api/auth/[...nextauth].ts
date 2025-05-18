@@ -8,13 +8,13 @@
  * 3. Export the auth handler as GET and POST
  */
 
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { compare } from 'bcrypt';
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { compare } from 'bcrypt'
+import NextAuth from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
 
-import { prisma } from '../../../../lib/prisma';
+import { prisma } from '../../../../lib/db'
 
 export default NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -31,26 +31,26 @@ export default NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email and password required');
+          throw new Error('Email and password required')
         }
 
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
           },
-        });
+        })
 
         if (!user || !user.hashedPassword) {
-          throw new Error('Email does not exist');
+          throw new Error('Email does not exist')
         }
 
-        const isCorrectPassword = await compare(credentials.password, user.hashedPassword);
+        const isCorrectPassword = await compare(credentials.password, user.hashedPassword)
 
         if (!isCorrectPassword) {
-          throw new Error('Incorrect password');
+          throw new Error('Incorrect password')
         }
 
-        return user;
+        return user
       },
     }),
   ],
@@ -65,4 +65,4 @@ export default NextAuth({
     secret: process.env.NEXTAUTH_SECRET,
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+})

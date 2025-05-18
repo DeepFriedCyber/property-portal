@@ -1,15 +1,15 @@
-import { useRouter } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation'
+import React, { useState, useEffect } from 'react'
 
-import { useDebounce } from '../../hooks/useDebounce';
-import { Button } from '../../src/ui';
+import { useDebounce } from '../../hooks/useDebounce'
+import { Button } from '../../src/ui'
 
 interface HeroProps {
-  title?: string;
-  subtitle?: string;
-  buttonText?: string;
-  useInlineSearch?: boolean;
-  onInlineSearch?: (query: string) => void;
+  title?: string
+  subtitle?: string
+  buttonText?: string
+  useInlineSearch?: boolean
+  onInlineSearch?: (query: string) => void
 }
 
 export default function Hero({
@@ -19,48 +19,48 @@ export default function Hero({
   useInlineSearch = false,
   onInlineSearch,
 }: HeroProps) {
-  const [input, setInput] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const router = useRouter();
+  const [input, setInput] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const router = useRouter()
 
   // Debounce the search input with a 500ms delay
-  const debouncedInput = useDebounce(input, 500);
+  const debouncedInput = useDebounce(input, 500)
 
   // Effect to trigger search when debounced input changes
   useEffect(() => {
     if (debouncedInput && debouncedInput.trim() && useInlineSearch && onInlineSearch) {
-      handleSearch(true);
+      handleSearch(true)
     }
-  }, [debouncedInput]);
+  }, [debouncedInput])
 
   const handleSearch = (isDebounced = false) => {
-    if (!input.trim()) return;
+    if (!input.trim()) return
 
     if (useInlineSearch && onInlineSearch) {
       // Only set isSearching if this isn't from the debounce effect
       // (to avoid UI flicker when typing quickly)
       if (!isDebounced) {
-        setIsSearching(true);
+        setIsSearching(true)
       }
 
-      onInlineSearch(input.trim());
+      onInlineSearch(input.trim())
 
       // Scroll to results
       setTimeout(() => {
-        const searchResults = document.getElementById('search-results');
+        const searchResults = document.getElementById('search-results')
         if (searchResults) {
           searchResults.scrollIntoView({
             behavior: 'smooth',
             block: 'start',
-          });
+          })
         }
-        setIsSearching(false);
-      }, 100);
+        setIsSearching(false)
+      }, 100)
     } else {
-      const encoded = encodeURIComponent(input.trim());
-      router.push(`/search?query=${encoded}`);
+      const encoded = encodeURIComponent(input.trim())
+      router.push(`/search?query=${encoded}`)
     }
-  };
+  }
 
   return (
     <section
@@ -79,7 +79,10 @@ export default function Hero({
       >
         <div className="flex flex-col sm:flex-row gap-5 items-center">
           <div className="w-full flex-1 relative">
-            <label htmlFor="property-search" className="sr-only">
+            <label
+              htmlFor="property-search"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Search for properties
             </label>
             <input
@@ -88,14 +91,13 @@ export default function Hero({
               className="w-full px-5 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="e.g. 'Modern flat near Cambridge with a garden'"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              aria-label="Search for properties"
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
               aria-describedby="search-description"
             />
-            <span id="search-description" className="sr-only">
-              Enter location, property type, or features to search
-            </span>
+            <div id="search-description" className="mt-1 text-xs text-gray-500">
+              Enter location, property type, or features to find your ideal property
+            </div>
           </div>
 
           <Button
@@ -117,5 +119,5 @@ export default function Hero({
         </div>
       </div>
     </section>
-  );
+  )
 }

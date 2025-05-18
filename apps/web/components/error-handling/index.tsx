@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react'
 
-import { ApiError } from '@/lib/api/error-handling';
-import { ValidationError } from '@/lib/api/validation';
-import logger from '@/lib/logging/logger';
+import { ApiError } from '@/lib/api/error-handling'
+import { ValidationError } from '@/lib/api/validation'
+import logger from '@/lib/logging/logger'
 
 interface ErrorBoundaryProps {
-  children: ReactNode;
-  fallback?: ReactNode;
+  children: ReactNode
+  fallback?: ReactNode
 }
 
 interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
+  hasError: boolean
+  error: Error | null
 }
 
 /**
@@ -21,12 +21,12 @@ interface ErrorBoundaryState {
  */
 class EnhancedErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
+    super(props)
+    this.state = { hasError: false, error: null }
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
@@ -35,13 +35,13 @@ class EnhancedErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryS
       componentStack: errorInfo.componentStack,
       errorName: error.name,
       errorMessage: error.message,
-    });
+    })
   }
 
   render(): ReactNode {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback;
+        return this.props.fallback
       }
 
       return (
@@ -57,10 +57,10 @@ class EnhancedErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryS
             Try again
           </button>
         </div>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
@@ -70,11 +70,11 @@ class EnhancedErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryS
 class ApiErrorBoundary extends EnhancedErrorBoundary {
   render(): ReactNode {
     if (this.state.hasError) {
-      const error = this.state.error;
-      const isApiError = error instanceof ApiError;
-      const statusCode = isApiError ? (error as ApiError).statusCode : 500;
-      const errorCode = isApiError ? (error as ApiError).code : 'UNKNOWN_ERROR';
-      const details = isApiError ? (error as ApiError).details : undefined;
+      const error = this.state.error
+      const isApiError = error instanceof ApiError
+      const statusCode = isApiError ? (error as ApiError).statusCode : 500
+      const errorCode = isApiError ? (error as ApiError).code : 'UNKNOWN_ERROR'
+      const details = isApiError ? (error as ApiError).details : undefined
 
       return (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -94,10 +94,10 @@ class ApiErrorBoundary extends EnhancedErrorBoundary {
             Retry
           </button>
         </div>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
@@ -107,9 +107,9 @@ class ApiErrorBoundary extends EnhancedErrorBoundary {
 class FormErrorBoundary extends EnhancedErrorBoundary {
   render(): ReactNode {
     if (this.state.hasError) {
-      const error = this.state.error;
-      const isValidationError = error instanceof ValidationError;
-      const fieldErrors = isValidationError ? (error as ValidationError).fieldErrors : {};
+      const error = this.state.error
+      const isValidationError = error instanceof ValidationError
+      const fieldErrors = isValidationError ? (error as ValidationError).fieldErrors : {}
 
       return (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -136,11 +136,11 @@ class FormErrorBoundary extends EnhancedErrorBoundary {
             Fix and retry
           </button>
         </div>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
-export { EnhancedErrorBoundary, ApiErrorBoundary, FormErrorBoundary };
+export { EnhancedErrorBoundary, ApiErrorBoundary, FormErrorBoundary }

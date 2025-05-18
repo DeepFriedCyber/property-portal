@@ -1,5 +1,5 @@
 // lib/monitoring/performance.ts
-import logger from '@/lib/logging/logger';
+import logger from '@/lib/logging/logger'
 
 /**
  * Performance monitoring utility
@@ -20,11 +20,11 @@ export enum MetricType {
 
 // Performance metric interface
 export interface PerformanceMetric {
-  name: string;
-  type: MetricType;
-  value: number;
-  unit: 'ms' | 'bytes' | 'count';
-  timestamp: number;
+  name: string
+  type: MetricType
+  value: number
+  unit: 'ms' | 'bytes' | 'count'
+  timestamp: number
 }
 
 /**
@@ -32,19 +32,19 @@ export interface PerformanceMetric {
  */
 export function initPerformanceMonitoring() {
   if (typeof window === 'undefined' || !window.performance) {
-    return;
+    return
   }
 
   // Report navigation timing metrics
-  reportNavigationTiming();
+  reportNavigationTiming()
 
   // Set up performance observers
-  setupPerformanceObservers();
+  setupPerformanceObservers()
 
   // Report metrics on page unload
   window.addEventListener('unload', () => {
-    reportResourceTiming();
-  });
+    reportResourceTiming()
+  })
 }
 
 /**
@@ -52,7 +52,7 @@ export function initPerformanceMonitoring() {
  */
 function reportNavigationTiming() {
   if (typeof window === 'undefined' || !window.performance) {
-    return;
+    return
   }
 
   // Wait for the page to be fully loaded
@@ -60,10 +60,10 @@ function reportNavigationTiming() {
     setTimeout(() => {
       const navigation = performance.getEntriesByType(
         'navigation'
-      )[0] as PerformanceNavigationTiming;
+      )[0] as PerformanceNavigationTiming
 
       if (!navigation) {
-        return;
+        return
       }
 
       const metrics: PerformanceMetric[] = [
@@ -95,7 +95,7 @@ function reportNavigationTiming() {
           unit: 'ms',
           timestamp: Date.now(),
         },
-      ];
+      ]
 
       // Log the metrics
       logger.info(
@@ -106,9 +106,9 @@ function reportNavigationTiming() {
           pathname: window.location.pathname,
         },
         ['performance', 'navigation']
-      );
-    }, 0);
-  });
+      )
+    }, 0)
+  })
 }
 
 /**
@@ -116,57 +116,57 @@ function reportNavigationTiming() {
  */
 function reportResourceTiming() {
   if (typeof window === 'undefined' || !window.performance) {
-    return;
+    return
   }
 
-  const resources = performance.getEntriesByType('resource');
+  const resources = performance.getEntriesByType('resource')
 
   if (!resources || resources.length === 0) {
-    return;
+    return
   }
 
   // Group resources by type
-  const resourcesByType: Record<string, PerformanceResourceTiming[]> = {};
+  const resourcesByType: Record<string, PerformanceResourceTiming[]> = {}
 
-  resources.forEach((resource) => {
-    const resourceTiming = resource as PerformanceResourceTiming;
-    const url = new URL(resourceTiming.name);
-    const fileExtension = url.pathname.split('.').pop() || 'unknown';
+  resources.forEach(resource => {
+    const resourceTiming = resource as PerformanceResourceTiming
+    const url = new URL(resourceTiming.name)
+    const fileExtension = url.pathname.split('.').pop() || 'unknown'
 
     if (!resourcesByType[fileExtension]) {
-      resourcesByType[fileExtension] = [];
+      resourcesByType[fileExtension] = []
     }
 
-    resourcesByType[fileExtension].push(resourceTiming);
-  });
+    resourcesByType[fileExtension].push(resourceTiming)
+  })
 
   // Calculate metrics for each resource type
   const metrics: Record<
     string,
     {
-      count: number;
-      totalSize: number;
-      totalDuration: number;
-      averageDuration: number;
+      count: number
+      totalSize: number
+      totalDuration: number
+      averageDuration: number
     }
-  > = {};
+  > = {}
 
   Object.entries(resourcesByType).forEach(([type, resources]) => {
     const totalSize = resources.reduce((sum, resource) => {
-      return sum + (resource.transferSize || 0);
-    }, 0);
+      return sum + (resource.transferSize || 0)
+    }, 0)
 
     const totalDuration = resources.reduce((sum, resource) => {
-      return sum + (resource.responseEnd - resource.startTime);
-    }, 0);
+      return sum + (resource.responseEnd - resource.startTime)
+    }, 0)
 
     metrics[type] = {
       count: resources.length,
       totalSize,
       totalDuration,
       averageDuration: totalDuration / resources.length,
-    };
-  });
+    }
+  })
 
   // Log the metrics
   logger.info(
@@ -177,7 +177,7 @@ function reportResourceTiming() {
       pathname: window.location.pathname,
     },
     ['performance', 'resource']
-  );
+  )
 }
 
 /**
@@ -185,20 +185,20 @@ function reportResourceTiming() {
  */
 function setupPerformanceObservers() {
   if (typeof window === 'undefined' || !window.PerformanceObserver) {
-    return;
+    return
   }
 
   // Observe paint metrics (FP, FCP)
   try {
-    const paintObserver = new PerformanceObserver((entries) => {
-      entries.getEntries().forEach((entry) => {
+    const paintObserver = new PerformanceObserver(entries => {
+      entries.getEntries().forEach(entry => {
         const metric: PerformanceMetric = {
           name: entry.name,
           type: MetricType.PAINT,
           value: entry.startTime,
           unit: 'ms',
           timestamp: Date.now(),
-        };
+        }
 
         logger.info(
           `Paint metric: ${entry.name}`,
@@ -208,26 +208,26 @@ function setupPerformanceObservers() {
             pathname: window.location.pathname,
           },
           ['performance', 'paint']
-        );
-      });
-    });
+        )
+      })
+    })
 
-    paintObserver.observe({ entryTypes: ['paint'] });
+    paintObserver.observe({ entryTypes: ['paint'] })
   } catch (error) {
-    logger.warn('Failed to observe paint metrics', { error });
+    logger.warn('Failed to observe paint metrics', { error })
   }
 
   // Observe layout shift metrics (CLS)
   try {
-    let cumulativeLayoutShift = 0;
+    let cumulativeLayoutShift = 0
 
-    const layoutShiftObserver = new PerformanceObserver((entries) => {
+    const layoutShiftObserver = new PerformanceObserver(entries => {
       entries.getEntries().forEach((entry: any) => {
         // Only count layout shifts without recent user input
         if (!entry.hadRecentInput) {
-          cumulativeLayoutShift += entry.value;
+          cumulativeLayoutShift += entry.value
         }
-      });
+      })
 
       const metric: PerformanceMetric = {
         name: 'cumulative_layout_shift',
@@ -235,7 +235,7 @@ function setupPerformanceObservers() {
         value: cumulativeLayoutShift,
         unit: 'count',
         timestamp: Date.now(),
-      };
+      }
 
       logger.info(
         'Layout shift metric',
@@ -245,25 +245,25 @@ function setupPerformanceObservers() {
           pathname: window.location.pathname,
         },
         ['performance', 'layout']
-      );
-    });
+      )
+    })
 
-    layoutShiftObserver.observe({ entryTypes: ['layout-shift'] });
+    layoutShiftObserver.observe({ entryTypes: ['layout-shift'] })
   } catch (error) {
-    logger.warn('Failed to observe layout shift metrics', { error });
+    logger.warn('Failed to observe layout shift metrics', { error })
   }
 
   // Observe first input delay (FID)
   try {
-    const firstInputObserver = new PerformanceObserver((entries) => {
-      entries.getEntries().forEach((entry) => {
+    const firstInputObserver = new PerformanceObserver(entries => {
+      entries.getEntries().forEach(entry => {
         const metric: PerformanceMetric = {
           name: 'first_input_delay',
           type: MetricType.FIRST_INPUT,
           value: entry.processingStart - entry.startTime,
           unit: 'ms',
           timestamp: Date.now(),
-        };
+        }
 
         logger.info(
           'First input delay metric',
@@ -273,13 +273,13 @@ function setupPerformanceObservers() {
             pathname: window.location.pathname,
           },
           ['performance', 'first-input']
-        );
-      });
-    });
+        )
+      })
+    })
 
-    firstInputObserver.observe({ entryTypes: ['first-input'] });
+    firstInputObserver.observe({ entryTypes: ['first-input'] })
   } catch (error) {
-    logger.warn('Failed to observe first input delay metrics', { error });
+    logger.warn('Failed to observe first input delay metrics', { error })
   }
 }
 
@@ -290,9 +290,9 @@ function setupPerformanceObservers() {
  * @returns Result of the function
  */
 export function measureExecutionTime<T>(fn: () => T, name: string): T {
-  const start = performance.now();
-  const result = fn();
-  const duration = performance.now() - start;
+  const start = performance.now()
+  const result = fn()
+  const duration = performance.now() - start
 
   const metric: PerformanceMetric = {
     name,
@@ -300,7 +300,7 @@ export function measureExecutionTime<T>(fn: () => T, name: string): T {
     value: duration,
     unit: 'ms',
     timestamp: Date.now(),
-  };
+  }
 
   logger.debug(
     `Execution time for ${name}`,
@@ -310,9 +310,9 @@ export function measureExecutionTime<T>(fn: () => T, name: string): T {
       pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
     },
     ['performance', 'execution-time']
-  );
+  )
 
-  return result;
+  return result
 }
 
 /**
@@ -322,11 +322,11 @@ export function measureExecutionTime<T>(fn: () => T, name: string): T {
  * @returns Promise that resolves to the result of the function
  */
 export async function measureAsyncExecutionTime<T>(fn: () => Promise<T>, name: string): Promise<T> {
-  const start = performance.now();
+  const start = performance.now()
 
   try {
-    const result = await fn();
-    const duration = performance.now() - start;
+    const result = await fn()
+    const duration = performance.now() - start
 
     const metric: PerformanceMetric = {
       name,
@@ -334,7 +334,7 @@ export async function measureAsyncExecutionTime<T>(fn: () => Promise<T>, name: s
       value: duration,
       unit: 'ms',
       timestamp: Date.now(),
-    };
+    }
 
     logger.debug(
       `Async execution time for ${name}`,
@@ -344,11 +344,11 @@ export async function measureAsyncExecutionTime<T>(fn: () => Promise<T>, name: s
         pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
       },
       ['performance', 'execution-time']
-    );
+    )
 
-    return result;
+    return result
   } catch (error) {
-    const duration = performance.now() - start;
+    const duration = performance.now() - start
 
     const metric: PerformanceMetric = {
       name: `${name}_error`,
@@ -356,7 +356,7 @@ export async function measureAsyncExecutionTime<T>(fn: () => Promise<T>, name: s
       value: duration,
       unit: 'ms',
       timestamp: Date.now(),
-    };
+    }
 
     logger.warn(
       `Error in async execution for ${name}`,
@@ -367,9 +367,9 @@ export async function measureAsyncExecutionTime<T>(fn: () => Promise<T>, name: s
         pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
       },
       ['performance', 'execution-time', 'error']
-    );
+    )
 
-    throw error;
+    throw error
   }
 }
 
@@ -379,14 +379,14 @@ export async function measureAsyncExecutionTime<T>(fn: () => Promise<T>, name: s
  * @returns Object with performance monitoring methods
  */
 export function usePerformanceMonitoring(componentName: string) {
-  const renderStart = performance.now();
+  const renderStart = performance.now()
 
   return {
     /**
      * Report component render time
      */
     reportRenderTime: () => {
-      const renderTime = performance.now() - renderStart;
+      const renderTime = performance.now() - renderStart
 
       const metric: PerformanceMetric = {
         name: `${componentName}_render`,
@@ -394,7 +394,7 @@ export function usePerformanceMonitoring(componentName: string) {
         value: renderTime,
         unit: 'ms',
         timestamp: Date.now(),
-      };
+      }
 
       logger.debug(
         `Render time for ${componentName}`,
@@ -404,7 +404,7 @@ export function usePerformanceMonitoring(componentName: string) {
           pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
         },
         ['performance', 'render-time']
-      );
+      )
     },
 
     /**
@@ -414,7 +414,7 @@ export function usePerformanceMonitoring(componentName: string) {
      * @returns Result of the function
      */
     measureExecutionTime: <T>(fn: () => T, name: string): T => {
-      return measureExecutionTime(fn, `${componentName}_${name}`);
+      return measureExecutionTime(fn, `${componentName}_${name}`)
     },
 
     /**
@@ -424,7 +424,7 @@ export function usePerformanceMonitoring(componentName: string) {
      * @returns Promise that resolves to the result of the function
      */
     measureAsyncExecutionTime: <T>(fn: () => Promise<T>, name: string): Promise<T> => {
-      return measureAsyncExecutionTime(fn, `${componentName}_${name}`);
+      return measureAsyncExecutionTime(fn, `${componentName}_${name}`)
     },
-  };
+  }
 }

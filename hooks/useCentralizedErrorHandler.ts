@@ -1,28 +1,28 @@
 // hooks/useCentralizedErrorHandler.ts
-import { usePathname } from 'next/navigation';
-import { useState, useCallback, useEffect } from 'react';
+import { usePathname } from 'next/navigation'
+import { useState, useCallback, useEffect } from 'react'
 
-import { ApiError } from '@/lib/api/error-handling';
-import { ValidationError } from '@/lib/api/validation';
-import { errorService, ErrorContext, ErrorType, ErrorSeverity } from '@/lib/error/error-service';
+import { ApiError } from '@/lib/api/error-handling'
+import { ValidationError } from '@/lib/api/validation'
+import { errorService, ErrorContext, ErrorType, ErrorSeverity } from '@/lib/error/error-service'
 
 interface ErrorState {
-  hasError: boolean;
-  error: Error | null;
-  errorMessage: string;
-  errorCode?: string;
-  errorDetails?: Record<string, unknown>;
-  isApiError: boolean;
-  isValidationError: boolean;
-  errorType: ErrorType;
-  errorSeverity: ErrorSeverity;
+  hasError: boolean
+  error: Error | null
+  errorMessage: string
+  errorCode?: string
+  errorDetails?: Record<string, unknown>
+  isApiError: boolean
+  isValidationError: boolean
+  errorType: ErrorType
+  errorSeverity: ErrorSeverity
 }
 
 interface UseCentralizedErrorHandlerOptions {
-  component?: string;
-  action?: string;
-  tags?: string[];
-  onError?: (error: Error, context: ErrorContext) => void;
+  component?: string
+  action?: string
+  tags?: string[]
+  onError?: (error: Error, context: ErrorContext) => void
 }
 
 /**
@@ -31,8 +31,8 @@ interface UseCentralizedErrorHandlerOptions {
  * @returns Error state and handler functions
  */
 export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOptions = {}) {
-  const { component, action, tags, onError } = options;
-  const pathname = usePathname();
+  const { component, action, tags, onError } = options
+  const pathname = usePathname()
 
   const [errorState, setErrorState] = useState<ErrorState>({
     hasError: false,
@@ -44,7 +44,7 @@ export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOp
     isValidationError: false,
     errorType: ErrorType.UNKNOWN,
     errorSeverity: ErrorSeverity.LOW,
-  });
+  })
 
   // Create a default context for all errors
   const defaultContext = {
@@ -53,7 +53,7 @@ export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOp
     tags,
     url: typeof window !== 'undefined' ? window.location.href : undefined,
     pathname,
-  };
+  }
 
   /**
    * Handle an error
@@ -66,29 +66,29 @@ export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOp
       const errorObject =
         error instanceof Error
           ? error
-          : new Error(typeof error === 'string' ? error : 'Unknown error');
+          : new Error(typeof error === 'string' ? error : 'Unknown error')
 
       // Determine error type and details
-      const isApiError = errorObject instanceof ApiError;
-      const isValidationError = errorObject instanceof ValidationError;
+      const isApiError = errorObject instanceof ApiError
+      const isValidationError = errorObject instanceof ValidationError
       const errorType = isApiError
         ? ErrorType.API
         : isValidationError
           ? ErrorType.VALIDATION
-          : ErrorType.UNKNOWN;
+          : ErrorType.UNKNOWN
 
       // Get error details
-      const errorMessage = errorObject.message;
+      const errorMessage = errorObject.message
       const errorCode = isApiError
         ? (errorObject as ApiError).code
         : isValidationError
           ? (errorObject as ValidationError).code
-          : undefined;
+          : undefined
       const errorDetails = isApiError
         ? (errorObject as ApiError).details
         : isValidationError
           ? (errorObject as ValidationError).details
-          : undefined;
+          : undefined
 
       // Create context for the error service
       const context: ErrorContext = {
@@ -100,7 +100,7 @@ export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOp
           errorCode,
           errorDetails,
         },
-      };
+      }
 
       // Update error state
       setErrorState({
@@ -113,18 +113,18 @@ export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOp
         isValidationError,
         errorType,
         errorSeverity: context.severity || ErrorSeverity.LOW,
-      });
+      })
 
       // Handle the error with the error service
-      errorService.handleError(errorObject, context);
+      errorService.handleError(errorObject, context)
 
       // Call the optional onError callback
       if (onError) {
-        onError(errorObject, context);
+        onError(errorObject, context)
       }
     },
     [defaultContext, onError]
-  );
+  )
 
   /**
    * Reset the error state
@@ -140,8 +140,8 @@ export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOp
       isValidationError: false,
       errorType: ErrorType.UNKNOWN,
       errorSeverity: ErrorSeverity.LOW,
-    });
-  }, []);
+    })
+  }, [])
 
   /**
    * Create a try/catch wrapper for a function
@@ -156,15 +156,15 @@ export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOp
     ) => {
       return (...args: T): R | undefined => {
         try {
-          return fn(...args);
+          return fn(...args)
         } catch (error) {
-          handleError(error, additionalContext);
-          return undefined;
+          handleError(error, additionalContext)
+          return undefined
         }
-      };
+      }
     },
     [handleError]
-  );
+  )
 
   /**
    * Create a try/catch wrapper for an async function
@@ -179,20 +179,20 @@ export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOp
     ) => {
       return async (...args: T): Promise<R | undefined> => {
         try {
-          return await fn(...args);
+          return await fn(...args)
         } catch (error) {
-          handleError(error, additionalContext);
-          return undefined;
+          handleError(error, additionalContext)
+          return undefined
         }
-      };
+      }
     },
     [handleError]
-  );
+  )
 
   // Reset error state when component or pathname changes
   useEffect(() => {
-    resetError();
-  }, [component, pathname, resetError]);
+    resetError()
+  }, [component, pathname, resetError])
 
   return {
     ...errorState,
@@ -200,5 +200,5 @@ export function useCentralizedErrorHandler(options: UseCentralizedErrorHandlerOp
     resetError,
     withErrorHandling,
     withAsyncErrorHandling,
-  };
+  }
 }

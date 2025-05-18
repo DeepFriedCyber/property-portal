@@ -1,11 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
 /**
  * Placeholder search API
  */
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const query = searchParams.get('q') || '';
+  const searchParams = request.nextUrl.searchParams
+  const query = searchParams.get('q') || ''
 
   // Mock search results
   const mockResults = [
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
       bedrooms: 2,
       type: 'Apartment',
     },
-  ];
+  ]
 
   return NextResponse.json({
     success: true,
@@ -31,5 +32,5 @@ export async function GET(request: NextRequest) {
       query,
       results: mockResults,
     },
-  });
+  })
 }

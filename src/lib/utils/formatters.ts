@@ -9,7 +9,20 @@ export function formatCurrency(value: number): string {
     currency: 'GBP',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(value);
+  }).format(value)
+}
+
+/**
+ * Format a number as GBP currency with optional decimal places
+ * @param value The number to format
+ * @returns Formatted currency string
+ */
+export function formatGBP(value: number): string {
+  return new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    minimumFractionDigits: 0,
+  }).format(value)
 }
 
 /**
@@ -18,12 +31,12 @@ export function formatCurrency(value: number): string {
  * @returns Formatted date string
  */
 export function formatDate(dateString: string | Date): string {
-  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString
   return new Intl.DateTimeFormat('en-GB', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-  }).format(date);
+  }).format(date)
 }
 
 /**
@@ -32,7 +45,7 @@ export function formatDate(dateString: string | Date): string {
  * @returns Formatted number string
  */
 export function formatNumber(value: number): string {
-  return new Intl.NumberFormat('en-GB').format(value);
+  return new Intl.NumberFormat('en-GB').format(value)
 }
 
 /**
@@ -41,7 +54,7 @@ export function formatNumber(value: number): string {
  * @returns Formatted square footage string
  */
 export function formatSquareFootage(value: number): string {
-  return `${formatNumber(value)} sq ft`;
+  return `${formatNumber(value)} sq ft`
 }
 
 /**
@@ -50,5 +63,5 @@ export function formatSquareFootage(value: number): string {
  * @returns Capitalized string
  */
 export function capitalize(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
+  return value.charAt(0).toUpperCase() + value.slice(1)
 }

@@ -5,6 +5,7 @@ This directory contains the global state management solution for the Property Po
 ## Overview
 
 We use Zustand for state management because it's:
+
 - Lightweight and simple
 - TypeScript-friendly
 - Doesn't require providers or context
@@ -24,18 +25,18 @@ The store is strictly typed using TypeScript:
 
 ```typescript
 // Define specific types for complex data
-export type MapPosition = { 
-  lat: number; 
-  lng: number 
-};
+export type MapPosition = {
+  lat: number
+  lng: number
+}
 
 // Define the complete store type
 export type Store = {
-  selectedLocation: MapPosition | null;
-  setSelectedLocation: (loc: MapPosition) => void;
-  
+  selectedLocation: MapPosition | null
+  setSelectedLocation: (loc: MapPosition) => void
+
   // ... other state and actions
-};
+}
 ```
 
 ## Usage Examples
@@ -43,19 +44,17 @@ export type Store = {
 ### Basic Usage
 
 ```tsx
-import { useStore } from '@/store/useStore';
+import { useStore } from '@/store/useStore'
 
 function MyComponent() {
   // Get values and actions from the store
-  const selectedLocation = useStore((state) => state.selectedLocation);
-  const setSelectedLocation = useStore((state) => state.setSelectedLocation);
-  
+  const selectedLocation = useStore(state => state.selectedLocation)
+  const setSelectedLocation = useStore(state => state.setSelectedLocation)
+
   // Use them in your component
   return (
-    <button onClick={() => setSelectedLocation({ lat: 51.505, lng: -0.09 })}>
-      Set Location
-    </button>
-  );
+    <button onClick={() => setSelectedLocation({ lat: 51.505, lng: -0.09 })}>Set Location</button>
+  )
 }
 ```
 
@@ -64,18 +63,16 @@ function MyComponent() {
 For better performance and code organization, use the provided selector hooks:
 
 ```tsx
-import { useMapStore } from '@/store/useStore';
+import { useMapStore } from '@/store/useStore'
 
 function MyComponent() {
   // Get map-related state and actions
-  const { selectedLocation, setSelectedLocation } = useMapStore();
-  
+  const { selectedLocation, setSelectedLocation } = useMapStore()
+
   // Use them in your component
   return (
-    <button onClick={() => setSelectedLocation({ lat: 51.505, lng: -0.09 })}>
-      Set Location
-    </button>
-  );
+    <button onClick={() => setSelectedLocation({ lat: 51.505, lng: -0.09 })}>Set Location</button>
+  )
 }
 ```
 

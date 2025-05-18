@@ -1,4 +1,4 @@
-import { Header } from './Header';
+import { Header } from './Header'
 const meta = {
   title: 'Example/Header',
   component: Header,
@@ -8,8 +8,8 @@ const meta = {
     // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
     layout: 'fullscreen',
   },
-};
-export default meta;
+}
+export default meta
 export const LoggedIn = {
   args: {
     user: {
@@ -19,12 +19,12 @@ export const LoggedIn = {
     onLogout: () => {},
     onCreateAccount: () => {},
   },
-};
+}
 export const LoggedOut = {
   args: {
     onLogin: () => {},
     onLogout: () => {},
     onCreateAccount: () => {},
   },
-};
+}
 //# sourceMappingURL=Header.stories.js.map

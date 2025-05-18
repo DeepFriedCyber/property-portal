@@ -1,25 +1,25 @@
 // AccessibleTable.tsx
-import React from 'react';
+import React from 'react'
 
 interface Column<T> {
-  header: string;
-  accessor: keyof T | ((data: T) => React.ReactNode);
-  width?: string;
+  header: string
+  accessor: keyof T | ((data: T) => React.ReactNode)
+  width?: string
 }
 
 interface AccessibleTableProps<T> {
-  data: T[];
-  columns: Column<T>[];
-  caption?: string;
-  ariaLabel?: string;
-  id: string;
-  sortColumn?: keyof T;
-  sortDirection?: 'asc' | 'desc';
-  onSort?: (column: keyof T) => void;
-  emptyMessage?: string;
-  isLoading?: boolean;
-  rowClassName?: (item: T) => string;
-  onRowClick?: (item: T) => void;
+  data: T[]
+  columns: Column<T>[]
+  caption?: string
+  ariaLabel?: string
+  id: string
+  sortColumn?: keyof T
+  sortDirection?: 'asc' | 'desc'
+  onSort?: (column: keyof T) => void
+  emptyMessage?: string
+  isLoading?: boolean
+  rowClassName?: (item: T) => string
+  onRowClick?: (item: T) => void
 }
 
 function AccessibleTable<T extends { id?: string | number }>({
@@ -39,36 +39,36 @@ function AccessibleTable<T extends { id?: string | number }>({
   // Function to get cell value based on accessor
   const getCellValue = (item: T, accessor: Column<T>['accessor']) => {
     if (typeof accessor === 'function') {
-      return accessor(item);
+      return accessor(item)
     }
-    return item[accessor];
-  };
+    return item[accessor]
+  }
 
   // Function to handle header click for sorting
   const handleHeaderClick = (column: Column<T>) => {
     if (onSort && typeof column.accessor !== 'function') {
-      onSort(column.accessor);
+      onSort(column.accessor)
     }
-  };
+  }
 
   // Function to determine if a column is sortable
   const isSortable = (column: Column<T>) => {
-    return onSort && typeof column.accessor !== 'function';
-  };
+    return onSort && typeof column.accessor !== 'function'
+  }
 
   // Function to get sort indicator
   const getSortIndicator = (column: Column<T>) => {
-    if (typeof column.accessor === 'function' || !sortColumn) return null;
+    if (typeof column.accessor === 'function' || !sortColumn) return null
 
     if (column.accessor === sortColumn) {
       return (
         <span className={`sort-indicator ${sortDirection}`} aria-hidden="true">
           {sortDirection === 'asc' ? ' ↑' : ' ↓'}
         </span>
-      );
+      )
     }
-    return null;
-  };
+    return null
+  }
 
   return (
     <div className="table-responsive" role="region" aria-label={ariaLabel || caption}>
@@ -78,7 +78,7 @@ function AccessibleTable<T extends { id?: string | number }>({
         <thead>
           <tr>
             {columns.map((column, index) => {
-              const sortable = isSortable(column);
+              const sortable = isSortable(column)
               return (
                 <th
                   key={index}
@@ -97,7 +97,7 @@ function AccessibleTable<T extends { id?: string | number }>({
                   {column.header}
                   {getSortIndicator(column)}
                 </th>
-              );
+              )
             })}
           </tr>
         </thead>
@@ -125,10 +125,10 @@ function AccessibleTable<T extends { id?: string | number }>({
                 role={onRowClick ? 'button' : undefined}
                 onKeyDown={
                   onRowClick
-                    ? (e) => {
+                    ? e => {
                         if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          onRowClick(item);
+                          e.preventDefault()
+                          onRowClick(item)
                         }
                       }
                     : undefined
@@ -143,7 +143,7 @@ function AccessibleTable<T extends { id?: string | number }>({
         </tbody>
       </table>
     </div>
-  );
+  )
 }
 
-export default AccessibleTable;
+export default AccessibleTable

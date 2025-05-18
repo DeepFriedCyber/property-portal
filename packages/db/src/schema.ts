@@ -7,14 +7,14 @@ import {
   integer,
   uuid,
   jsonb,
-} from 'drizzle-orm/pg-core';
+} from 'drizzle-orm/pg-core'
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   fullName: text('full_name'),
   email: varchar('email', { length: 256 }).unique(),
   // ... other user fields
-});
+})
 
 export const posts = pgTable('posts', {
   id: serial('id').primaryKey(),
@@ -23,7 +23,7 @@ export const posts = pgTable('posts', {
   authorId: integer('author_id').references(() => users.id),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+})
 
 export const apiTokens = pgTable('api_tokens', {
   id: serial('id').primaryKey(),
@@ -33,7 +33,7 @@ export const apiTokens = pgTable('api_tokens', {
     .references(() => users.id),
   expiresAt: timestamp('expires_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+})
 
 // Property schema from drizzle/schema.ts
 export const property = pgTable('properties', {
@@ -50,6 +50,6 @@ export const property = pgTable('properties', {
   location: text('location'),
   bathrooms: integer('bathrooms'),
   area: integer('area'),
-});
+})
 
 // Add all other tables here

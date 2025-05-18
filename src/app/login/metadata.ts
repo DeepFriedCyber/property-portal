@@ -2,7 +2,8 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Sign In',
-  description: 'Sign in to your Property Portal account to manage your properties, saved searches, and more.',
+  description:
+    'Sign in to your Property Portal account to manage your properties, saved searches, and more.',
   robots: {
     index: false,
     follow: true,

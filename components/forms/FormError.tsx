@@ -1,16 +1,16 @@
 // components/forms/FormError.tsx
-import React from 'react';
+import React from 'react'
 
 interface FormErrorProps {
-  error?: string;
-  className?: string;
+  error?: string
+  className?: string
 }
 
 /**
  * Form-level error display component
  */
 const FormError: React.FC<FormErrorProps> = ({ error, className = '' }) => {
-  if (!error) return null;
+  if (!error) return null
 
   return (
     <div
@@ -38,7 +38,7 @@ const FormError: React.FC<FormErrorProps> = ({ error, className = '' }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FormError;
+export default FormError

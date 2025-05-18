@@ -10,5 +10,13 @@
         "project": "./tsconfig.json"
       }
     }
+  },
+  "rules": {
+    "import/no-unresolved": [
+      "error",
+      {
+        "ignore": ["^leaflet$"]
+      }
+    ]
   }
 }

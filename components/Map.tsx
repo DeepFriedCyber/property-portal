@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react'
+
 import 'leaflet/dist/leaflet.css'
 import { useLeafletMap, Location } from '@/hooks/useLeafletMap'
 
@@ -12,7 +13,7 @@ interface MapProps {
 
 /**
  * A reusable map component using Leaflet
- * 
+ *
  * This component is responsible for:
  * - Rendering the map container
  * - Passing props to the useLeafletMap hook
@@ -26,7 +27,7 @@ const Map = ({
   height = '400px',
 }: MapProps) => {
   const mapContainerRef = useRef<HTMLDivElement>(null)
-  
+
   // Use our custom hook to manage the map
   const { isMapReady, setView } = useLeafletMap({
     containerRef: mapContainerRef,

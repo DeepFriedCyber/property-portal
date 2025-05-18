@@ -22,8 +22,8 @@ Simply use Tailwind's `dark:` variant to specify dark mode styles:
 
 ```jsx
 <div className="bg-white dark:bg-gray-800 text-black dark:text-white">
-  This content will have a white background with black text in light mode,
-  and a dark gray background with white text in dark mode.
+  This content will have a white background with black text in light mode, and a dark gray
+  background with white text in dark mode.
 </div>
 ```
 
@@ -56,7 +56,7 @@ Available custom colors:
 To add a theme toggle to your component:
 
 ```jsx
-import ThemeToggle from '@/app/components/ThemeToggle';
+import ThemeToggle from '@/app/components/ThemeToggle'
 
 export default function MyComponent() {
   return (
@@ -64,7 +64,7 @@ export default function MyComponent() {
       <ThemeToggle />
       {/* Your component content */}
     </div>
-  );
+  )
 }
 ```
 
@@ -73,22 +73,23 @@ export default function MyComponent() {
 If you need to access or modify the theme in your component logic:
 
 ```jsx
-'use client';
+'use client'
 
-import { useTheme } from '@/app/providers/ThemeProvider';
+import { useTheme } from '@/app/providers/ThemeProvider'
 
 export default function MyComponent() {
-  const { theme, setTheme } = useTheme();
-  
+  const { theme, setTheme } = useTheme()
+
   // Check if dark mode is active
-  const isDarkMode = theme === 'dark' || 
-    (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  
+  const isDarkMode =
+    theme === 'dark' ||
+    (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+
   // Change theme programmatically
-  const enableDarkMode = () => setTheme('dark');
-  const enableLightMode = () => setTheme('light');
-  const useSystemPreference = () => setTheme('system');
-  
+  const enableDarkMode = () => setTheme('dark')
+  const enableLightMode = () => setTheme('light')
+  const useSystemPreference = () => setTheme('system')
+
   return (
     <div>
       <p>Current theme: {theme}</p>
@@ -97,7 +98,7 @@ export default function MyComponent() {
       <button onClick={enableLightMode}>Light</button>
       <button onClick={useSystemPreference}>System</button>
     </div>
-  );
+  )
 }
 ```
 

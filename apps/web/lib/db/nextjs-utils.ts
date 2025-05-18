@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
 
 /**
  * HTTP status codes
@@ -17,14 +17,14 @@ export enum HttpStatus {
  * Standard API response format
  */
 interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
+  success: boolean
+  data?: T
   error?: {
-    code: string;
-    message: string;
-    details?: unknown;
-  };
-  statusCode: number;
+    code: string
+    message: string
+    details?: unknown
+  }
+  statusCode: number
 }
 
 /**
@@ -35,9 +35,9 @@ export function successResponse<T>(data: T, statusCode: HttpStatus = HttpStatus.
     success: true,
     data,
     statusCode,
-  };
+  }
 
-  return NextResponse.json(response, { status: statusCode });
+  return NextResponse.json(response, { status: statusCode })
 }
 
 /**
@@ -57,9 +57,9 @@ export function errorResponse(
       details,
     },
     statusCode,
-  };
+  }
 
-  return NextResponse.json(response, { status: statusCode });
+  return NextResponse.json(response, { status: statusCode })
 }
 
 /**
@@ -70,16 +70,16 @@ export function withDatabaseHandler<T, Params extends unknown[] = []>(
 ) {
   return async (req: NextRequest, ...args: Params): Promise<NextResponse> => {
     try {
-      return await handler(req, ...args);
+      return await handler(req, ...args)
     } catch (error) {
-      console.error('Database operation failed:', error);
+      console.error('Database operation failed:', error)
 
       return errorResponse(
         'DATABASE_ERROR',
         'An error occurred while processing your request',
         HttpStatus.INTERNAL_SERVER_ERROR,
         process.env.NODE_ENV === 'development' ? { error: String(error) } : undefined
-      );
+      )
     }
-  };
+  }
 }

@@ -1,11 +1,11 @@
-import React, { ButtonHTMLAttributes, ReactNode } from 'react';
-import './Button.css'; // We'll create a basic CSS file
+import React, { ButtonHTMLAttributes, ReactNode } from 'react'
+import './Button.css' // We'll create a basic CSS file
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'destructive';
-  size?: 'small' | 'medium' | 'large';
-  isLoading?: boolean;
+  children: ReactNode
+  variant?: 'primary' | 'secondary' | 'destructive'
+  size?: 'small' | 'medium' | 'large'
+  isLoading?: boolean
 }
 
 export const Button = ({
@@ -17,10 +17,10 @@ export const Button = ({
   className = '',
   ...props
 }: ButtonProps) => {
-  const modeClass = `button--${variant}`;
-  const sizeClass = `button--${size}`;
-  const loadingClass = isLoading ? 'button--loading' : '';
-  const disabledClass = disabled || isLoading ? 'button--disabled' : '';
+  const modeClass = `button--${variant}`
+  const sizeClass = `button--${size}`
+  const loadingClass = isLoading ? 'button--loading' : ''
+  const disabledClass = disabled || isLoading ? 'button--disabled' : ''
 
   return (
     <button
@@ -31,5 +31,5 @@ export const Button = ({
     >
       {isLoading ? <span className="button__loader"></span> : children}
     </button>
-  );
-};
+  )
+}

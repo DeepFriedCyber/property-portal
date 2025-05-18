@@ -8,18 +8,18 @@ import { useUIStore } from '@/store/useStore'
  */
 export default function SidebarToggle() {
   const { isSidebarOpen, toggleSidebar } = useUIStore()
-  
+
   return (
     <button
       type="button"
       onClick={toggleSidebar}
       className="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
       aria-expanded={isSidebarOpen}
+      aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+      aria-controls="main-sidebar"
     >
-      <span className="sr-only">
-        {isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
-      </span>
-      
+      <span className="sr-only">{isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}</span>
+
       {/* Icon changes based on sidebar state */}
       {isSidebarOpen ? (
         <svg

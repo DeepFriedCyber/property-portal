@@ -1,19 +1,19 @@
 // ErrorBoundaryExample.tsx
-import React from 'react';
+import React from 'react'
 
-import ErrorBoundary from './ErrorBoundary';
+import ErrorBoundary from './ErrorBoundary'
 
 // Example component that might throw an error
 const BuggyCounter = () => {
-  const [counter, setCounter] = React.useState(0);
+  const [counter, setCounter] = React.useState(0)
 
   const handleClick = () => {
-    setCounter((prevCounter) => prevCounter + 1);
-  };
+    setCounter(prevCounter => prevCounter + 1)
+  }
 
   if (counter === 5) {
     // Simulate an error when counter reaches 5
-    throw new Error('I crashed when counter reached 5!');
+    throw new Error('I crashed when counter reached 5!')
   }
 
   return (
@@ -21,8 +21,8 @@ const BuggyCounter = () => {
       <p>Counter: {counter}</p>
       <button onClick={handleClick}>Increment</button>
     </div>
-  );
-};
+  )
+}
 
 // Custom fallback UI
 const CustomFallback = () => (
@@ -31,14 +31,14 @@ const CustomFallback = () => (
     <p>We're sorry for the inconvenience. Our team has been notified.</p>
     <button onClick={() => window.location.reload()}>Refresh Page</button>
   </div>
-);
+)
 
 // Example of how to use ErrorBoundary
 const ErrorBoundaryExample = () => {
   const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
     // In a real app, you might send this to an error reporting service
-    console.error('Caught an error:', error, errorInfo);
-  };
+    console.error('Caught an error:', error, errorInfo)
+  }
 
   return (
     <div>
@@ -68,7 +68,7 @@ const ErrorBoundaryExample = () => {
         </ErrorBoundary>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ErrorBoundaryExample;
+export default ErrorBoundaryExample

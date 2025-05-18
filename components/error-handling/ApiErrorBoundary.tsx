@@ -1,18 +1,18 @@
 // components/error-handling/ApiErrorBoundary.tsx
-'use client';
+'use client'
 
-import React from 'react';
+import React from 'react'
 
-import EnhancedErrorBoundary from './EnhancedErrorBoundary';
+import EnhancedErrorBoundary from './EnhancedErrorBoundary'
 
-import { ApiError } from '@/lib/api/error-handling';
-import logger from '@/lib/logging/logger';
+import { ApiError } from '@/lib/api/error-handling'
+import logger from '@/lib/logging/logger'
 
 interface ApiErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode | ((error: Error, resetError: () => void) => React.ReactNode);
-  onError?: (error: Error) => void;
-  retryable?: boolean;
+  children: React.ReactNode
+  fallback?: React.ReactNode | ((error: Error, resetError: () => void) => React.ReactNode)
+  onError?: (error: Error) => void
+  retryable?: boolean
 }
 
 /**
@@ -26,13 +26,13 @@ const ApiErrorBoundary: React.FC<ApiErrorBoundaryProps> = ({
 }) => {
   // Default fallback UI for API errors
   const defaultFallback = (error: Error, resetError: () => void) => {
-    const isApiError = error instanceof ApiError;
-    const status = isApiError ? (error as ApiError).status : 500;
-    const code = isApiError ? (error as ApiError).code : 'UNKNOWN_ERROR';
+    const isApiError = error instanceof ApiError
+    const status = isApiError ? (error as ApiError).status : 500
+    const code = isApiError ? (error as ApiError).code : 'UNKNOWN_ERROR'
 
     // Determine if the error is retryable
     const canRetry =
-      retryable && (!isApiError || (status !== 401 && status !== 403 && status !== 404));
+      retryable && (!isApiError || (status !== 401 && status !== 403 && status !== 404))
 
     return (
       <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
@@ -57,8 +57,8 @@ const ApiErrorBoundary: React.FC<ApiErrorBoundaryProps> = ({
           </button>
         )}
       </div>
-    );
-  };
+    )
+  }
 
   // Handle API errors
   const handleError = (error: Error) => {
@@ -73,13 +73,13 @@ const ApiErrorBoundary: React.FC<ApiErrorBoundaryProps> = ({
         details: error instanceof ApiError ? (error as ApiError).details : undefined,
       },
       ['error-boundary', 'api-error']
-    );
+    )
 
     // Call the optional onError callback
     if (onError) {
-      onError(error);
+      onError(error)
     }
-  };
+  }
 
   return (
     <EnhancedErrorBoundary
@@ -89,7 +89,7 @@ const ApiErrorBoundary: React.FC<ApiErrorBoundaryProps> = ({
     >
       {children}
     </EnhancedErrorBoundary>
-  );
-};
+  )
+}
 
-export default ApiErrorBoundary;
+export default ApiErrorBoundary

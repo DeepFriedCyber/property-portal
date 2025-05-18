@@ -1,5 +1,5 @@
-import clsx from 'clsx';
-import { jsx as _jsx } from 'react/jsx-runtime';
+import clsx from 'clsx'
+import { jsx as _jsx } from 'react/jsx-runtime'
 export const Button = ({
   children,
   variant = 'primary',
@@ -28,13 +28,13 @@ export const Button = ({
       'bg-gray-300 text-gray-500 cursor-not-allowed': disabled,
     },
     className
-  );
+  )
   return _jsx('button', {
     onClick: onClick,
     className: buttonClassName,
     disabled: disabled,
     type: type,
     children: children,
-  });
-};
+  })
+}
 //# sourceMappingURL=Button.js.map

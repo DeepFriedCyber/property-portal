@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 // This component injects a script into the head to prevent flickering on page load
 export default function ThemeScript() {
@@ -22,5 +22,5 @@ export default function ThemeScript() {
         `,
       }}
     />
-  );
+  )
 }

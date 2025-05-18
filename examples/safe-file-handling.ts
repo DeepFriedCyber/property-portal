@@ -7,10 +7,10 @@
 
 // Type definition for file objects
 interface FileInfo {
-  name: string;
-  size: number;
-  type: string;
-  lastModified?: number;
+  name: string
+  size: number
+  type: string
+  lastModified?: number
 }
 
 /**
@@ -19,17 +19,17 @@ interface FileInfo {
  * @returns An object with file properties or fallback values
  */
 export function getSafeFileInfo(file: FileInfo | null | undefined): {
-  fileName: string;
-  fileSize: number | string;
-  fileType: string;
-  lastModified?: Date | string;
+  fileName: string
+  fileSize: number | string
+  fileType: string
+  lastModified?: Date | string
 } {
   return {
     fileName: file?.name ?? 'unknown',
     fileSize: file?.size ?? 'unknown',
     fileType: file?.type ?? 'unknown',
     lastModified: file?.lastModified ? new Date(file.lastModified) : 'unknown',
-  };
+  }
 }
 
 /**
@@ -49,7 +49,7 @@ export function createFileErrorLog(
     ...getSafeFileInfo(file),
     error: error ? String(error) : undefined,
     timestamp: new Date().toISOString(),
-  };
+  }
 }
 
 // Example usage:
@@ -57,15 +57,15 @@ export function createFileErrorLog(
 // ❌ BAD: Unsafe file property access
 function unsafeFileLogging(file: FileInfo | undefined, error: Error) {
   // This will throw if file is undefined
-  console.error(`Error processing file ${file.name} of size ${file.size}:`, error.message);
+  console.error(`Error processing file ${file.name} of size ${file.size}:`, error.message)
 
   // This structured log will fail if file is undefined
   const logData = {
     fileName: file.name,
     fileSize: file.size,
     error: error.message,
-  };
-  console.error(logData);
+  }
+  console.error(logData)
 }
 
 // ✅ GOOD: Safe file property access with optional chaining and nullish coalescing
@@ -74,22 +74,22 @@ function betterFileLogging(file: FileInfo | undefined, error: Error) {
   console.error(
     `Error processing file ${file?.name ?? 'unknown'} of size ${file?.size ?? 'unknown'}:`,
     error.message
-  );
+  )
 
   // Safe structured logging
   const logData = {
     fileName: file?.name ?? 'unknown',
     fileSize: file?.size ?? 'unknown',
     error: error.message,
-  };
-  console.error(logData);
+  }
+  console.error(logData)
 }
 
 // ✅ BEST: Using utility functions for consistent handling
 function bestFileLogging(file: FileInfo | undefined, error: unknown) {
   // Using the utility function for consistent handling
-  const logData = createFileErrorLog('Error processing file', file, error);
-  console.error(logData);
+  const logData = createFileErrorLog('Error processing file', file, error)
+  console.error(logData)
 
   // Could also use a logger library
   // logger.error(createFileErrorLog('Error processing file', file, error));
@@ -99,24 +99,24 @@ function bestFileLogging(file: FileInfo | undefined, error: unknown) {
 async function handleFileUpload(file: FileInfo | undefined) {
   try {
     if (!file) {
-      throw new Error('No file provided');
+      throw new Error('No file provided')
     }
 
     // Simulate file upload
-    await simulateFileUpload(file);
+    await simulateFileUpload(file)
 
-    return { success: true };
+    return { success: true }
   } catch (error) {
     // ✅ GOOD: Safe error logging with file context
-    const logData = createFileErrorLog('File upload failed', file, error);
-    console.error(logData);
+    const logData = createFileErrorLog('File upload failed', file, error)
+    console.error(logData)
 
     // Return structured error response
     return {
       success: false,
       error: String(error),
       fileName: file?.name ?? 'unknown',
-    };
+    }
   }
 }
 
@@ -124,17 +124,17 @@ async function handleFileUpload(file: FileInfo | undefined) {
 async function simulateFileUpload(file: FileInfo): Promise<void> {
   // Simulation only
   if (file.size > 10000000) {
-    throw new Error('File too large');
+    throw new Error('File too large')
   }
   if (!file.name.match(/\.(jpg|jpeg|png|pdf)$/i)) {
-    throw new Error('Unsupported file type');
+    throw new Error('Unsupported file type')
   }
   // Simulate network error
   if (Math.random() < 0.1) {
-    throw new Error('Network error');
+    throw new Error('Network error')
   }
   // Success case
-  return Promise.resolve();
+  return Promise.resolve()
 }
 
-export { unsafeFileLogging, betterFileLogging, bestFileLogging, handleFileUpload };
+export { unsafeFileLogging, betterFileLogging, bestFileLogging, handleFileUpload }

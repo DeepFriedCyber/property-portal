@@ -1,24 +1,24 @@
 // hooks/useErrorHandler.ts
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react'
 
-import { ApiError } from '@/lib/api/error-handling';
-import { ValidationError } from '@/lib/api/validation';
-import logger from '@/lib/logging/logger';
+import { ApiError } from '@/lib/api/error-handling'
+import { ValidationError } from '@/lib/api/validation'
+import logger from '@/lib/logging/logger'
 
 interface ErrorState {
-  hasError: boolean;
-  error: Error | null;
-  errorMessage: string;
-  errorCode?: string;
-  errorDetails?: any;
-  isApiError: boolean;
-  isValidationError: boolean;
+  hasError: boolean
+  error: Error | null
+  errorMessage: string
+  errorCode?: string
+  errorDetails?: any
+  isApiError: boolean
+  isValidationError: boolean
 }
 
 interface UseErrorHandlerOptions {
-  logErrors?: boolean;
-  rethrow?: boolean;
-  onError?: (error: Error) => void;
+  logErrors?: boolean
+  rethrow?: boolean
+  onError?: (error: Error) => void
 }
 
 /**
@@ -27,7 +27,7 @@ interface UseErrorHandlerOptions {
  * @returns Error state and handler functions
  */
 export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
-  const { logErrors = true, rethrow = false, onError } = options;
+  const { logErrors = true, rethrow = false, onError } = options
 
   const [errorState, setErrorState] = useState<ErrorState>({
     hasError: false,
@@ -37,7 +37,7 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
     errorDetails: undefined,
     isApiError: false,
     isValidationError: false,
-  });
+  })
 
   /**
    * Handle an error
@@ -51,24 +51,24 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
       const errorObject =
         error instanceof Error
           ? error
-          : new Error(typeof error === 'string' ? error : 'Unknown error');
+          : new Error(typeof error === 'string' ? error : 'Unknown error')
 
       // Determine error type
-      const isApiError = errorObject instanceof ApiError;
-      const isValidationError = errorObject instanceof ValidationError;
+      const isApiError = errorObject instanceof ApiError
+      const isValidationError = errorObject instanceof ValidationError
 
       // Get error details
-      const errorMessage = errorObject.message;
+      const errorMessage = errorObject.message
       const errorCode = isApiError
         ? (errorObject as ApiError).code
         : isValidationError
           ? (errorObject as ValidationError).code
-          : undefined;
+          : undefined
       const errorDetails = isApiError
         ? (errorObject as ApiError).details
         : isValidationError
           ? (errorObject as ValidationError).details
-          : undefined;
+          : undefined
 
       // Update error state
       setErrorState({
@@ -79,7 +79,7 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
         errorDetails,
         isApiError,
         isValidationError,
-      });
+      })
 
       // Log the error
       if (logErrors) {
@@ -94,21 +94,21 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
             errorDetails,
           },
           [...(tags || []), 'error-handler']
-        );
+        )
       }
 
       // Call the optional onError callback
       if (onError) {
-        onError(errorObject);
+        onError(errorObject)
       }
 
       // Rethrow the error if requested
       if (rethrow) {
-        throw errorObject;
+        throw errorObject
       }
     },
     [logErrors, rethrow, onError]
-  );
+  )
 
   /**
    * Reset the error state
@@ -122,8 +122,8 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
       errorDetails: undefined,
       isApiError: false,
       isValidationError: false,
-    });
-  }, []);
+    })
+  }, [])
 
   /**
    * Create a try/catch wrapper for a function
@@ -136,15 +136,15 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
     <T extends any[], R>(fn: (...args: T) => R, context?: Record<string, any>, tags?: string[]) => {
       return (...args: T): R | undefined => {
         try {
-          return fn(...args);
+          return fn(...args)
         } catch (error) {
-          handleError(error, context, tags);
-          return undefined;
+          handleError(error, context, tags)
+          return undefined
         }
-      };
+      }
     },
     [handleError]
-  );
+  )
 
   /**
    * Create a try/catch wrapper for an async function
@@ -161,15 +161,15 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
     ) => {
       return async (...args: T): Promise<R | undefined> => {
         try {
-          return await fn(...args);
+          return await fn(...args)
         } catch (error) {
-          handleError(error, context, tags);
-          return undefined;
+          handleError(error, context, tags)
+          return undefined
         }
-      };
+      }
     },
     [handleError]
-  );
+  )
 
   return {
     ...errorState,
@@ -177,5 +177,5 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
     resetError,
     withErrorHandling,
     withAsyncErrorHandling,
-  };
+  }
 }

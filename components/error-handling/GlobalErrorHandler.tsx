@@ -1,17 +1,17 @@
 // components/error-handling/GlobalErrorHandler.tsx
-'use client';
+'use client'
 
-import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation'
+import React, { useEffect } from 'react'
 
-import logger from '@/lib/logging/logger';
+import logger from '@/lib/logging/logger'
 
 interface GlobalErrorHandlerProps {
-  children: React.ReactNode;
-  sentryDsn?: string;
-  logRocketAppId?: string;
-  environment?: 'development' | 'test' | 'production';
-  release?: string;
+  children: React.ReactNode
+  sentryDsn?: string
+  logRocketAppId?: string
+  environment?: 'development' | 'test' | 'production'
+  release?: string
 }
 
 /**
@@ -25,8 +25,8 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
   environment = process.env.NODE_ENV as 'development' | 'test' | 'production',
   release = process.env.NEXT_PUBLIC_APP_VERSION,
 }) => {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   // Configure logger on mount
   useEffect(() => {
@@ -37,7 +37,7 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
       logRocketAppId,
       environment,
       release,
-    });
+    })
 
     // Log application start
     logger.info('Application initialized', {
@@ -45,7 +45,7 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
       release,
       pathname,
       searchParams: searchParams ? Object.fromEntries(searchParams.entries()) : {},
-    });
+    })
 
     // Set up global error handlers
     const handleGlobalError = (
@@ -55,9 +55,9 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
       const error =
         type === 'error'
           ? (event as ErrorEvent).error || new Error((event as ErrorEvent).message)
-          : (event as PromiseRejectionEvent).reason;
+          : (event as PromiseRejectionEvent).reason
 
-      const message = type === 'error' ? 'Uncaught global error' : 'Unhandled promise rejection';
+      const message = type === 'error' ? 'Uncaught global error' : 'Unhandled promise rejection'
 
       // Log the error
       logger.error(
@@ -71,38 +71,38 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
           type,
         },
         ['global-error', type]
-      );
+      )
 
       // Don't prevent default behavior in production to allow Sentry/LogRocket to capture
       if (environment !== 'production') {
-        event.preventDefault();
+        event.preventDefault()
       }
-    };
+    }
 
     // Add event listeners
-    window.addEventListener('error', (event) => handleGlobalError(event, 'error'));
-    window.addEventListener('unhandledrejection', (event) =>
+    window.addEventListener('error', event => handleGlobalError(event, 'error'))
+    window.addEventListener('unhandledrejection', event =>
       handleGlobalError(event, 'unhandledrejection')
-    );
+    )
 
     // Clean up
     return () => {
-      window.removeEventListener('error', (event) => handleGlobalError(event, 'error'));
-      window.removeEventListener('unhandledrejection', (event) =>
+      window.removeEventListener('error', event => handleGlobalError(event, 'error'))
+      window.removeEventListener('unhandledrejection', event =>
         handleGlobalError(event, 'unhandledrejection')
-      );
-    };
-  }, [environment, release, sentryDsn, logRocketAppId, pathname, searchParams]);
+      )
+    }
+  }, [environment, release, sentryDsn, logRocketAppId, pathname, searchParams])
 
   // Track route changes
   useEffect(() => {
     logger.debug('Route changed', {
       pathname,
       searchParams: searchParams ? Object.fromEntries(searchParams.entries()) : {},
-    });
-  }, [pathname, searchParams]);
+    })
+  }, [pathname, searchParams])
 
-  return <>{children}</>;
-};
+  return <>{children}</>
+}
 
-export default GlobalErrorHandler;
+export default GlobalErrorHandler

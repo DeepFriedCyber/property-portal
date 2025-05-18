@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
+import { useEffect, useRef, useState } from 'react'
 
 // Define the location type
 export interface Location {
@@ -23,7 +23,7 @@ interface UseLeafletMapReturn {
 
 /**
  * Custom hook for managing a Leaflet map
- * 
+ *
  * This hook handles:
  * - Map initialization and cleanup
  * - Setting the map view
@@ -51,14 +51,27 @@ export function useLeafletMap({
       zoom
     )
 
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map)
+    // Add MapTiler UK-optimized tiles or fallback to OpenStreetMap
+    const maptilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY
+
+    if (maptilerKey) {
+      // Use MapTiler with UK-optimized layer
+      L.tileLayer(`https://api.maptiler.com/maps/streets/256/{z}/{x}/{y}.png?key=${maptilerKey}`, {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://www.maptiler.com/">MapTiler</a>',
+      }).addTo(map)
+    } else {
+      // Fallback to OpenStreetMap if no MapTiler key is available
+      console.warn('MapTiler API key not found. Using OpenStreetMap as fallback.')
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map)
+    }
 
     // Create a layer group for markers
     markersLayerRef.current = L.layerGroup().addTo(map)
-    
+
     // Store map reference
     mapRef.current = map
     setIsMapReady(true)
@@ -85,18 +98,18 @@ export function useLeafletMap({
   // Function to update markers
   const updateMarkers = (newMarkers: Location[]) => {
     if (!markersLayerRef.current) return
-    
+
     // Clear existing markers
     markersLayerRef.current.clearLayers()
-    
+
     // Add new markers
     newMarkers.forEach(location => {
       const marker = L.marker([location.lat, location.lng])
-      
+
       if (onMarkerClick) {
         marker.on('click', () => onMarkerClick(location))
       }
-      
+
       marker.addTo(markersLayerRef.current!)
     })
   }
@@ -111,6 +124,6 @@ export function useLeafletMap({
   return {
     isMapReady,
     setView,
-    updateMarkers
+    updateMarkers,
   }
 }

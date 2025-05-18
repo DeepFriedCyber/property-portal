@@ -1,16 +1,16 @@
 // components/error-handling/GlobalErrorHandler.tsx
-'use client';
+'use client'
 
-import * as Sentry from '@sentry/nextjs';
-import LogRocket from 'logrocket';
-import React, { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs'
+import LogRocket from 'logrocket'
+import React, { useEffect } from 'react'
 
 interface GlobalErrorHandlerProps {
-  children: React.ReactNode;
-  sentryDsn?: string;
-  logRocketAppId?: string;
-  environment: 'development' | 'test' | 'production';
-  release?: string;
+  children: React.ReactNode
+  sentryDsn?: string
+  logRocketAppId?: string
+  environment: 'development' | 'test' | 'production'
+  release?: string
 }
 
 /**
@@ -33,7 +33,7 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
         tracesSampleRate: environment === 'production' ? 0.2 : 1.0,
         replaysSessionSampleRate: environment === 'production' ? 0.1 : 1.0,
         replaysOnErrorSampleRate: 1.0,
-      });
+      })
     }
 
     // Initialize LogRocket if app ID is provided
@@ -47,62 +47,62 @@ const GlobalErrorHandler: React.FC<GlobalErrorHandlerProps> = ({
             log: false,
           },
         },
-      });
+      })
 
       // Integrate LogRocket with Sentry if both are available
       if (sentryDsn) {
-        LogRocket.getSessionURL((sessionURL) => {
-          Sentry.withScope((scope) => {
-            scope.setExtra('logRocketSessionURL', sessionURL);
-          });
-        });
+        LogRocket.getSessionURL(sessionURL => {
+          Sentry.withScope(scope => {
+            scope.setExtra('logRocketSessionURL', sessionURL)
+          })
+        })
       }
     }
 
     // Set up global error handler
-    const originalOnError = window.onerror;
+    const originalOnError = window.onerror
     window.onerror = (message, source, lineno, colno, error) => {
       // Call the original handler if it exists
       if (originalOnError) {
-        originalOnError(message, source, lineno, colno, error);
+        originalOnError(message, source, lineno, colno, error)
       }
 
       // Custom error handling logic here
-      console.error('Global error caught:', { message, source, lineno, colno, error });
+      console.error('Global error caught:', { message, source, lineno, colno, error })
 
-      return false; // Let the default handler run
-    };
+      return false // Let the default handler run
+    }
 
     // Set up unhandled promise rejection handler
-    const originalOnUnhandledRejection = window.onunhandledrejection;
+    const originalOnUnhandledRejection = window.onunhandledrejection
 
     // Using addEventListener instead of direct assignment to avoid 'this' context issues
     window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
       // Call the original handler if it exists
       if (typeof originalOnUnhandledRejection === 'function') {
         // We need to call it as a method of window to maintain the correct context
-        window.onunhandledrejection = originalOnUnhandledRejection;
-        window.onunhandledrejection(event);
+        window.onunhandledrejection = originalOnUnhandledRejection
+        window.onunhandledrejection(event)
         // Reset it back to null to avoid duplicate handling
-        window.onunhandledrejection = null;
+        window.onunhandledrejection = null
       }
 
       // Custom rejection handling logic here
-      console.error('Unhandled promise rejection:', event.reason);
+      console.error('Unhandled promise rejection:', event.reason)
 
       // We can't return false here as addEventListener doesn't support it
       // Use preventDefault() if you want to prevent the default behavior
       // event.preventDefault();
-    });
+    })
 
     // Cleanup function
     return () => {
-      window.onerror = originalOnError;
-      window.onunhandledrejection = originalOnUnhandledRejection;
-    };
-  }, [sentryDsn, logRocketAppId, environment, release]);
+      window.onerror = originalOnError
+      window.onunhandledrejection = originalOnUnhandledRejection
+    }
+  }, [sentryDsn, logRocketAppId, environment, release])
 
-  return <>{children}</>;
-};
+  return <>{children}</>
+}
 
-export default GlobalErrorHandler;
+export default GlobalErrorHandler

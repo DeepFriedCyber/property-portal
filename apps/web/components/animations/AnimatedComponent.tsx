@@ -1,33 +1,33 @@
-'use client';
+'use client'
 
-import { motion, Variants } from 'framer-motion';
-import React, { ReactNode } from 'react';
+import { motion, Variants } from 'framer-motion'
+import React, { ReactNode } from 'react'
 
 // Common animation variants
 export const fadeInVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
-};
+}
 
 export const slideInVariants: Variants = {
   hidden: { x: -50, opacity: 0 },
   visible: { x: 0, opacity: 1 },
-};
+}
 
 export const scaleVariants: Variants = {
   hidden: { scale: 0.8, opacity: 0 },
   visible: { scale: 1, opacity: 1 },
-};
+}
 
 interface AnimatedComponentProps {
-  children: ReactNode;
-  className?: string;
-  variants: Variants;
+  children: ReactNode
+  className?: string
+  variants: Variants
   transition?: {
-    duration?: number;
-    delay?: number;
-    ease?: string | number[];
-  };
+    duration?: number
+    delay?: number
+    ease?: string | number[]
+  }
 }
 
 /**
@@ -50,7 +50,7 @@ const AnimatedComponent: React.FC<AnimatedComponentProps> = ({
     >
       {children}
     </motion.div>
-  );
-};
+  )
+}
 
-export default AnimatedComponent;
+export default AnimatedComponent

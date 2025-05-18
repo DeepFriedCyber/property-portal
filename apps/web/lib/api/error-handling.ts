@@ -2,9 +2,9 @@
  * Custom API error class for handling API-specific errors
  */
 export class ApiError extends Error {
-  statusCode: number;
-  code: string;
-  details?: Record<string, unknown>;
+  statusCode: number
+  code: string
+  details?: Record<string, unknown>
 
   constructor(
     message: string,
@@ -12,14 +12,14 @@ export class ApiError extends Error {
     code: string = 'INTERNAL_SERVER_ERROR',
     details?: Record<string, unknown>
   ) {
-    super(message);
-    this.name = 'ApiError';
-    this.statusCode = statusCode;
-    this.code = code;
-    this.details = details;
+    super(message)
+    this.name = 'ApiError'
+    this.statusCode = statusCode
+    this.code = code
+    this.details = details
 
     // Ensures proper prototype chain for instanceof checks
-    Object.setPrototypeOf(this, ApiError.prototype);
+    Object.setPrototypeOf(this, ApiError.prototype)
   }
 }
 
@@ -28,14 +28,14 @@ export class ApiError extends Error {
  */
 export function handleApiError(error: unknown): ApiError {
   if (error instanceof ApiError) {
-    return error;
+    return error
   }
 
   if (error instanceof Error) {
-    return new ApiError(error.message);
+    return new ApiError(error.message)
   }
 
-  return new ApiError('An unknown error occurred');
+  return new ApiError('An unknown error occurred')
 }
 
 /**
@@ -43,13 +43,13 @@ export function handleApiError(error: unknown): ApiError {
  */
 export function formatApiError(error: unknown): {
   error: {
-    message: string;
-    code: string;
-    statusCode: number;
-    details?: Record<string, unknown>;
-  };
+    message: string
+    code: string
+    statusCode: number
+    details?: Record<string, unknown>
+  }
 } {
-  const apiError = handleApiError(error);
+  const apiError = handleApiError(error)
 
   return {
     error: {
@@ -58,5 +58,5 @@ export function formatApiError(error: unknown): {
       statusCode: apiError.statusCode,
       details: apiError.details,
     },
-  };
+  }
 }

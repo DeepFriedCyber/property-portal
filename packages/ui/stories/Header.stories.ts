@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react'
 
-import { Header, HeaderProps } from './Header';
+import { Header, HeaderProps } from './Header'
 
 const meta = {
   title: 'Example/Header',
@@ -11,10 +11,10 @@ const meta = {
     // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
     layout: 'fullscreen',
   },
-} satisfies Meta<HeaderProps>;
+} satisfies Meta<HeaderProps>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const LoggedIn: Story = {
   args: {
@@ -25,7 +25,7 @@ export const LoggedIn: Story = {
     onLogout: () => {},
     onCreateAccount: () => {},
   },
-};
+}
 
 export const LoggedOut: Story = {
   args: {
@@ -33,4 +33,4 @@ export const LoggedOut: Story = {
     onLogout: () => {},
     onCreateAccount: () => {},
   },
-};
+}

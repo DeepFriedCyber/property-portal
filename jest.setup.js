@@ -1,9 +1,9 @@
 // Import Jest DOM matchers
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom'
 
 // Mock fetch
-import { enableFetchMocks } from 'jest-fetch-mock';
-enableFetchMocks();
+import { enableFetchMocks } from 'jest-fetch-mock'
+enableFetchMocks()
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
@@ -19,17 +19,17 @@ jest.mock('next/navigation', () => ({
   }),
   usePathname: () => '/',
   useSearchParams: () => new URLSearchParams(),
-}));
+}))
 
 // Mock environment variables
 process.env = {
   ...process.env,
   NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
   DATABASE_URL: 'postgres://test:test@localhost:5432/test_db',
-};
+}
 
 // Suppress console errors during tests
-const originalConsoleError = console.error;
+const originalConsoleError = console.error
 console.error = (...args) => {
   if (
     typeof args[0] === 'string' &&
@@ -37,7 +37,7 @@ console.error = (...args) => {
       args[0].includes('Warning: React.createElement') ||
       args[0].includes('Error: Uncaught [Error: expected'))
   ) {
-    return;
+    return
   }
-  originalConsoleError(...args);
-};
+  originalConsoleError(...args)
+}
