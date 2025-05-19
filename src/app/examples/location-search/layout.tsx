@@ -5,10 +5,6 @@ export const metadata: Metadata = {
   description: 'Example of UK location and postcode search with autocomplete',
 }
 
-export default function LocationSearchLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function LocationSearchLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }

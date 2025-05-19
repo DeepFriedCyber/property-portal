@@ -1,0 +1,6 @@
+import { redirect } from 'next/navigation'
+
+// This file redirects from the old route (/[id]) to the new route (/properties/[id])
+export default function PropertyRedirect({ params }: { params: { id: string } }) {
+  redirect(`/properties/${params.id}`)
+}

@@ -28,6 +28,9 @@ model Property {
   councilTaxBand String?    // Council tax band (A-H)
   epcRating      String?    // Energy Performance Certificate rating
   tenure         String?    // Freehold, Leasehold, etc.
+  embedding      Unsupported("vector(1536)")? // Vector embedding for similarity search
+                                                 // Note: Indexed with IVFFlat for performance:
+                                                 // CREATE INDEX "Property_embedding_idx" ON "Property" USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   favorites      Favorite[]

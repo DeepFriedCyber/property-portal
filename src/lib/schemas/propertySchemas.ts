@@ -8,6 +8,7 @@ export const createPropertySchema = z.object({
   imageUrl: z.string().url({ message: 'Image URL must be a valid URL' }),
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
+  embedding: z.array(z.number()).optional(),
 })
 
 // Type inferred from the schema
