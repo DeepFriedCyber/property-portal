@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 
 import { formatGBP } from '@/lib/currency'
@@ -36,6 +37,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   // Format location
   const location = `${city}${address ? `, ${address}` : ''}`
 
+  // Handle view details click
+  const handleViewDetails = () => {
+    if (onViewDetails) {
+      onViewDetails(id)
+    }
+  }
+
   return (
     <article
       className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02]"
@@ -57,13 +65,27 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         </div>
         <p className="text-gray-700 mb-4 line-clamp-2">{description}</p>
         <PropertyAmenities lat={lat} lng={lng} />
-        <button
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
-          onClick={() => onViewDetails && onViewDetails(id)}
-          aria-label={`View details for ${title || 'this property'}`}
-        >
-          View Details
-        </button>
+
+        {onViewDetails ? (
+          // Use callback if provided (for custom handling)
+          <button
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+            onClick={handleViewDetails}
+            aria-label={`View details for ${title || 'this property'}`}
+          >
+            View Details
+          </button>
+        ) : (
+          // Otherwise use direct link to property page
+          <Link href={`/properties/${id}`} passHref>
+            <span
+              className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors text-center cursor-pointer"
+              aria-label={`View details for ${title || 'this property'}`}
+            >
+              View Details
+            </span>
+          </Link>
+        )}
       </div>
     </article>
   )

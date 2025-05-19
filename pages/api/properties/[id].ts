@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { getPropertyById, getNearbyProperties } from '../../../lib/properties'
+import { getPropertyById, getNearbyProperties } from '../../../lib/db/propertyService'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query
@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Check if nearby properties are requested
       const includeNearby = req.query.nearby === 'true'
-      let nearbyProperties = []
+      let nearbyProperties: Awaited<ReturnType<typeof getNearbyProperties>> = []
 
       if (includeNearby) {
         const distance = req.query.distance ? parseFloat(req.query.distance as string) : 10

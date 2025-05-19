@@ -1,60 +1,59 @@
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { compare } from 'bcrypt'
-import NextAuth from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import GoogleProvider from 'next-auth/providers/google'
+import { currentUser, auth, clerkClient } from '@clerk/nextjs/server'
 
 import { prisma } from '@/lib/db'
-
-export const authOptions = {
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    }),
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+export { auth }
+/**
+ * Get the current user with extended DB info
+ */
+export async function getCurrentUser() {
+  const clerkUser = await currentUser()
+  if (!clerkUser) return null
+  let dbUser = await prisma.user.findUnique({
+    where: { clerkId: clerkUser.id },
+  })
+  if (!dbUser) {
+    dbUser = await prisma.user.create({
+      data: {
+        clerkId: clerkUser.id,
+        email: clerkUser.emailAddresses[0]?.emailAddress || '',
+        role: (clerkUser.publicMetadata?.role as string) || 'user',
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email and password required')
-        }
-
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        })
-
-        if (!user || !user.hashedPassword) {
-          throw new Error('Email does not exist')
-        }
-
-        const isCorrectPassword = await compare(credentials.password, user.hashedPassword)
-
-        if (!isCorrectPassword) {
-          throw new Error('Incorrect password')
-        }
-
-        return user
-      },
-    }),
-  ],
-  pages: {
-    signIn: '/login',
-  },
-  debug: process.env.NODE_ENV === 'development',
-  session: {
-    strategy: 'jwt',
-  },
-  jwt: {
-    secret: process.env.NEXTAUTH_SECRET,
-  },
-  secret: process.env.NEXTAUTH_SECRET,
+    })
+  }
+  return {
+    id: dbUser.id,
+    clerkId: clerkUser.id,
+    email: dbUser.email,
+    role: dbUser.role,
+    firstName: clerkUser.firstName,
+    lastName: clerkUser.lastName,
+  }
 }
+/**
+ * Check if the current user has a specific role
+ */
+export async function hasRole(role: string) {
+  const user = await getCurrentUser()
+  return user?.role === role
+}
+/**
+ * Get any user by Clerk ID (includes DB data)
+ */
+export async function getUserByClerkId(clerkId: string) {
+  const clerk = await clerkClient()
+  const clerkUser = await clerk.users.getUser(clerkId)
+  const dbUser = await prisma.user.findUnique({ where: { clerkId } })
 
-export const auth = NextAuth(authOptions)
+  if (!dbUser) {
+    throw new Error(`User with clerkId ${clerkId} not found in database`)
+  }
+
+  return {
+    id: dbUser.id,
+    clerkId: clerkUser.id,
+    email: clerkUser.emailAddresses[0]?.emailAddress,
+    firstName: clerkUser.firstName,
+    lastName: clerkUser.lastName,
+    role: dbUser.role ?? 'user',
+  }
+}

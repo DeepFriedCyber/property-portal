@@ -1,7 +1,8 @@
+'use client'
+
 import React, { useState } from 'react'
-import Head from 'next/head'
-import LocationSearch from '../../components/LocationSearch'
-import { LocationResult } from '../../lib/services/locationService'
+import LocationSearch from '@/components/LocationSearch'
+import { LocationResult } from '@/lib/services/locationService'
 
 /**
  * Example page demonstrating the UK location search and autocomplete functionality
@@ -16,14 +17,6 @@ export default function LocationSearchExample() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Head>
-        <title>UK Location Search Example</title>
-        <meta
-          name="description"
-          content="Example of UK location and postcode search with autocomplete"
-        />
-      </Head>
-
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">UK Location Search</h1>
 

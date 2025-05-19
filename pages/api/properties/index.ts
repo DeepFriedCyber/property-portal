@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { getProperties } from '../../../lib/properties'
+import { getProperties, PropertyFilter, PaginationOptions } from '../../../lib/db/propertyService'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { minPrice, maxPrice, location, page, limit } = req.query
 
       // Build filter object
-      const filter: any = {}
+      const filter: PropertyFilter = {}
 
       if (minPrice) {
         filter.minPrice = parseFloat(minPrice as string)
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       // Build pagination options
-      const pagination: any = {}
+      const pagination: PaginationOptions = {}
 
       if (page) {
         pagination.page = parseInt(page as string)
