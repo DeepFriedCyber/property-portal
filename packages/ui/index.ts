@@ -6,6 +6,7 @@
 
 // Export all components
 export * from './components/Button'
+export * from './components/Map'
 
 // Export component types
 export type { ButtonProps } from './components/Button'
