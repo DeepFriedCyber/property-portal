@@ -11,7 +11,7 @@ export default function LocationSearchExample() {
   const [selectedLocation, setSelectedLocation] = useState<LocationResult | null>(null)
 
   const handleLocationSelect = (location: LocationResult) => {
-    console.log('Selected location:', location)
+    // Set the selected location without logging
     setSelectedLocation(location)
   }
 

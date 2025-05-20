@@ -1,10 +1,11 @@
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
+
+import ErrorBoundary from '@/app/components/ErrorBoundary'
 import LoadingSkeleton from '@/app/components/LoadingSkeleton'
 import PropertyList from '@/app/components/PropertyList'
-import ErrorBoundary from '@/app/components/ErrorBoundary'
 import { fetchProperties } from '@/lib/api'
-import { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,35 +46,38 @@ async function PropertyListContainer({
   const location = searchParams.location as string | undefined
   const page = searchParams.page ? parseInt(searchParams.page as string) : 1
   const limit = 10
-  const offset = (page - 1) * limit
 
   // Fetch properties using our API utility
-  const { properties, totalCount, error } = await fetchProperties({
-    listingType,
-    minPrice,
-    maxPrice,
-    bedrooms,
-    propertyType,
-    location,
-    limit,
-    offset,
-  })
+  try {
+    // Create a search query string from location if provided
+    const query = location || ''
 
-  if (error) {
-    throw new Error(error)
+    // Create filters object with all the filter parameters
+    const filters = {
+      minPrice,
+      maxPrice,
+      bedrooms,
+      propertyType,
+      listingType,
+    }
+
+    const { properties, totalCount } = await fetchProperties(query, page, limit, filters)
+
+    const totalPages = Math.ceil(totalCount / limit)
+
+    return (
+      <PropertyList
+        properties={properties}
+        totalCount={totalCount}
+        page={page}
+        totalPages={totalPages}
+        searchParams={searchParams}
+      />
+    )
+  } catch (error) {
+    // Re-throw the error to be caught by the ErrorBoundary
+    throw new Error(error instanceof Error ? error.message : 'Failed to fetch properties')
   }
-
-  const totalPages = Math.ceil(totalCount / limit)
-
-  return (
-    <PropertyList
-      properties={properties}
-      totalCount={totalCount}
-      page={page}
-      totalPages={totalPages}
-      searchParams={searchParams}
-    />
-  )
 }
 
 export default function PropertiesPage({
