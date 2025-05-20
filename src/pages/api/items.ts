@@ -66,7 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     } catch (error: unknown) {
       // Catch any other unexpected errors during processing
       // eslint-disable-next-line no-console
-      console.error('Error creating item:', error)
+      console.error('Error creating item:', error instanceof Error ? error.message : String(error))
       return res.status(500).json({
         success: false,
         error: {
