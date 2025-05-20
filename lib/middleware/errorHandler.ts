@@ -1,6 +1,7 @@
 // lib/middleware/errorHandler.ts
-import { NextFunction, Request, Response } from 'express';
-import { winstonLogger as logger } from '../logging/winston-logger';
+import { NextFunction, Request, Response } from 'express'
+
+import { winstonLogger as logger } from '../logging/winston-logger'
 
 /**
  * Custom application error class with additional context
@@ -11,10 +12,10 @@ export class AppError extends Error {
     message: string,
     public details?: Record<string, unknown>
   ) {
-    super(message);
-    this.name = 'AppError';
+    super(message)
+    this.name = 'AppError'
     // Ensure proper prototype chain for instanceof checks
-    Object.setPrototypeOf(this, AppError.prototype);
+    Object.setPrototypeOf(this, AppError.prototype)
   }
 }
 
@@ -23,7 +24,7 @@ export class AppError extends Error {
  * @returns A unique ID string
  */
 function generateRequestId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2, 15);
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 15)
 }
 
 /**
@@ -31,12 +32,12 @@ function generateRequestId(): string {
  */
 export function requestIdMiddleware(req: Request, res: Response, next: NextFunction) {
   // Generate a unique request ID if not already present
-  req.id = req.id || generateRequestId();
-  
+  req.id = req.id || generateRequestId()
+
   // Add the request ID to response headers for debugging
-  res.setHeader('X-Request-ID', req.id);
-  
-  next();
+  res.setHeader('X-Request-ID', req.id)
+
+  next()
 }
 
 /**
@@ -50,7 +51,7 @@ export function errorHandler(
 ) {
   // If headers already sent, let the default Express error handler deal with it
   if (res.headersSent) {
-    return next(err);
+    return next(err)
   }
 
   // Handle known application errors
@@ -60,18 +61,18 @@ export function errorHandler(
         path: req.path,
         method: req.method,
         requestId: req.id,
-        details: err.details
-      }
-    });
+        details: err.details,
+      },
+    })
 
     return res.status(err.statusCode).json({
       error: {
         message: err.message,
         details: err.details,
         timestamp: new Date().toISOString(),
-        requestId: req.id
-      }
-    });
+        requestId: req.id,
+      },
+    })
   }
 
   // Handle unexpected errors
@@ -81,22 +82,22 @@ export function errorHandler(
       path: req.path,
       method: req.method,
       requestId: req.id,
-      body: req.body
-    }
-  });
+      body: req.body,
+    },
+  })
 
   // In production, don't expose error details to clients
-  const isProduction = process.env.NODE_ENV === 'production';
-  
+  const isProduction = process.env.NODE_ENV === 'production'
+
   res.status(500).json({
     error: {
       message: isProduction ? 'Internal Server Error' : err.message,
       requestId: req.id,
       timestamp: new Date().toISOString(),
       // Only include stack trace in non-production environments
-      ...(isProduction ? {} : { stack: err.stack })
-    }
-  });
+      ...(isProduction ? {} : { stack: err.stack }),
+    },
+  })
 }
 
 /**
@@ -107,17 +108,17 @@ export function notFoundHandler(req: Request, res: Response) {
     context: {
       path: req.path,
       method: req.method,
-      requestId: req.id
-    }
-  });
+      requestId: req.id,
+    },
+  })
 
   res.status(404).json({
     error: {
       message: `Route not found: ${req.method} ${req.path}`,
       requestId: req.id,
-      timestamp: new Date().toISOString()
-    }
-  });
+      timestamp: new Date().toISOString(),
+    },
+  })
 }
 
 /**
@@ -132,24 +133,26 @@ export function createError(
   message: string,
   details?: Record<string, unknown>
 ): AppError {
-  return new AppError(statusCode, message, details);
+  return new AppError(statusCode, message, details)
 }
 
 // Common error creators
-export const BadRequest = (message = 'Bad Request', details?: Record<string, unknown>) => 
-  createError(400, message, details);
+export const BadRequest = (message = 'Bad Request', details?: Record<string, unknown>) =>
+  createError(400, message, details)
 
-export const Unauthorized = (message = 'Unauthorized', details?: Record<string, unknown>) => 
-  createError(401, message, details);
+export const Unauthorized = (message = 'Unauthorized', details?: Record<string, unknown>) =>
+  createError(401, message, details)
 
-export const Forbidden = (message = 'Forbidden', details?: Record<string, unknown>) => 
-  createError(403, message, details);
+export const Forbidden = (message = 'Forbidden', details?: Record<string, unknown>) =>
+  createError(403, message, details)
 
-export const NotFound = (message = 'Not Found', details?: Record<string, unknown>) => 
-  createError(404, message, details);
+export const NotFound = (message = 'Not Found', details?: Record<string, unknown>) =>
+  createError(404, message, details)
 
-export const Conflict = (message = 'Conflict', details?: Record<string, unknown>) => 
-  createError(409, message, details);
+export const Conflict = (message = 'Conflict', details?: Record<string, unknown>) =>
+  createError(409, message, details)
 
-export const InternalServerError = (message = 'Internal Server Error', details?: Record<string, unknown>) => 
-  createError(500, message, details);
+export const InternalServerError = (
+  message = 'Internal Server Error',
+  details?: Record<string, unknown>
+) => createError(500, message, details)

@@ -1,5 +1,6 @@
 'use client'
 
+import { ApiError } from '@/lib/api/error-handling'
 import React, { useState } from 'react'
 
 import {
@@ -9,7 +10,6 @@ import {
 } from '@/components/error-handling'
 import CentralizedErrorHandlingExample from '@/components/examples/CentralizedErrorHandlingExample'
 import ErrorHandlingHookExample from '@/components/examples/ErrorHandlingHookExample'
-import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
 import logger from '@/lib/logging/logger'
 

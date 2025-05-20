@@ -9,8 +9,8 @@ This document outlines the database optimizations implemented in the Property Po
 We've implemented an HNSW (Hierarchical Navigable Small World) index for the vector embeddings in the `Property` table. This provides significant performance improvements over the previous IVFFlat index.
 
 ```sql
-CREATE INDEX "Property_embedding_hnsw_idx" ON "Property" 
-USING hnsw (embedding vector_cosine_ops) 
+CREATE INDEX "Property_embedding_hnsw_idx" ON "Property"
+USING hnsw (embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 ```
 
@@ -27,6 +27,7 @@ WITH (m = 16, ef_construction = 64);
 - `ef_construction = 64`: Controls the size of the dynamic candidate list during index construction
 
 You can adjust these parameters based on your specific needs:
+
 - Higher values provide better recall but slower indexing
 - Lower values provide faster indexing but potentially lower recall
 
@@ -47,7 +48,7 @@ const pool = new Pool({
   ssl: {
     rejectUnauthorized: false, // Required for Neon Postgres
   },
-});
+})
 ```
 
 ### Configuration

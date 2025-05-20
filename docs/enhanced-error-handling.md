@@ -25,6 +25,7 @@ The system provides:
 ### 2. Middleware Setup (`lib/middleware/index.ts`)
 
 Configures all middleware in one place:
+
 - Security middleware (Helmet)
 - CORS configuration
 - Body parsers
@@ -39,6 +40,7 @@ The logging system has been integrated with the error handling middleware:
 #### Winston Logger (`lib/logging/winston-logger.ts`)
 
 A robust server-side logger based on Winston:
+
 - Console output with colorized, human-readable format
 - File output with JSON format for machine processing
 - Automatic log rotation and size limits
@@ -48,6 +50,7 @@ A robust server-side logger based on Winston:
 #### Advanced Winston Logger (`lib/logging/advanced-winston-logger.ts`)
 
 An enhanced version with daily rotation:
+
 - Daily log rotation with date-based filenames
 - Compressed archives of old logs
 - Size-based rotation (20MB max file size)
@@ -69,18 +72,18 @@ An enhanced version with daily rotation:
 ```typescript
 app.get('/api/properties/:id', async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const property = await findProperty(id);
-    
+    const { id } = req.params
+    const property = await findProperty(id)
+
     if (!property) {
-      throw NotFound(`Property with ID ${id} not found`);
+      throw NotFound(`Property with ID ${id} not found`)
     }
-    
-    res.json({ success: true, data: property });
+
+    res.json({ success: true, data: property })
   } catch (error) {
-    next(error); // Pass to error handler middleware
+    next(error) // Pass to error handler middleware
   }
-});
+})
 ```
 
 ### 2. Validation Errors
@@ -88,24 +91,24 @@ app.get('/api/properties/:id', async (req, res, next) => {
 ```typescript
 app.post('/api/properties', (req, res, next) => {
   try {
-    const { title, price } = req.body;
-    
+    const { title, price } = req.body
+
     if (!title) {
-      throw BadRequest('Title is required');
+      throw BadRequest('Title is required')
     }
-    
+
     if (!price || isNaN(price) || price <= 0) {
-      throw BadRequest('Valid price is required', { 
+      throw BadRequest('Valid price is required', {
         providedPrice: price,
-        message: 'Price must be a positive number'
-      });
+        message: 'Price must be a positive number',
+      })
     }
-    
+
     // Process the request...
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 ```
 
 ### 3. Authorization Errors
@@ -115,19 +118,19 @@ app.put('/api/properties/:id', async (req, res, next) => {
   try {
     // Check authentication
     if (!req.user) {
-      throw Unauthorized('Authentication required');
+      throw Unauthorized('Authentication required')
     }
-    
+
     // Check authorization
     if (property.createdBy !== req.user.id && req.user.role !== 'admin') {
-      throw Forbidden('You do not have permission to update this property');
+      throw Forbidden('You do not have permission to update this property')
     }
-    
+
     // Process the request...
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 ```
 
 ## Error Response Format

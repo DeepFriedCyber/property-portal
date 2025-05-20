@@ -49,13 +49,13 @@ A lightweight logger for client-side use:
 ### Basic Logging
 
 ```typescript
-import { winstonLogger as logger } from './lib/logging/winston-logger';
+import { winstonLogger as logger } from './lib/logging/winston-logger'
 
 // Log at different levels
-logger.debug('Detailed debug information');
-logger.info('Something noteworthy happened');
-logger.warn('Something concerning happened');
-logger.error('Something went wrong', new Error('Error details'));
+logger.debug('Detailed debug information')
+logger.info('Something noteworthy happened')
+logger.warn('Something concerning happened')
+logger.error('Something went wrong', new Error('Error details'))
 ```
 
 ### Logging with Context
@@ -65,25 +65,25 @@ logger.info('User registered', {
   context: {
     userId: 'user-123',
     email: 'user@example.com',
-    plan: 'premium'
-  }
-});
+    plan: 'premium',
+  },
+})
 ```
 
 ### Request-Aware Logging
 
 ```typescript
-import { loggerWithRequest } from './lib/logging/winston-logger';
+import { loggerWithRequest } from './lib/logging/winston-logger'
 
 app.get('/api/properties', (req, res) => {
-  const reqLogger = loggerWithRequest(req);
-  
+  const reqLogger = loggerWithRequest(req)
+
   reqLogger.info('Fetching properties', {
-    filters: req.query
-  });
-  
+    filters: req.query,
+  })
+
   // The request ID, path, and method are automatically included
-});
+})
 ```
 
 ## Log Files
@@ -107,29 +107,29 @@ The logger can be configured through environment variables:
 The logging system is integrated with the error handling middleware:
 
 ```typescript
-import { BadRequest } from './lib/middleware/errorHandler';
-import { winstonLogger as logger } from './lib/logging/winston-logger';
+import { BadRequest } from './lib/middleware/errorHandler'
+import { winstonLogger as logger } from './lib/logging/winston-logger'
 
 app.post('/api/properties', (req, res, next) => {
   try {
-    logger.info('Creating property', { body: req.body });
-    
+    logger.info('Creating property', { body: req.body })
+
     if (!req.body.title) {
-      throw BadRequest('Title is required');
+      throw BadRequest('Title is required')
     }
-    
+
     // Process request...
-    
   } catch (error) {
     // The error handler middleware will log the error
-    next(error);
+    next(error)
   }
-});
+})
 ```
 
 ## Best Practices
 
 1. **Use the appropriate log level**
+
    - Debug: Detailed information for debugging
    - Info: Normal application behavior
    - Warn: Concerning but non-critical issues
@@ -137,15 +137,18 @@ app.post('/api/properties', (req, res, next) => {
    - Fatal: Critical errors that may cause application failure
 
 2. **Include relevant context**
+
    - Add enough information to understand the log entry
    - Don't include sensitive information
    - Don't log entire objects without sanitization
 
 3. **Use structured logging**
+
    - Use the context parameter instead of string concatenation
    - This makes logs easier to search and analyze
 
 4. **Log at service boundaries**
+
    - Log when entering and leaving important functions
    - Log before and after external service calls
    - Log database operations

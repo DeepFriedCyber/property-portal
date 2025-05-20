@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from 'next/image'
 
 export function PropertyCard({ image, title }: { image: string; title: string }) {
   return (
@@ -12,5 +12,5 @@ export function PropertyCard({ image, title }: { image: string; title: string })
       />
       <h3 className="p-2 text-xl font-bold">{title}</h3>
     </div>
-  );
+  )
 }

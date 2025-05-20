@@ -1,7 +1,6 @@
 // hooks/useApi.ts
-import { useState, useCallback } from 'react'
-
 import { ApiError, createApiClient } from '@/lib/api/error-handling'
+import { useState, useCallback } from 'react'
 
 interface UseApiOptions {
   baseUrl?: string

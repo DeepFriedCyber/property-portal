@@ -55,6 +55,7 @@
 To verify the security measures:
 
 1. Run the security check script:
+
    ```
    npm run security:check
    ```

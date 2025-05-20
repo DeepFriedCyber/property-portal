@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
+
 import LoadMore from '@/components/LoadMore'
 import Pagination from '@/components/Pagination'
 import PropertyCard from '@/components/PropertyCard'

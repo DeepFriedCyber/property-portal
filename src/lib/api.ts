@@ -1,5 +1,6 @@
-import { prisma } from './db'
 import { Property } from '@/types/property'
+
+import { prisma } from './db'
 
 /**
  * Fetch properties with optional filtering

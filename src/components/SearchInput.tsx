@@ -1,9 +1,10 @@
 'use client'
 
-import { useSearchStore } from '@/store/searchStore'
-import { useRouter, useSearchParams } from 'next/navigation'
 import debounce from 'lodash.debounce'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useCallback, useTransition } from 'react'
+
+import { useSearchStore } from '@/store/searchStore'
 
 export default function SearchInput() {
   const [query, setQuery] = useState('')

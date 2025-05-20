@@ -23,14 +23,14 @@ API routes should use the `withErrorHandling` wrapper to automatically handle er
 ```typescript
 import { withErrorHandling, ValidationError } from '@/lib/api'
 
-export const GET = withErrorHandling(async (request) => {
+export const GET = withErrorHandling(async request => {
   // Your API logic here
-  
+
   // Throw specific errors when needed
   if (!isValid) {
     throw new ValidationError('Invalid data', { details: 'Specific error details' })
   }
-  
+
   // Return response normally
   return NextResponse.json({ data: 'Your data' })
 })
@@ -79,6 +79,7 @@ logger.debug('Processing request', { requestData })
 In development, logs are output to the console with colors for different levels.
 
 In production, logs are:
+
 1. Output to the console
 2. Written to `logs/combined.log` for all logs
 3. Written to `logs/error.log` for error logs only
@@ -86,6 +87,7 @@ In production, logs are:
 ### Request Logging
 
 All API requests are automatically logged by the middleware with:
+
 - Request method and path
 - Query parameters
 - User agent

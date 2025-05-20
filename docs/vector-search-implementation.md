@@ -17,9 +17,9 @@ Vector search enables semantic search capabilities, allowing users to find prope
 The `20240601_add_hnsw_index.sql` migration adds an HNSW index to the properties table for efficient vector search:
 
 ```sql
-CREATE INDEX IF NOT EXISTS idx_properties_embedding_hnsw 
-ON properties 
-USING hnsw (embedding vector_cosine_ops) 
+CREATE INDEX IF NOT EXISTS idx_properties_embedding_hnsw
+ON properties
+USING hnsw (embedding vector_cosine_ops)
 WITH (
     m = 16,              -- Maximum number of connections per node
     ef_construction = 64, -- Size of dynamic candidate list during construction
@@ -59,34 +59,34 @@ The HNSW index is configured with the following parameters:
 const response = await fetch('/api/search/semantic', {
   method: 'POST',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     query: 'modern apartment with a view near downtown',
     filters: {
       minPrice: 200000,
       maxPrice: 500000,
-      bedrooms: 2
+      bedrooms: 2,
     },
     options: {
       limit: 10,
-      similarityThreshold: 0.7
-    }
-  })
-});
+      similarityThreshold: 0.7,
+    },
+  }),
+})
 
-const data = await response.json();
-const properties = data.data.results;
+const data = await response.json()
+const properties = data.data.results
 ```
 
 ### Similar Properties
 
 ```javascript
 // Client-side example
-const propertyId = '123';
-const response = await fetch(`/api/search/similar/${propertyId}?limit=5`);
-const data = await response.json();
-const similarProperties = data.data.similarProperties;
+const propertyId = '123'
+const response = await fetch(`/api/search/similar/${propertyId}?limit=5`)
+const data = await response.json()
+const similarProperties = data.data.similarProperties
 ```
 
 ## Performance Considerations
@@ -96,6 +96,7 @@ const similarProperties = data.data.similarProperties;
 2. **Query Performance**: The `ef_search` parameter controls the trade-off between search speed and recall. Adjust based on your requirements.
 
 3. **Embedding Generation**: Generating embeddings can be computationally expensive. Consider:
+
    - Generating embeddings asynchronously
    - Caching embeddings for common queries
    - Using a dedicated service for embedding generation
@@ -125,16 +126,16 @@ async function generateEmbeddings(text: string): Promise<number[]> {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
       model: 'text-embedding-ada-002',
-      input: text
-    })
-  });
-  
-  const data = await response.json();
-  return data.data[0].embedding;
+      input: text,
+    }),
+  })
+
+  const data = await response.json()
+  return data.data[0].embedding
 }
 ```
 

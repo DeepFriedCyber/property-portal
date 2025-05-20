@@ -35,11 +35,11 @@ API endpoints for semantic search with rate limiting:
 ```typescript
 router.post('/semantic', semanticSearchLimiter, async (req, res, next) => {
   // Implementation details...
-});
+})
 
 router.get('/similar/:propertyId', similarPropertiesLimiter, async (req, res, next) => {
   // Implementation details...
-});
+})
 ```
 
 ### 2. Frontend Implementation
@@ -51,7 +51,7 @@ React component for the semantic search interface:
 ```tsx
 const SemanticSearch: React.FC = () => {
   // Implementation details...
-};
+}
 ```
 
 #### Similar Properties Component (`components/search/SimilarProperties.tsx`)
@@ -61,7 +61,7 @@ React component for displaying similar properties:
 ```tsx
 const SimilarProperties: React.FC<SimilarPropertiesProps> = ({ propertyId, limit = 4 }) => {
   // Implementation details...
-};
+}
 ```
 
 ### 3. Database Configuration
@@ -69,7 +69,7 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({ propertyId, limit
 The implementation uses HNSW indexing for efficient vector search:
 
 ```sql
-CREATE INDEX ON properties USING hnsw (embedding vector_cosine_ops) 
+CREATE INDEX ON properties USING hnsw (embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64, ef_search = 100);
 ```
 
@@ -83,14 +83,14 @@ const semanticSearchLimiter = createRateLimitMiddleware({
   interval: 60 * 1000,
   maxRequests: 20,
   prefix: 'ratelimit:semantic:',
-});
+})
 
 // Similar properties: 50 requests per minute
 const similarPropertiesLimiter = createRateLimitMiddleware({
   interval: 60 * 1000,
   maxRequests: 50,
   prefix: 'ratelimit:similar:',
-});
+})
 ```
 
 ## Testing
@@ -102,18 +102,20 @@ The implementation includes Cypress tests to verify functionality:
 ```typescript
 describe('Property Search', () => {
   it('performs semantic search', () => {
-    cy.intercept('POST', '/api/search/semantic', { fixture: 'searchResults.json' }).as('searchRequest');
-    cy.visit('/search');
-    cy.get('[data-testid="search-input"]').type('cosy flat near parks');
-    cy.get('[data-testid="search-button"]').click();
+    cy.intercept('POST', '/api/search/semantic', { fixture: 'searchResults.json' }).as(
+      'searchRequest'
+    )
+    cy.visit('/search')
+    cy.get('[data-testid="search-input"]').type('cosy flat near parks')
+    cy.get('[data-testid="search-button"]').click()
     cy.wait('@searchRequest').its('request.body').should('deep.include', {
-      query: 'cosy flat near parks'
-    });
-    cy.get('[data-testid="property-card"]').should('have.length.gt', 0);
-  });
+      query: 'cosy flat near parks',
+    })
+    cy.get('[data-testid="property-card"]').should('have.length.gt', 0)
+  })
 
   // Additional tests...
-});
+})
 ```
 
 ## Usage Examples
@@ -125,34 +127,34 @@ describe('Property Search', () => {
 const response = await fetch('/api/search/semantic', {
   method: 'POST',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     query: 'modern apartment with a view near downtown',
     filters: {
       minPrice: 200000,
       maxPrice: 500000,
-      bedrooms: 2
+      bedrooms: 2,
     },
     options: {
       limit: 10,
-      similarityThreshold: 0.7
-    }
-  })
-});
+      similarityThreshold: 0.7,
+    },
+  }),
+})
 
-const data = await response.json();
-const properties = data.data.results;
+const data = await response.json()
+const properties = data.data.results
 ```
 
 ### Similar Properties
 
 ```typescript
 // Client-side example
-const propertyId = 'prop-123';
-const response = await fetch(`/api/search/similar/${propertyId}?limit=5`);
-const data = await response.json();
-const similarProperties = data.data.similarProperties;
+const propertyId = 'prop-123'
+const response = await fetch(`/api/search/similar/${propertyId}?limit=5`)
+const data = await response.json()
+const similarProperties = data.data.similarProperties
 ```
 
 ## Performance Considerations

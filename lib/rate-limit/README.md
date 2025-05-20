@@ -16,16 +16,16 @@ This library provides rate limiting functionality for the Property Portal API.
 ### Basic Usage
 
 ```typescript
-import { rateLimit } from '@/lib/rate-limit';
+import { rateLimit } from '@/lib/rate-limit'
 
 // Create a rate limiter
 const limiter = rateLimit({
   interval: 60 * 1000, // 1 minute
-  maxRequests: 20,     // 20 requests per minute
-});
+  maxRequests: 20, // 20 requests per minute
+})
 
 // Check if a request is allowed
-const { success, remaining, resetIn } = await limiter.check('user-ip-address');
+const { success, remaining, resetIn } = await limiter.check('user-ip-address')
 
 if (!success) {
   // Handle rate limit exceeded
@@ -35,67 +35,75 @@ if (!success) {
 ### Express Middleware
 
 ```typescript
-import express from 'express';
-import { rateLimitMiddleware } from '@/lib/rate-limit';
+import express from 'express'
+import { rateLimitMiddleware } from '@/lib/rate-limit'
 
-const app = express();
+const app = express()
 
 // Apply rate limiting to all routes
-app.use(rateLimitMiddleware({
-  interval: 60 * 1000, // 1 minute
-  maxRequests: 100,    // 100 requests per minute
-}));
+app.use(
+  rateLimitMiddleware({
+    interval: 60 * 1000, // 1 minute
+    maxRequests: 100, // 100 requests per minute
+  })
+)
 
 // Or apply to specific routes
-app.use('/api/search', rateLimitMiddleware({
-  interval: 60 * 1000, // 1 minute
-  maxRequests: 20,     // 20 requests per minute
-}));
+app.use(
+  '/api/search',
+  rateLimitMiddleware({
+    interval: 60 * 1000, // 1 minute
+    maxRequests: 20, // 20 requests per minute
+  })
+)
 ```
 
 ### Redis-based Rate Limiting
 
 ```typescript
-import { redisRateLimit } from '@/lib/rate-limit/redis';
+import { redisRateLimit } from '@/lib/rate-limit/redis'
 
 // Create a Redis-based rate limiter
-const limiter = redisRateLimit({
-  interval: 60 * 1000, // 1 minute
-  maxRequests: 20,     // 20 requests per minute
-}, 'redis://localhost:6379'); // Optional Redis URL
+const limiter = redisRateLimit(
+  {
+    interval: 60 * 1000, // 1 minute
+    maxRequests: 20, // 20 requests per minute
+  },
+  'redis://localhost:6379'
+) // Optional Redis URL
 
 // Check if a request is allowed
-const result = await limiter.check('user-ip-address');
+const result = await limiter.check('user-ip-address')
 ```
 
 ### Environment-based Factory
 
 ```typescript
-import { createRateLimiter, createRateLimitMiddleware } from '@/lib/rate-limit/factory';
+import { createRateLimiter, createRateLimitMiddleware } from '@/lib/rate-limit/factory'
 
 // Create the appropriate rate limiter based on the environment
 const limiter = createRateLimiter({
   interval: 60 * 1000,
   maxRequests: 20,
-});
+})
 
 // Create the appropriate middleware based on the environment
 const middleware = createRateLimitMiddleware({
   interval: 60 * 1000,
   maxRequests: 20,
-});
+})
 ```
 
 ## Configuration Options
 
 The rate limiter accepts the following options:
 
-| Option | Type | Description | Default |
-|--------|------|-------------|---------|
-| `interval` | number | Time window in milliseconds | - |
-| `maxRequests` | number | Maximum number of requests allowed in the interval | - |
-| `prefix` | string | Prefix for the cache key | `'ratelimit:'` |
-| `enableLogging` | boolean | Whether to log rate limit events | `true` |
+| Option          | Type    | Description                                        | Default        |
+| --------------- | ------- | -------------------------------------------------- | -------------- |
+| `interval`      | number  | Time window in milliseconds                        | -              |
+| `maxRequests`   | number  | Maximum number of requests allowed in the interval | -              |
+| `prefix`        | string  | Prefix for the cache key                           | `'ratelimit:'` |
+| `enableLogging` | boolean | Whether to log rate limit events                   | `true`         |
 
 ## Response Headers
 

@@ -3,10 +3,9 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
+import { prisma } from '@/lib/db'
 import { createPropertySchema, updatePropertySchema } from '@/lib/schemas/propertySchemas'
 import { Property } from '@/types/property'
-
-import { prisma } from '@/lib/db'
 
 /**
  * Add a new property listing

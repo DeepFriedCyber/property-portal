@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { fetchProperties } from '@/lib/api'
 import { prisma } from '@/lib/db'
-import { createPropertySchema } from '@/lib/schemas/propertySchemas'
 import { generatePropertyEmbedding } from '@/lib/embeddings'
+import { createPropertySchema } from '@/lib/schemas/propertySchemas'
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
   try {
     // Parse request body
     const body = await request.json()
-    
+
     // Validate property data
     const validationResult = createPropertySchema.safeParse(body)
     if (!validationResult.success) {
@@ -40,16 +41,16 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    
+
     const propertyData = validationResult.data
-    
+
     // Generate embedding for the property
     const embedding = await generatePropertyEmbedding({
       title: propertyData.title,
       location: propertyData.location,
       description: body.description || '',
     })
-    
+
     // Create property with embedding
     const property = await prisma.property.create({
       data: {
@@ -66,13 +67,10 @@ export async function POST(request: NextRequest) {
         features: body.features || [],
       },
     })
-    
+
     return NextResponse.json({ property }, { status: 201 })
   } catch (error) {
     console.error('Error creating property:', error)
-    return NextResponse.json(
-      { error: 'Failed to create property' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to create property' }, { status: 500 })
   }
 }

@@ -22,8 +22,8 @@ Rate limiting is implemented in `lib/rate-limit.ts` and applied to API routes us
 ```typescript
 export const POST = withRateLimit(handler, {
   limit: 20,
-  interval: 60 // 60 seconds
-});
+  interval: 60, // 60 seconds
+})
 ```
 
 ### Security Headers

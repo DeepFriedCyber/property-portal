@@ -38,47 +38,47 @@ The `index.ts` file provides a convenient way to set up all middleware:
 ### Basic Setup
 
 ```typescript
-import express from 'express';
-import { setupMiddleware } from './lib/middleware';
+import express from 'express'
+import { setupMiddleware } from './lib/middleware'
 
-const app = express();
+const app = express()
 
 // Apply all middleware
-setupMiddleware(app);
+setupMiddleware(app)
 
 // Add your routes here
 app.get('/api/example', (req, res) => {
-  res.json({ success: true });
-});
+  res.json({ success: true })
+})
 
-app.listen(3000);
+app.listen(3000)
 ```
 
 ### Throwing Application Errors
 
 ```typescript
-import { BadRequest, NotFound } from './lib/middleware';
+import { BadRequest, NotFound } from './lib/middleware'
 
 app.get('/api/properties/:id', async (req, res, next) => {
   try {
-    const { id } = req.params;
-    
+    const { id } = req.params
+
     // Validate input
     if (!id) {
-      throw BadRequest('Property ID is required');
+      throw BadRequest('Property ID is required')
     }
-    
-    const property = await findProperty(id);
-    
+
+    const property = await findProperty(id)
+
     if (!property) {
-      throw NotFound(`Property with ID ${id} not found`);
+      throw NotFound(`Property with ID ${id} not found`)
     }
-    
-    res.json({ success: true, data: property });
+
+    res.json({ success: true, data: property })
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 ```
 
 ### Available Error Helpers
@@ -93,17 +93,17 @@ app.get('/api/properties/:id', async (req, res, next) => {
 ### Custom Error Creation
 
 ```typescript
-import { createError } from './lib/middleware';
+import { createError } from './lib/middleware'
 
 // Create a custom error with status code 422
 const validationError = createError(422, 'Validation failed', {
   fields: {
     email: 'Invalid email format',
-    password: 'Password too short'
-  }
-});
+    password: 'Password too short',
+  },
+})
 
-throw validationError;
+throw validationError
 ```
 
 ## Error Response Format

@@ -1,4 +1,4 @@
-import { rateLimit } from 'express-rate-limit';
+import { rateLimit } from 'express-rate-limit'
 
 // Note: Using memory store instead of Redis for simplicity
 // To use Redis, install the required packages:
@@ -22,6 +22,6 @@ export const apiLimiter = rateLimit({
   handler: (req, res) => {
     res.status(429).json({
       error: 'Too many requests',
-    });
+    })
   },
-});
+})

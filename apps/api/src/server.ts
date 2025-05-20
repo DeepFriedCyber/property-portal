@@ -1,8 +1,14 @@
 // apps/api/src/server.ts
 import express from 'express';
-import { setupMiddleware } from '../../../lib/middleware';
+
+// Define routes
 import { winstonLogger as logger } from '../../../lib/logging/winston-logger';
+import { setupMiddleware } from '../../../lib/middleware';
 import { createRateLimitMiddleware } from '../../../lib/rate-limit/factory';
+
+import propertiesRoutes from './routes/properties';
+import searchRoutes from './routes/search';
+import usersRoutes from './routes/users';
 
 // Create Express application
 const app = express();
@@ -14,17 +20,12 @@ setupMiddleware(app);
 // This is a fallback to prevent abuse of endpoints that don't have specific rate limits
 const globalRateLimiter = createRateLimitMiddleware({
   interval: 60 * 1000, // 1 minute
-  maxRequests: 200,    // 200 requests per minute
+  maxRequests: 200, // 200 requests per minute
   prefix: 'ratelimit:global:',
 });
 
 // Apply global rate limiter to all routes
 app.use(globalRateLimiter);
-
-// Define routes
-import propertiesRoutes from './routes/properties';
-import usersRoutes from './routes/users';
-import searchRoutes from './routes/search';
 
 // Apply routes
 app.use('/api/properties', propertiesRoutes);
@@ -36,7 +37,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '0.0.0'
+    version: process.env.npm_package_version || '0.0.0',
   });
 });
 
@@ -49,8 +50,8 @@ export function startServer() {
       context: {
         port: PORT,
         environment: process.env.NODE_ENV || 'development',
-        version: process.env.npm_package_version || '0.0.0'
-      }
+        version: process.env.npm_package_version || '0.0.0',
+      },
     });
   });
 }

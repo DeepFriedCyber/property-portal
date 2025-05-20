@@ -23,11 +23,11 @@ All API requests are subject to a global rate limit:
 // Global rate limit: 200 requests per minute
 const globalRateLimiter = createRateLimitMiddleware({
   interval: 60 * 1000, // 1 minute
-  maxRequests: 200,    // 200 requests per minute
+  maxRequests: 200, // 200 requests per minute
   prefix: 'ratelimit:global:',
-});
+})
 
-app.use(globalRateLimiter);
+app.use(globalRateLimiter)
 ```
 
 ### 2. Resource-Specific Rate Limiting
@@ -40,16 +40,16 @@ Different API resources have different rate limits based on their resource requi
 // Semantic search: 20 requests per minute
 const semanticSearchLimiter = createRateLimitMiddleware({
   interval: 60 * 1000, // 1 minute
-  maxRequests: 20,     // 20 requests per minute
+  maxRequests: 20, // 20 requests per minute
   prefix: 'ratelimit:semantic:',
-});
+})
 
 // Similar properties search: 50 requests per minute
 const similarPropertiesLimiter = createRateLimitMiddleware({
   interval: 60 * 1000, // 1 minute
-  maxRequests: 50,     // 50 requests per minute
+  maxRequests: 50, // 50 requests per minute
   prefix: 'ratelimit:similar:',
-});
+})
 ```
 
 #### Properties API
@@ -58,16 +58,16 @@ const similarPropertiesLimiter = createRateLimitMiddleware({
 // Read operations: 100 requests per minute
 const readLimiter = createRateLimitMiddleware({
   interval: 60 * 1000, // 1 minute
-  maxRequests: 100,    // 100 requests per minute
+  maxRequests: 100, // 100 requests per minute
   prefix: 'ratelimit:properties:read:',
-});
+})
 
 // Write operations: 30 requests per minute
 const writeLimiter = createRateLimitMiddleware({
   interval: 60 * 1000, // 1 minute
-  maxRequests: 30,     // 30 requests per minute
+  maxRequests: 30, // 30 requests per minute
   prefix: 'ratelimit:properties:write:',
-});
+})
 ```
 
 #### Users API
@@ -76,9 +76,9 @@ const writeLimiter = createRateLimitMiddleware({
 // Profile operations: 30 requests per minute
 const profileLimiter = createRateLimitMiddleware({
   interval: 60 * 1000, // 1 minute
-  maxRequests: 30,     // 30 requests per minute
+  maxRequests: 30, // 30 requests per minute
   prefix: 'ratelimit:users:profile:',
-});
+})
 ```
 
 ## Rate Limit Headers
@@ -90,6 +90,7 @@ When a request is made, the following headers are included in the response:
 - `X-RateLimit-Reset`: Time in seconds until the rate limit resets
 
 Example:
+
 ```
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
@@ -129,10 +130,12 @@ The rate limiting system supports two storage backends:
 Used in development and testing environments. Rate limit data is stored in memory using a Map.
 
 Pros:
+
 - No external dependencies
 - Simple setup
 
 Cons:
+
 - Not suitable for distributed environments
 - Data is lost on server restart
 
@@ -141,11 +144,13 @@ Cons:
 Used in production environments. Rate limit data is stored in Redis.
 
 Pros:
+
 - Works in distributed environments
 - Persists across server restarts
 - Automatic key expiration
 
 Cons:
+
 - Requires Redis server
 - More complex setup
 
@@ -178,7 +183,7 @@ The system uses middleware to apply rate limits to routes:
 ```typescript
 router.post('/semantic', semanticSearchLimiter, async (req, res, next) => {
   // Route handler
-});
+})
 ```
 
 ## Future Improvements

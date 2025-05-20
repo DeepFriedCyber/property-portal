@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+
 import { semanticPropertySearch } from '@/lib/semantic-search'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

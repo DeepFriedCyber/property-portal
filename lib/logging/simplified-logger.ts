@@ -16,7 +16,7 @@ const SENSITIVE_FIELDS = [
   'creditCard',
   'cardNumber',
   'cvv',
-];
+]
 
 export enum LogLevel {
   DEBUG = 'debug',
@@ -27,15 +27,15 @@ export enum LogLevel {
 }
 
 interface LoggerConfig {
-  enableConsole?: boolean;
-  minLevel?: LogLevel;
-  sentryDsn?: string;
-  logRocketAppId?: string;
-  userId?: string;
-  userEmail?: string;
-  requestId?: string;
-  release?: string;
-  environment?: 'development' | 'test' | 'production';
+  enableConsole?: boolean
+  minLevel?: LogLevel
+  sentryDsn?: string
+  logRocketAppId?: string
+  userId?: string
+  userEmail?: string
+  requestId?: string
+  release?: string
+  environment?: 'development' | 'test' | 'production'
 }
 
 const defaultConfig: LoggerConfig = {
@@ -45,21 +45,21 @@ const defaultConfig: LoggerConfig = {
   environment:
     (process.env.NODE_ENV as unknown as 'development' | 'test' | 'production') || 'development',
   release: process.env.NEXT_PUBLIC_APP_VERSION,
-};
+}
 
 // Global logger configuration
-let loggerConfig: LoggerConfig = { ...defaultConfig };
-let sentryInitialized = false;
-let logRocketInitialized = false;
+let loggerConfig: LoggerConfig = { ...defaultConfig }
+let sentryInitialized = false
+let logRocketInitialized = false
 
 // Flag to track if we've warned about server usage
-let serverWarningShown = false;
+let serverWarningShown = false
 
 /**
  * Check if code is running in browser environment
  */
 function isBrowser(): boolean {
-  return typeof window !== 'undefined';
+  return typeof window !== 'undefined'
 }
 
 /**
@@ -69,10 +69,10 @@ function warnIfServer() {
   if (!isBrowser() && !serverWarningShown) {
     console.warn(
       'Warning: simplified-logger is being used in a server context. ' +
-      'Sentry and LogRocket integrations will be disabled. ' +
-      'For server-side logging, consider using a server-compatible logger.'
-    );
-    serverWarningShown = true;
+        'Sentry and LogRocket integrations will be disabled. ' +
+        'For server-side logging, consider using a server-compatible logger.'
+    )
+    serverWarningShown = true
   }
 }
 
@@ -80,28 +80,28 @@ function warnIfServer() {
  * Configure the logger
  */
 export function configureLogger(config: Partial<LoggerConfig>) {
-  loggerConfig = { ...loggerConfig, ...config };
+  loggerConfig = { ...loggerConfig, ...config }
 
   // Use environment variables for secrets if not explicitly provided
-  const sentryDsn = loggerConfig.sentryDsn || process.env.NEXT_PUBLIC_SENTRY_DSN;
-  const logRocketAppId = loggerConfig.logRocketAppId || process.env.NEXT_PUBLIC_LOGROCKET_APP_ID;
+  const sentryDsn = loggerConfig.sentryDsn || process.env.NEXT_PUBLIC_SENTRY_DSN
+  const logRocketAppId = loggerConfig.logRocketAppId || process.env.NEXT_PUBLIC_LOGROCKET_APP_ID
 
   // Initialize external logging services if configured and in browser environment
   if (sentryDsn && isBrowser()) {
-    initSentry(sentryDsn, loggerConfig);
+    initSentry(sentryDsn, loggerConfig)
   } else if (sentryDsn) {
-    warnIfServer();
+    warnIfServer()
   }
 
   if (logRocketAppId && isBrowser()) {
-    initLogRocket(logRocketAppId, loggerConfig);
+    initLogRocket(logRocketAppId, loggerConfig)
   } else if (logRocketAppId) {
-    warnIfServer();
+    warnIfServer()
   }
 
   // In production, ensure we're not logging too verbosely
   if (process.env.NODE_ENV === 'production' && !config.minLevel) {
-    loggerConfig.minLevel = LogLevel.WARN;
+    loggerConfig.minLevel = LogLevel.WARN
   }
 }
 
@@ -111,38 +111,38 @@ export function configureLogger(config: Partial<LoggerConfig>) {
 async function initSentry(dsn: string, config: LoggerConfig) {
   // Skip initialization if already initialized or if dsn is missing/empty
   if (sentryInitialized) {
-    console.debug('Sentry already initialized, skipping initialization');
-    return;
+    console.debug('Sentry already initialized, skipping initialization')
+    return
   }
 
   if (!dsn || dsn.trim() === '') {
-    console.warn('Sentry DSN is empty or missing, skipping initialization');
-    return null;
+    console.warn('Sentry DSN is empty or missing, skipping initialization')
+    return null
   }
 
   try {
-    const Sentry = await import('@sentry/nextjs');
+    const Sentry = await import('@sentry/nextjs')
 
     Sentry.init({
       dsn,
       environment: config.environment,
       release: config.release,
       tracesSampleRate: config.environment === 'production' ? 0.2 : 1.0,
-    });
+    })
 
     // Set user information if available
     if (config.userId || config.userEmail) {
       Sentry.setUser({
         id: config.userId,
         email: config.userEmail,
-      });
+      })
     }
 
-    sentryInitialized = true;
-    return Sentry;
+    sentryInitialized = true
+    return Sentry
   } catch (error) {
-    console.error('Failed to initialize Sentry:', error);
-    return null;
+    console.error('Failed to initialize Sentry:', error)
+    return null
   }
 }
 
@@ -152,17 +152,17 @@ async function initSentry(dsn: string, config: LoggerConfig) {
 async function initLogRocket(appId: string, config: LoggerConfig) {
   // Skip initialization if already initialized or if appId is missing/empty
   if (logRocketInitialized) {
-    console.debug('LogRocket already initialized, skipping initialization');
-    return;
+    console.debug('LogRocket already initialized, skipping initialization')
+    return
   }
 
   if (!appId || appId.trim() === '') {
-    console.warn('LogRocket App ID is empty or missing, skipping initialization');
-    return null;
+    console.warn('LogRocket App ID is empty or missing, skipping initialization')
+    return null
   }
 
   try {
-    const LogRocket = (await import('logrocket')).default as typeof import('logrocket').default;
+    const LogRocket = (await import('logrocket')).default as typeof import('logrocket').default
 
     LogRocket.init(appId, {
       release: config.release,
@@ -174,35 +174,35 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
       },
       network: {
         isEnabled: true,
-        requestSanitizer: (request) => {
+        requestSanitizer: request => {
           // Don't log request bodies for sensitive endpoints
           if (request.url.includes('/api/auth') || request.url.includes('/api/user')) {
-            request.body = null;
+            request.body = null
           }
-          return request;
+          return request
         },
-        responseSanitizer: (response) => {
+        responseSanitizer: response => {
           // Don't log response bodies for sensitive endpoints
           if (response.url.includes('/api/auth') || response.url.includes('/api/user')) {
-            response.body = null;
+            response.body = null
           }
-          return response;
+          return response
         },
       },
-    });
+    })
 
     // Set user information if available
     if (config.userId || config.userEmail) {
       LogRocket.identify(config.userId || 'anonymous', {
         email: config.userEmail,
-      });
+      })
     }
 
-    logRocketInitialized = true;
-    return LogRocket;
+    logRocketInitialized = true
+    return LogRocket
   } catch (error) {
-    console.error('Failed to initialize LogRocket:', error);
-    return null;
+    console.error('Failed to initialize LogRocket:', error)
+    return null
   }
 }
 
@@ -210,30 +210,30 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
  * Set user information for logging
  */
 export async function setLogUser(userId?: string, userEmail?: string) {
-  loggerConfig.userId = userId;
-  loggerConfig.userEmail = userEmail;
+  loggerConfig.userId = userId
+  loggerConfig.userEmail = userEmail
 
   // Update user information in external services only in browser environment
   if (sentryInitialized && isBrowser()) {
     try {
-      const Sentry = await import('@sentry/nextjs');
+      const Sentry = await import('@sentry/nextjs')
       Sentry.setUser({
         id: userId,
         email: userEmail,
-      });
+      })
     } catch (err) {
-      console.error('Failed to set user in Sentry:', err);
+      console.error('Failed to set user in Sentry:', err)
     }
   }
 
   if (logRocketInitialized && isBrowser()) {
     try {
-      const LogRocket = (await import('logrocket')).default as typeof import('logrocket').default;
+      const LogRocket = (await import('logrocket')).default as typeof import('logrocket').default
       LogRocket.identify(userId || 'anonymous', {
         email: userEmail,
-      });
+      })
     } catch (err) {
-      console.error('Failed to set user in LogRocket:', err);
+      console.error('Failed to set user in LogRocket:', err)
     }
   }
 }
@@ -242,26 +242,26 @@ export async function setLogUser(userId?: string, userEmail?: string) {
  * Set request ID for logging
  */
 export async function setRequestId(requestId: string) {
-  loggerConfig.requestId = requestId;
+  loggerConfig.requestId = requestId
 
   // Update request ID in external services
   if (sentryInitialized && typeof window !== 'undefined') {
     try {
-      const Sentry = await import('@sentry/nextjs');
-      Sentry.configureScope((scope) => {
-        scope.setTag('requestId', requestId);
-      });
+      const Sentry = await import('@sentry/nextjs')
+      Sentry.configureScope(scope => {
+        scope.setTag('requestId', requestId)
+      })
     } catch (err) {
-      console.error('Failed to set request ID in Sentry:', err);
+      console.error('Failed to set request ID in Sentry:', err)
     }
   }
 
   if (logRocketInitialized && typeof window !== 'undefined') {
     try {
-      const LogRocket = (await import('logrocket')).default;
-      LogRocket.setMeta('requestId', requestId);
+      const LogRocket = (await import('logrocket')).default
+      LogRocket.setMeta('requestId', requestId)
     } catch (err) {
-      console.error('Failed to set request ID in LogRocket:', err);
+      console.error('Failed to set request ID in LogRocket:', err)
     }
   }
 }
@@ -270,25 +270,25 @@ export async function setRequestId(requestId: string) {
  * Sanitize data for logging by removing sensitive fields
  */
 function sanitizeForLogging(data: any): any {
-  if (!data) return data;
-  
+  if (!data) return data
+
   if (typeof data === 'object' && data !== null) {
     if (Array.isArray(data)) {
-      return data.map(sanitizeForLogging);
+      return data.map(sanitizeForLogging)
     }
-    
-    const sanitized: Record<string, any> = {};
+
+    const sanitized: Record<string, any> = {}
     for (const [key, value] of Object.entries(data)) {
       if (SENSITIVE_FIELDS.some(field => key.toLowerCase().includes(field.toLowerCase()))) {
-        sanitized[key] = '[REDACTED]';
+        sanitized[key] = '[REDACTED]'
       } else {
-        sanitized[key] = sanitizeForLogging(value);
+        sanitized[key] = sanitizeForLogging(value)
       }
     }
-    return sanitized;
+    return sanitized
   }
-  
-  return data;
+
+  return data
 }
 
 /**
@@ -303,7 +303,7 @@ async function log(
 ) {
   // Skip if below minimum log level
   if (loggerConfig.minLevel && shouldSkipLog(level, loggerConfig.minLevel)) {
-    return;
+    return
   }
 
   // Enhance context with requestId and userId if available in config
@@ -311,26 +311,26 @@ async function log(
     ...(context || {}),
     ...(loggerConfig.requestId ? { requestId: loggerConfig.requestId } : {}),
     ...(loggerConfig.userId ? { userId: loggerConfig.userId } : {}),
-  });
+  })
 
   // Log to console if enabled
   if (loggerConfig.enableConsole !== false) {
-    logToConsole(level, message, enhancedContext, tags, error);
+    logToConsole(level, message, enhancedContext, tags, error)
   }
 
   // Log to external services
-  await logToExternalServices(level, message, enhancedContext, tags, error);
+  await logToExternalServices(level, message, enhancedContext, tags, error)
 }
 
 /**
  * Determine if a log should be skipped based on minimum level
  */
 function shouldSkipLog(level: LogLevel, minLevel: LogLevel): boolean {
-  const levels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR, LogLevel.FATAL];
-  const levelIndex = levels.indexOf(level);
-  const minLevelIndex = levels.indexOf(minLevel);
+  const levels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR, LogLevel.FATAL]
+  const levelIndex = levels.indexOf(level)
+  const minLevelIndex = levels.indexOf(minLevel)
 
-  return levelIndex < minLevelIndex;
+  return levelIndex < minLevelIndex
 }
 
 /**
@@ -343,25 +343,25 @@ function logToConsole(
   tags?: string[],
   error?: Error
 ) {
-  const timestamp = new Date().toISOString();
-  const formattedMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
-  const logData = { ...(context || {}), tags };
+  const timestamp = new Date().toISOString()
+  const formattedMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}`
+  const logData = { ...(context || {}), tags }
 
   // Use the appropriate console method based on level
   switch (level) {
     case LogLevel.DEBUG:
-      console.debug(formattedMessage, logData);
-      break;
+      console.debug(formattedMessage, logData)
+      break
     case LogLevel.INFO:
-      console.info(formattedMessage, logData);
-      break;
+      console.info(formattedMessage, logData)
+      break
     case LogLevel.WARN:
-      console.warn(formattedMessage, logData);
-      break;
+      console.warn(formattedMessage, logData)
+      break
     case LogLevel.ERROR:
     case LogLevel.FATAL:
-      console.error(formattedMessage, error || '', logData);
-      break;
+      console.error(formattedMessage, error || '', logData)
+      break
   }
 }
 
@@ -377,58 +377,58 @@ async function logToExternalServices(
 ) {
   // Skip external logging if not in browser environment
   if (!isBrowser()) {
-    return;
+    return
   }
 
   // Send to Sentry if configured and level is ERROR or FATAL
   if (sentryInitialized && (level === LogLevel.ERROR || level === LogLevel.FATAL)) {
     try {
-      const Sentry = await import('@sentry/nextjs');
+      const Sentry = await import('@sentry/nextjs')
 
       // Set extra context
-      Sentry.configureScope((scope) => {
+      Sentry.configureScope(scope => {
         if (context) {
           Object.entries(context).forEach(([key, value]) => {
-            scope.setExtra(key, value);
-          });
+            scope.setExtra(key, value)
+          })
         }
 
         if (tags) {
-          tags.forEach((tag) => {
-            scope.setTag(tag, 'true');
-          });
+          tags.forEach(tag => {
+            scope.setTag(tag, 'true')
+          })
         }
-      });
+      })
 
       // Capture the error or message
       if (error) {
-        Sentry.captureException(error);
+        Sentry.captureException(error)
       } else {
-        Sentry.captureMessage(message, level);
+        Sentry.captureMessage(message, level)
       }
     } catch (err) {
-      console.error('Failed to log to Sentry:', err);
+      console.error('Failed to log to Sentry:', err)
     }
   }
 
   // Send to LogRocket if configured
   if (logRocketInitialized) {
     try {
-      const LogRocket = (await import('logrocket')).default as typeof import('logrocket').default;
+      const LogRocket = (await import('logrocket')).default as typeof import('logrocket').default
 
       // Log the message
       if (level === LogLevel.ERROR || level === LogLevel.FATAL) {
         LogRocket.captureException(error || new Error(message), {
           tags: tags?.reduce((acc, tag) => ({ ...acc, [tag]: true }), {}),
           extra: context,
-        });
+        })
       } else if (level === LogLevel.WARN) {
-        LogRocket.warn(message, context);
+        LogRocket.warn(message, context)
       } else {
-        LogRocket.log(message, context);
+        LogRocket.log(message, context)
       }
     } catch (err) {
-      console.error('Failed to log to LogRocket:', err);
+      console.error('Failed to log to LogRocket:', err)
     }
   }
 }
@@ -437,35 +437,35 @@ async function logToExternalServices(
  * Log a debug message
  */
 export function debug(message: string, context?: any, tags?: string[]) {
-  log(LogLevel.DEBUG, message, context, tags);
+  log(LogLevel.DEBUG, message, context, tags)
 }
 
 /**
  * Log an info message
  */
 export function info(message: string, context?: any, tags?: string[]) {
-  log(LogLevel.INFO, message, context, tags);
+  log(LogLevel.INFO, message, context, tags)
 }
 
 /**
  * Log a warning message
  */
 export function warn(message: string, context?: any, tags?: string[]) {
-  log(LogLevel.WARN, message, context, tags);
+  log(LogLevel.WARN, message, context, tags)
 }
 
 /**
  * Log an error message
  */
 export function error(message: string, errorObj?: Error, context?: any, tags?: string[]) {
-  log(LogLevel.ERROR, message, context, tags, errorObj);
+  log(LogLevel.ERROR, message, context, tags, errorObj)
 }
 
 /**
  * Log a fatal error message
  */
 export function fatal(message: string, errorObj?: Error, context?: any, tags?: string[]) {
-  log(LogLevel.FATAL, message, context, tags, errorObj);
+  log(LogLevel.FATAL, message, context, tags, errorObj)
 }
 
 // Export a default logger object
@@ -478,11 +478,6 @@ const logger = {
   configureLogger,
   setLogUser,
   setRequestId,
-};
+}
 
-export default logger;
-
-
-
-
-
+export default logger

@@ -1,8 +1,8 @@
 'use client'
 
+import { ApiError } from '@/lib/api/error-handling'
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 
-import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
 import logger from '@/lib/logging/logger'
 

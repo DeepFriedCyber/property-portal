@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { fetchNearbyAmenities } from '../../lib/amenities'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

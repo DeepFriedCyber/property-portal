@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { validatePropertyCSV } from './csv-import'
 
 describe('CSV Import Validation', () => {
@@ -9,22 +10,24 @@ describe('CSV Import Validation', () => {
 "Modern Flat","Manchester, UK",275000,1,1,750,53.4808,-2.2426`
 
     const result = validatePropertyCSV(validCSV)
-    
+
     expect(result.valid).toBe(true)
     expect(result.data.length).toBe(3)
     expect(result.errors.length).toBe(0)
-    
+
     // Check the first property
-    expect(result.data[0]).toEqual(expect.objectContaining({
-      title: 'Luxury Apartment',
-      location: 'London, UK',
-      price: 500000,
-      bedrooms: 2,
-      bathrooms: 2,
-      area: 1200,
-      lat: 51.5074,
-      lng: -0.1278
-    }))
+    expect(result.data[0]).toEqual(
+      expect.objectContaining({
+        title: 'Luxury Apartment',
+        location: 'London, UK',
+        price: 500000,
+        bedrooms: 2,
+        bathrooms: 2,
+        area: 1200,
+        lat: 51.5074,
+        lng: -0.1278,
+      })
+    )
   })
 
   it('should handle CSV with quoted values containing commas', () => {
@@ -32,7 +35,7 @@ describe('CSV Import Validation', () => {
 "Luxury Apartment, Central","London, Westminster, UK",500000,2,2`
 
     const result = validatePropertyCSV(csvWithCommas)
-    
+
     expect(result.valid).toBe(true)
     expect(result.data.length).toBe(1)
     expect(result.data[0].title).toBe('Luxury Apartment, Central')
@@ -44,11 +47,13 @@ describe('CSV Import Validation', () => {
 "Luxury Apartment","London, UK",2`
 
     const result = validatePropertyCSV(invalidCSV)
-    
+
     expect(result.valid).toBe(false)
     expect(result.data.length).toBe(0)
     expect(result.errors.length).toBe(1)
-    expect(result.errors[0].errors.header).toContain(expect.stringContaining('Missing required columns'))
+    expect(result.errors[0].errors.header).toContain(
+      expect.stringContaining('Missing required columns')
+    )
   })
 
   it('should validate each row and report errors', () => {
@@ -58,7 +63,7 @@ describe('CSV Import Validation', () => {
 "Cozy Cottage","Bath, UK",350000,3,1`
 
     const result = validatePropertyCSV(mixedCSV)
-    
+
     expect(result.valid).toBe(false)
     expect(result.data.length).toBe(2) // Two valid rows
     expect(result.errors.length).toBe(1) // One invalid row
@@ -69,7 +74,7 @@ describe('CSV Import Validation', () => {
     const emptyCSV = ''
 
     const result = validatePropertyCSV(emptyCSV)
-    
+
     expect(result.valid).toBe(false)
     expect(result.data.length).toBe(0)
     expect(result.errors.length).toBe(1)
@@ -80,7 +85,7 @@ describe('CSV Import Validation', () => {
     const headerOnlyCSV = 'title,location,price,bedrooms,bathrooms'
 
     const result = validatePropertyCSV(headerOnlyCSV)
-    
+
     expect(result.valid).toBe(false)
     expect(result.data.length).toBe(0)
     expect(result.errors.length).toBe(1)
@@ -92,7 +97,7 @@ describe('CSV Import Validation', () => {
 "Luxury Apartment","London, UK",abc,2,2`
 
     const result = validatePropertyCSV(csvWithInvalidNumbers)
-    
+
     expect(result.valid).toBe(false)
     expect(result.data.length).toBe(0)
     expect(result.errors.length).toBe(1)
@@ -107,7 +112,7 @@ describe('CSV Import Validation', () => {
 `
 
     const result = validatePropertyCSV(csvWithEmptyLines)
-    
+
     expect(result.valid).toBe(true)
     expect(result.data.length).toBe(2)
   })

@@ -31,7 +31,7 @@ export const logger = createLogger({
               metaStr = `\n${metadata.stack}`
               delete metadata.stack
             }
-            
+
             // Format remaining metadata if any
             if (Object.keys(metadata).length > 0) {
               metaStr += `\n${JSON.stringify(metadata, null, 2)}`
@@ -48,17 +48,17 @@ export const logger = createLogger({
 if (isProduction) {
   // Log everything to a combined log file
   logger.add(
-    new transports.File({ 
+    new transports.File({
       filename: 'logs/combined.log',
       maxsize: 5242880, // 5MB
       maxFiles: 5,
     })
   )
-  
+
   // Log errors separately
   logger.add(
-    new transports.File({ 
-      filename: 'logs/error.log', 
+    new transports.File({
+      filename: 'logs/error.log',
       level: 'error',
       maxsize: 5242880, // 5MB
       maxFiles: 5,

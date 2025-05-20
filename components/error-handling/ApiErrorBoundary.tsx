@@ -3,9 +3,10 @@
 
 import React from 'react'
 
+import { ApiError } from '@/lib/api/error-handling'
+
 import EnhancedErrorBoundary from './EnhancedErrorBoundary'
 
-import { ApiError } from '@/lib/api/error-handling'
 import logger from '@/lib/logging/logger'
 
 interface ApiErrorBoundaryProps {

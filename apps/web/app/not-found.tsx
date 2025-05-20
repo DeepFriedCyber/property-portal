@@ -1,8 +1,9 @@
 'use client'
 
-import GitHubPagesLink from '@/components/common/GitHubPagesLink'
-import React, { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import React, { useEffect } from 'react'
+
+import GitHubPagesLink from '@/components/common/GitHubPagesLink'
 
 /**
  * Custom 404 page for Next.js with GitHub Pages support

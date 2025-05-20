@@ -1,9 +1,9 @@
-import { PrismaClient } from '@prisma/client';
-import { Pool } from 'pg';
+import { PrismaClient } from '@prisma/client'
+import { Pool } from 'pg'
 
 // Environment variables
-const DATABASE_URL = process.env.DATABASE_URL;
-const POOL_SIZE = parseInt(process.env.POOL_SIZE || '10', 10);
+const DATABASE_URL = process.env.DATABASE_URL
+const POOL_SIZE = parseInt(process.env.POOL_SIZE || '10', 10)
 
 // Connection pool configuration
 const pool = new Pool({
@@ -14,17 +14,17 @@ const pool = new Pool({
   ssl: {
     rejectUnauthorized: false, // Required for Neon Postgres
   },
-});
+})
 
 // Log pool events for monitoring
 pool.on('connect', () => {
-  console.log('Database pool connection established');
-});
+  console.log('Database pool connection established')
+})
 
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
-  process.exit(-1);
-});
+pool.on('error', err => {
+  console.error('Unexpected error on idle client', err)
+  process.exit(-1)
+})
 
 // Create a custom Prisma client with connection pooling
 const prismaClientSingleton = () => {
@@ -35,19 +35,19 @@ const prismaClientSingleton = () => {
       },
     },
     log: ['query', 'error', 'warn'],
-  });
-};
+  })
+}
 
 // Use global to maintain a single instance across hot reloads in development
-type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
+type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClientSingleton | undefined;
-};
+  prisma: PrismaClientSingleton | undefined
+}
 
 // Export the Prisma client singleton
-export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
+export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
-export default prisma;
+export default prisma

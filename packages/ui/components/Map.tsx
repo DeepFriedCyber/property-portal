@@ -1,8 +1,8 @@
-import React from 'react';
+import React from 'react'
 
 interface MapProps {
-  center?: [number, number];
-  zoom?: number;
+  center?: [number, number]
+  zoom?: number
 }
 
 /**
@@ -23,5 +23,5 @@ export function Map({ center = [51.505, -0.09], zoom = 13 }: MapProps) {
         <p>Zoom: {zoom}</p>
       </div>
     </div>
-  );
+  )
 }

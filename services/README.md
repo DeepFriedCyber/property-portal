@@ -15,28 +15,28 @@ The `vectorSearch.ts` service provides semantic search capabilities using vector
 ### Usage
 
 ```typescript
-import vectorSearchService from '../services/vectorSearch';
+import vectorSearchService from '../services/vectorSearch'
 
 // Semantic search
 const embeddings = await vectorSearchService.generateEmbeddings(
   'modern apartment with a view near downtown'
-);
+)
 
 const properties = await vectorSearchService.semanticPropertySearch(
   embeddings,
   {
     minPrice: 200000,
     maxPrice: 500000,
-    bedrooms: 2
+    bedrooms: 2,
   },
   {
     limit: 10,
-    similarityThreshold: 0.7
+    similarityThreshold: 0.7,
   }
-);
+)
 
 // Similar properties
-const similarProperties = await vectorSearchService.getSimilarProperties('property-123', 5);
+const similarProperties = await vectorSearchService.getSimilarProperties('property-123', 5)
 ```
 
 ### Configuration
@@ -73,16 +73,16 @@ async function generateEmbeddings(text: string): Promise<number[]> {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
       model: 'text-embedding-ada-002',
-      input: text
-    })
-  });
-  
-  const data = await response.json();
-  return data.data[0].embedding;
+      input: text,
+    }),
+  })
+
+  const data = await response.json()
+  return data.data[0].embedding
 }
 ```
 

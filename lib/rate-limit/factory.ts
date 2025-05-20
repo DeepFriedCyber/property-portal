@@ -1,8 +1,9 @@
 // lib/rate-limit/factory.ts
-import { RateLimitOptions } from './index';
-import { rateLimit } from './index';
-import { redisRateLimit } from './redis';
-import { winstonLogger as logger } from '../logging/winston-logger';
+import { winstonLogger as logger } from '../logging/winston-logger'
+
+import { redisRateLimit } from './redis'
+
+import { RateLimitOptions, rateLimit } from './index'
 
 /**
  * Create a rate limiter based on the environment
@@ -11,14 +12,14 @@ import { winstonLogger as logger } from '../logging/winston-logger';
  */
 export function createRateLimiter(options: RateLimitOptions) {
   // Use Redis in production, in-memory in development
-  const useRedis = process.env.NODE_ENV === 'production' || process.env.USE_REDIS === 'true';
-  
+  const useRedis = process.env.NODE_ENV === 'production' || process.env.USE_REDIS === 'true'
+
   if (useRedis) {
-    logger.info('Using Redis-based rate limiter');
-    return redisRateLimit(options);
+    logger.info('Using Redis-based rate limiter')
+    return redisRateLimit(options)
   } else {
-    logger.info('Using in-memory rate limiter');
-    return rateLimit(options);
+    logger.info('Using in-memory rate limiter')
+    return rateLimit(options)
   }
 }
 
@@ -28,18 +29,18 @@ export function createRateLimiter(options: RateLimitOptions) {
  * @returns Express middleware function
  */
 export function createRateLimitMiddleware(options: RateLimitOptions) {
-  const useRedis = process.env.NODE_ENV === 'production' || process.env.USE_REDIS === 'true';
-  
+  const useRedis = process.env.NODE_ENV === 'production' || process.env.USE_REDIS === 'true'
+
   if (useRedis) {
-    const { redisRateLimitMiddleware } = require('./redis');
-    return redisRateLimitMiddleware(options);
+    const { redisRateLimitMiddleware } = require('./redis')
+    return redisRateLimitMiddleware(options)
   } else {
-    const { rateLimitMiddleware } = require('./index');
-    return rateLimitMiddleware(options);
+    const { rateLimitMiddleware } = require('./index')
+    return rateLimitMiddleware(options)
   }
 }
 
 export default {
   createRateLimiter,
-  createRateLimitMiddleware
-};
+  createRateLimitMiddleware,
+}

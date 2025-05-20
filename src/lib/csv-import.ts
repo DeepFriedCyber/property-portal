@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { createPropertySchema } from './schemas/propertySchemas'
 
 // Type for CSV validation errors
@@ -29,7 +30,7 @@ export function validatePropertyCSV(csvString: string): CSVValidationResult {
 
   // Split the CSV into lines
   const lines = csvString.trim().split('\n')
-  
+
   // Ensure there's at least a header and one data row
   if (lines.length < 2) {
     result.valid = false
@@ -44,11 +45,11 @@ export function validatePropertyCSV(csvString: string): CSVValidationResult {
 
   // Parse the header row
   const header = parseCSVLine(lines[0])
-  
+
   // Validate required columns
   const requiredColumns = ['title', 'location', 'price', 'bedrooms', 'bathrooms']
   const missingColumns = requiredColumns.filter(col => !header.includes(col))
-  
+
   if (missingColumns.length > 0) {
     result.valid = false
     result.errors.push({
@@ -64,9 +65,9 @@ export function validatePropertyCSV(csvString: string): CSVValidationResult {
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim()
     if (!line) continue // Skip empty lines
-    
+
     const rowData = parseCSVLine(line)
-    
+
     // Create an object from the CSV row
     const propertyData: Record<string, any> = {}
     header.forEach((column, index) => {
@@ -79,10 +80,10 @@ export function validatePropertyCSV(csvString: string): CSVValidationResult {
         }
       }
     })
-    
+
     // Validate the property data
     const validationResult = createPropertySchema.safeParse(propertyData)
-    
+
     if (validationResult.success) {
       result.data.push(validationResult.data)
     } else {
@@ -107,10 +108,10 @@ function parseCSVLine(line: string): string[] {
   const result: string[] = []
   let current = ''
   let inQuotes = false
-  
+
   for (let i = 0; i < line.length; i++) {
     const char = line[i]
-    
+
     if (char === '"') {
       // Toggle quote state
       inQuotes = !inQuotes
@@ -123,9 +124,9 @@ function parseCSVLine(line: string): string[] {
       current += char
     }
   }
-  
+
   // Add the last field
   result.push(current.trim())
-  
+
   return result
 }

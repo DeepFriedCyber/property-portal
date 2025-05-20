@@ -1,4 +1,5 @@
 import { renderHook } from '@testing-library/react'
+
 import { useLeafletMap } from './useLeafletMap'
 
 // Mock Leaflet

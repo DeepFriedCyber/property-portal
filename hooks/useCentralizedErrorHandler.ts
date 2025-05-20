@@ -1,8 +1,8 @@
 // hooks/useCentralizedErrorHandler.ts
+import { ApiError } from '@/lib/api/error-handling'
 import { usePathname } from 'next/navigation'
 import { useState, useCallback, useEffect } from 'react'
 
-import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
 import { errorService, ErrorContext, ErrorType, ErrorSeverity } from '@/lib/error/error-service'
 

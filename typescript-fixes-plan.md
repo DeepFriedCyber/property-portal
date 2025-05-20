@@ -3,6 +3,7 @@
 ## Progress Report
 
 ### Completed Fixes:
+
 1. ✅ Fixed the syntax error in PropertyForm.tsx (missing closing bracket in enum definition)
 2. ✅ Replaced @ts-ignore with @ts-expect-error in the embeddings test file
 3. ✅ Replaced @ts-ignore with @ts-expect-error in the database modules (index.ts and migrate.ts)
@@ -42,6 +43,7 @@
 ## Priority 4: Improve Type Safety
 
 4. **Improve Type Safety in Database Access**
+
    - Problem: Type safety issues with postgres import
    - Fix: Properly type the postgres client or use a typed alternative
    - Options:

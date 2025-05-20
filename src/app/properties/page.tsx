@@ -1,10 +1,11 @@
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
+
+import ErrorBoundary from '@/app/components/ErrorBoundary'
 import LoadingSkeleton from '@/app/components/LoadingSkeleton'
 import PropertyList from '@/app/components/PropertyList'
-import ErrorBoundary from '@/app/components/ErrorBoundary'
 import { fetchProperties } from '@/lib/api'
-import { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 

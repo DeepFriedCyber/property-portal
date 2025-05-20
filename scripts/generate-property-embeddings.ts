@@ -1,43 +1,44 @@
 // scripts/generate-property-embeddings.ts
-import { Pool } from 'pg';
-import pgvector from 'pgvector';
-import dotenv from 'dotenv';
-import { generateEmbeddings } from '../services/vectorSearch';
+import dotenv from 'dotenv'
+import { Pool } from 'pg'
+import pgvector from 'pgvector'
+
+import { generateEmbeddings } from '../services/vectorSearch'
 
 // Load environment variables
-dotenv.config();
+dotenv.config()
 
 // Initialize pgvector
-pgvector.init();
+pgvector.init()
 
 // Create a connection pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+})
 
 /**
  * Generate embeddings for all properties that don't have them
  */
 async function generatePropertyEmbeddings() {
-  const client = await pool.connect();
-  
+  const client = await pool.connect()
+
   try {
-    console.log('Starting embedding generation for properties...');
-    
+    console.log('Starting embedding generation for properties...')
+
     // Start a transaction
-    await client.query('BEGIN');
-    
+    await client.query('BEGIN')
+
     // Get properties without embeddings
     const { rows: properties } = await client.query(`
       SELECT id, title, description, location, property_type
       FROM properties
       WHERE embedding IS NULL
       LIMIT 100
-    `);
-    
-    console.log(`Found ${properties.length} properties without embeddings`);
-    
+    `)
+
+    console.log(`Found ${properties.length} properties without embeddings`)
+
     // Process each property
     for (const [index, property] of properties.entries()) {
       try {
@@ -47,47 +48,51 @@ async function generatePropertyEmbeddings() {
           Description: ${property.description || ''}
           Location: ${property.location || ''}
           Type: ${property.property_type || ''}
-        `.trim();
-        
+        `.trim()
+
         // Generate embeddings
-        const embedding = await generateEmbeddings(textToEmbed);
-        
+        const embedding = await generateEmbeddings(textToEmbed)
+
         // Update the property with the embedding
-        await client.query(
-          `UPDATE properties SET embedding = $1 WHERE id = $2`,
-          [pgvector.toSql(embedding), property.id]
-        );
-        
-        console.log(`[${index + 1}/${properties.length}] Generated embedding for property ${property.id}`);
+        await client.query(`UPDATE properties SET embedding = $1 WHERE id = $2`, [
+          pgvector.toSql(embedding),
+          property.id,
+        ])
+
+        console.log(
+          `[${index + 1}/${properties.length}] Generated embedding for property ${property.id}`
+        )
       } catch (error) {
-        console.error(`Failed to generate embedding for property ${property.id}:`, error);
+        console.error(`Failed to generate embedding for property ${property.id}:`, error)
       }
     }
-    
+
     // Commit the transaction
-    await client.query('COMMIT');
-    
-    console.log('Embedding generation completed');
-    
+    await client.query('COMMIT')
+
+    console.log('Embedding generation completed')
+
     // If there are more properties to process, suggest running the script again
     if (properties.length === 100) {
-      console.log('There may be more properties without embeddings. Run the script again to process them.');
+      console.log(
+        'There may be more properties without embeddings. Run the script again to process them.'
+      )
     }
   } catch (error) {
     // Rollback the transaction on error
-    await client.query('ROLLBACK');
-    console.error('Embedding generation failed:', error);
+    await client.query('ROLLBACK')
+    console.error('Embedding generation failed:', error)
   } finally {
     // Release the client back to the pool
-    client.release();
-    
+    client.release()
+
     // Close the pool
-    await pool.end();
+    await pool.end()
   }
 }
 
 // Run the script
 generatePropertyEmbeddings().catch(error => {
-  console.error('Script failed:', error);
-  process.exit(1);
-});
+  console.error('Script failed:', error)
+  process.exit(1)
+})

@@ -11,11 +11,13 @@ We use PostgreSQL with the pgvector extension to enable similarity searches for 
 ### Database Setup
 
 1. **pgvector Extension**: We use the PostgreSQL pgvector extension for vector operations.
+
    ```sql
    CREATE EXTENSION IF NOT EXISTS "vector";
    ```
 
 2. **Schema**: The Property model includes an embedding field of type vector(1536).
+
    ```prisma
    model Property {
      // other fields...
@@ -37,8 +39,8 @@ Properties are embedded using a text embedding service that converts textual des
 const embedding = await generatePropertyEmbedding({
   title: property.title,
   location: property.location,
-  description: property.description
-});
+  description: property.description,
+})
 ```
 
 ### Similarity Search
@@ -46,7 +48,7 @@ const embedding = await generatePropertyEmbedding({
 We use the cosine similarity operator (`<=>`) to find similar properties:
 
 ```sql
-SELECT 
+SELECT
   id, title, description, price, /* other fields */,
   embedding <=> ${queryEmbedding}::vector AS similarity
 FROM "Property"
