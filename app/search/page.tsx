@@ -1,5 +1,5 @@
 // app/search/page.tsx
-import SearchForm from '@/components/SearchForm'
+import SearchForm from '../../components/SearchForm'
 
 export const metadata = {
   title: 'Semantic Property Search',
