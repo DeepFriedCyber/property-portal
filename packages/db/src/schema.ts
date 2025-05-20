@@ -50,6 +50,26 @@ export const property = pgTable('properties', {
   location: text('location'),
   bathrooms: integer('bathrooms'),
   area: integer('area'),
+  city: text('city'),
+  state: text('state'),
+  zipCode: text('zip_code'),
+  description: text('description'),
+  createdBy: text('created_by'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at'),
+})
+
+// Uploads table for tracking CSV uploads
+export const uploads = pgTable('uploads', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').notNull(),
+  filename: text('filename').notNull(),
+  status: text('status').notNull(), // processing, complete, failed, etc.
+  totalProperties: integer('total_properties').default(0),
+  invalidProperties: integer('invalid_properties').default(0),
+  processingStats: jsonb('processing_stats'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at'),
 })
 
 // Add all other tables here

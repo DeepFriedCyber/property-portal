@@ -13,14 +13,18 @@ datasource db {
 
 model Property {
   id             String     @id @default(uuid())
-  title          String
-  description    String
-  price          Float
-  bedrooms       Int
-  bathrooms      Int
-  area           Float      // in square feet/meters
-  location       String
+  uploadId       String?    // Reference to the upload batch
+  title          String?
+  description    String?
+  price          Float?
+  bedrooms       Int?
+  bathrooms      Int?
+  area           Float?     // in square feet/meters
+  location       String?
   address        String
+  city           String?
+  state          String?    // County in UK context
+  postcode       String?    // UK postcode
   lat            Float?     // latitude for mapping
   lng            Float?     // longitude for mapping
   images         String[]   // array of image URLs
@@ -28,11 +32,15 @@ model Property {
   councilTaxBand String?    // Council tax band (A-H)
   epcRating      String?    // Energy Performance Certificate rating
   tenure         String?    // Freehold, Leasehold, etc.
+  propertyType   String?    // Type of property (house, apartment, etc.)
+  listingType    String?    // Type of listing (sale, rent)
+  metadata       Json?      // Additional metadata as JSON
   embedding      Unsupported("vector(1536)")? // Vector embedding for similarity search
                                                  // Note: Indexed with IVFFlat for performance:
                                                  // CREATE INDEX "Property_embedding_idx" ON "Property" USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
+  createdBy      String?    // User ID who created the property
   favorites      Favorite[]
 }
 
@@ -56,5 +64,17 @@ model Favorite {
   createdAt  DateTime @default(now())
 
   @@unique([userId, propertyId])
+}
+
+model Upload {
+  id               String    @id @default(uuid())
+  userId           String
+  filename         String
+  status           String    // 'processing', 'complete', 'failed'
+  totalProperties  Int
+  invalidProperties Int
+  processingStats  String?   // JSON string with processing statistics
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime? @updatedAt
 }
 
