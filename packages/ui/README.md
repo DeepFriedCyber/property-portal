@@ -31,3 +31,13 @@ export default function Home() {
   );
 }
 ```
+
+## 🛠️ Development
+
+```bash
+# Run Storybook for component testing
+pnpm run storybook
+
+# Build package for production
+pnpm run build
+```
