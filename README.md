@@ -12,7 +12,7 @@ This monorepo contains the frontend and backend services for the Property Portal
 
 ## Getting Started
 
-To get the `apps/web` frontend running:
+To get the Property Portal running:
 
 1. Copy the `.env.example` file to `.env` and update the environment variables with your actual values:
 
@@ -20,21 +20,82 @@ To get the `apps/web` frontend running:
 cp .env.example .env
 ```
 
-2. Update the following required environment variables:
-   - `DATABASE_URL`: Your PostgreSQL connection string
-   - `NEXTAUTH_SECRET`: A secure random string (generate with `openssl rand -base64 32`)
-   - `NEXTAUTH_URL`: Your application URL (use `http://localhost:3000` for local development)
+2. Set up the required environment variables as detailed in the [Environment Configuration](#environment-configuration) section below.
 
 > **Security Note**: Never commit your `.env` file to version control. It contains sensitive information like API keys and database credentials. The `.gitignore` file is configured to exclude `.env` files.
 
-2. Navigate to the web app directory and start the development server:
+3. Install dependencies:
 
 ```bash
-cd apps/web
+npm install
+```
+
+4. Start the development server:
+
+```bash
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Environment Configuration
+
+The Property Portal requires several environment variables to function properly. These are organized into categories in the `.env.example` file. Below is a detailed explanation of each required variable:
+
+### Database Configuration
+
+- `DATABASE_URL`: PostgreSQL connection string with pgvector extension support
+  - Format: `postgresql://username:password@hostname:port/database`
+  - Example: `postgresql://postgres:password@localhost:5432/property_portal`
+  - **Note**: The database must have the pgvector extension installed for property similarity search
+
+### Authentication
+
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Your Clerk publishable key (starts with pk_test_ or pk_live_)
+- `CLERK_SECRET_KEY`: Your Clerk secret key (starts with sk_test_ or sk_live_)
+- Clerk redirect URLs (customize as needed):
+  - `NEXT_PUBLIC_CLERK_SIGN_IN_URL`: Path for sign-in page
+  - `NEXT_PUBLIC_CLERK_SIGN_UP_URL`: Path for sign-up page
+  - `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL`: Redirect path after sign-in
+  - `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL`: Redirect path after sign-up
+
+### AI & Embeddings
+
+- `EMBEDDING_SERVICE_URL`: URL for the embedding service that generates vector embeddings
+  - Default: `http://localhost:8000` if not specified
+  - This service is used for property similarity search
+
+### Maps & Location Services
+
+Choose ONE of the following map providers:
+
+- Google Maps:
+  - `GOOGLE_MAPS_API_KEY`: Your Google Maps API key
+
+- OR Mapbox:
+  - `NEXT_PUBLIC_MAPBOX_TOKEN`: Your Mapbox access token
+
+- OR MapTiler:
+  - `NEXT_PUBLIC_MAPTILER_KEY`: Your MapTiler API key (client-side)
+  - `MAPTILER_API_KEY`: Your MapTiler API key (server-side)
+
+### Payment Processing (if using payments)
+
+- `STRIPE_SECRET_KEY`: Your Stripe secret key
+- `STRIPE_WEBHOOK_SECRET`: Your Stripe webhook secret for verifying webhook events
+
+### Image Storage
+
+- `CLOUDINARY_CLOUD_NAME`: Your Cloudinary cloud name
+- `CLOUDINARY_API_KEY`: Your Cloudinary API key
+- `CLOUDINARY_API_SECRET`: Your Cloudinary API secret
+
+### Application Settings
+
+- `NEXT_PUBLIC_APP_URL`: Public URL of your application (used for API calls and redirects)
+  - Local development: `http://localhost:3000`
+  - Production: Your deployed URL
+- `NODE_ENV`: Environment setting (`development`, `test`, or `production`)
 
 ## GitHub Pages Deployment
 
