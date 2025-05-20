@@ -1,11 +1,12 @@
 // apps/api/src/server.ts
 import express from 'express';
 
-// Define routes
-import { winstonLogger as logger } from '../../../lib/logging/winston-logger';
+// Import middleware and utilities
 import { setupMiddleware } from '../../../lib/middleware';
 import { createRateLimitMiddleware } from '../../../lib/rate-limit/factory';
+import { winstonLogger as logger } from '../../../lib/logging/winston-logger';
 
+// Import route handlers
 import propertiesRoutes from './routes/properties';
 import searchRoutes from './routes/search';
 import usersRoutes from './routes/users';
