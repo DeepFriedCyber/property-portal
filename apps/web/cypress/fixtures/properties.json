@@ -1,0 +1,44 @@
+[
+  {
+    "id": "1",
+    "title": "Luxury Villa",
+    "price": 1500000,
+    "location": "Miami",
+    "bedrooms": 5,
+    "bathrooms": 4,
+    "sqft": 4200,
+    "description": "Stunning waterfront property with panoramic views",
+    "images": [
+      "/images/properties/luxury-villa-1.jpg",
+      "/images/properties/luxury-villa-2.jpg"
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Cozy Apartment",
+    "price": 800000,
+    "location": "New York",
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "sqft": 1200,
+    "description": "Modern apartment in the heart of Manhattan",
+    "images": [
+      "/images/properties/cozy-apartment-1.jpg",
+      "/images/properties/cozy-apartment-2.jpg"
+    ]
+  },
+  {
+    "id": "3",
+    "title": "Suburban Home",
+    "price": 650000,
+    "location": "Chicago",
+    "bedrooms": 4,
+    "bathrooms": 3,
+    "sqft": 2800,
+    "description": "Family-friendly home in a quiet neighborhood",
+    "images": [
+      "/images/properties/suburban-home-1.jpg",
+      "/images/properties/suburban-home-2.jpg"
+    ]
+  }
+]
