@@ -1,12 +1,13 @@
 'use server'
 
+// External imports
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
+// Internal imports
+import { prisma } from '@/lib/db'
 import { createPropertySchema, updatePropertySchema } from '@/lib/schemas/propertySchemas'
 import { Property } from '@/types/property'
-
-import { prisma } from '@/lib/db'
 
 /**
  * Add a new property listing
@@ -74,7 +75,8 @@ export async function addProperty(formData: FormData | z.infer<typeof createProp
       data: property,
     }
   } catch (error) {
-    console.error('Error adding property:', error)
+    // Log the error with proper error handling
+    console.error('Error adding property:', error instanceof Error ? error.message : String(error))
     return {
       success: false,
       error: {
@@ -199,7 +201,11 @@ export async function updateProperty(
       data: property,
     }
   } catch (error) {
-    console.error('Error updating property:', error)
+    // Log the error with proper error handling
+    console.error(
+      'Error updating property:',
+      error instanceof Error ? error.message : String(error)
+    )
     return {
       success: false,
       error: {
@@ -226,7 +232,11 @@ export async function deleteProperty(id: string) {
       success: true,
     }
   } catch (error) {
-    console.error('Error deleting property:', error)
+    // Log the error with proper error handling
+    console.error(
+      'Error deleting property:',
+      error instanceof Error ? error.message : String(error)
+    )
     return {
       success: false,
       error: {
@@ -278,7 +288,11 @@ export async function getProperty(id: string): Promise<{
       data: typedProperty,
     }
   } catch (error) {
-    console.error('Error fetching property:', error)
+    // Log the error with proper error handling
+    console.error(
+      'Error fetching property:',
+      error instanceof Error ? error.message : String(error)
+    )
     return {
       success: false,
       error: {
@@ -391,7 +405,11 @@ export async function getProperties(options?: {
       },
     }
   } catch (error) {
-    console.error('Error fetching properties:', error)
+    // Log the error with proper error handling
+    console.error(
+      'Error fetching properties:',
+      error instanceof Error ? error.message : String(error)
+    )
     return {
       success: false,
       error: {

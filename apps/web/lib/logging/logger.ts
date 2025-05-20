@@ -104,7 +104,7 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
 
   try {
     // Dynamically import LogRocket to avoid bundling it unnecessarily
-    // @ts-ignore - LogRocket types may vary
+    // @ts-expect-error - LogRocket types may vary between versions
     const LogRocket = (await import('logrocket')).default
 
     LogRocket.init(appId, {
@@ -155,7 +155,7 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
       LogRocket.getSessionURL(sessionURL => {
         // Use a try-catch to handle potential missing methods
         try {
-          // @ts-ignore - Sentry API might vary between versions
+          // Using any type for scope as Sentry API might vary between versions
           Sentry.withScope((scope: any) => {
             scope.setExtra('logRocketSessionURL', sessionURL)
           })
@@ -212,7 +212,7 @@ export async function setLogUser(userId?: string, userEmail?: string) {
   }
 
   if (logRocketInitialized && typeof window !== 'undefined') {
-    // @ts-ignore - LogRocket types may vary
+    // @ts-expect-error - LogRocket types may vary between versions
     const LogRocket = (await import('logrocket')).default
     LogRocket.identify(userId || 'anonymous', {
       email: userEmail || '',
@@ -294,7 +294,7 @@ async function logToExternalServices(entry: LogEntry) {
 
       // Set extra context
       try {
-        // @ts-ignore - Sentry API might vary between versions
+        // Using any type for scope as Sentry API might vary between versions
         Sentry.withScope((scope: any) => {
           if (context) {
             Object.entries(context).forEach(([key, value]) => {
@@ -326,7 +326,7 @@ async function logToExternalServices(entry: LogEntry) {
   // Send to LogRocket if configured
   if (loggerConfig.logRocketAppId && logRocketInitialized) {
     try {
-      // @ts-ignore - LogRocket types may vary
+      // @ts-expect-error - LogRocket types may vary between versions
       const LogRocket = (await import('logrocket')).default
 
       // Log the message

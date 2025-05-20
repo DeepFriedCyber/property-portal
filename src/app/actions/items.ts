@@ -67,7 +67,8 @@ export async function createItem(
     }
   } catch (error: unknown) {
     // Catch any other unexpected errors during processing
-    console.error('Error creating item:', error)
+    // eslint-disable-next-line no-console
+    console.error('Error creating item:', error instanceof Error ? error.message : String(error))
     return {
       success: false,
       error: {
@@ -90,7 +91,8 @@ export async function getItems(): Promise<ActionResponse> {
       },
     }
   } catch (error: unknown) {
-    console.error('Error fetching items:', error)
+    // eslint-disable-next-line no-console
+    console.error('Error fetching items:', error instanceof Error ? error.message : String(error))
     return {
       success: false,
       error: {

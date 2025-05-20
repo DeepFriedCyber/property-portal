@@ -37,19 +37,27 @@
     "prisma:studio": "prisma studio",
     "prisma:setup": "node scripts/setup-db.js",
     "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:optimize": "node scripts/apply-db-optimizations.js",
     "cypress": "cypress open",
     "cypress:run": "cypress run",
-    "cypress:property-detail": "cypress run --spec \"cypress/e2e/property-detail.cy.ts\""
+    "cypress:property-detail": "cypress run --spec \"cypress/e2e/property-detail.cy.ts\"",
+    "security:check": "node scripts/security-check.js",
+    "db:migrate:vector": "node db/run-migration.js 20240601_add_embedding_column.sql && node db/run-migration.js 20240601_add_hnsw_index.sql",
+    "db:generate-embeddings": "tsx scripts/generate-property-embeddings.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.19.2",
     "@prisma/client": "^6.8.2",
+    "@types/pg": "^8.10.9",
     "@types/uuid": "^10.0.0",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
+    "pg": "^8.11.3",
     "pgvector": "^0.2.0",
     "prisma": "^6.8.2",
     "uuid": "^11.1.0",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
     "zod": "^3.24.4",
     "zustand": "^4.5.0"
   },
