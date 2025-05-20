@@ -1,10 +1,13 @@
+// External imports
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 
+// Internal imports
 import ErrorBoundary from '@/app/components/ErrorBoundary'
 import { Skeleton } from '@/app/components/ui/Skeleton'
 import { fetchPropertyById } from '@/lib/api'
 
+// Local imports
 import PropertyDetailData from './PropertyDetailData'
 
 // Generate dynamic metadata for the property detail page
@@ -19,14 +22,20 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       }
     }
 
-    return {
+    const metadata: Metadata = {
       title: `${property.title} | Property Portal`,
       description: `View details for ${property.title} located at ${property.location}. Priced at $${property.price.toLocaleString()}.`,
-      openGraph: {
-        images: [property.imageUrl],
-      },
     }
-  } catch (error) {
+
+    // Only add openGraph images if imageUrl exists
+    if (property.imageUrl) {
+      metadata.openGraph = {
+        images: [property.imageUrl],
+      }
+    }
+
+    return metadata
+  } catch (_) {
     return {
       title: 'Property Details | Property Portal',
       description: 'View detailed information about this property.',
