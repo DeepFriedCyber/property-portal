@@ -45,6 +45,9 @@ const defaultConfig: LoggerConfig = {
   environment:
     (process.env.NODE_ENV as unknown as 'development' | 'test' | 'production') || 'development',
   release: process.env.NEXT_PUBLIC_APP_VERSION,
+  sampleRate: 1.0, // Default to 100% sampling
+  maxRetries: 3, // Default to 3 retry attempts
+  retryDelay: 1000, // Default to 1 second base delay
 }
 
 // Global logger configuration
@@ -63,6 +66,56 @@ function isBrowser(): boolean {
 }
 
 /**
+ * @returns Object containing device and browser details
+ */
+function getDeviceInfo(): Record<string, string | number | null> {
+  if (!isBrowser()) {
+    return { environment: 'server' }
+  }
+  
+  try {
+    return {
+      userAgent: navigator.userAgent,
+      screenWidth: window.screen.width,
+      screenHeight: window.screen.height,
+      language: navigator.language,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      platform: navigator.platform,
+      vendor: navigator.vendor,
+      deviceMemory: (navigator as any).deviceMemory || null,
+      connectionType: (navigator as any).connection?.effectiveType || null
+    }
+  } catch (error) {
+    // Fallback if any browser APIs are not available
+    return { 
+      userAgent: navigator.userAgent,
+      environment: 'browser'
+    }
+  }
+}
+
+/**
+ * Persist critical logs to localStorage for later sending
+ */
+function persistLog(log: PersistentLog) {
+  if (isBrowser() && typeof localStorage !== 'undefined') {
+    try {
+      // Load existing logs from localStorage
+      const storedLogs = localStorage.getItem('persistentLogs')
+      persistentLogs = storedLogs ? JSON.parse(storedLogs) : []
+
+      // Add new log and limit to maximum number
+      persistentLogs = [log, ...persistentLogs].slice(0, MAX_PERSISTENT_LOGS)
+
+      // Save back to localStorage
+      localStorage.setItem('persistentLogs', JSON.stringify(persistentLogs))
+    } catch (error) {
+      console.error('Failed to persist log:', error)
+    }
+  }
+}
+
+/**
  * Warn if logger is used in server context with client-only features
  */
 function warnIfServer() {
@@ -73,6 +126,92 @@ function warnIfServer() {
         'For server-side logging, consider using a server-compatible logger.'
     )
     serverWarningShown = true
+  }
+}
+
+/**
+ * Send persisted logs to external services
+ */
+export async function sendPersistedLogs() {
+  if (!isBrowser() || typeof localStorage === 'undefined') return
+
+  try {
+    // Get logs from localStorage
+    const storedLogs = localStorage.getItem('persistentLogs')
+    if (!storedLogs) return
+
+    const logs: PersistentLog[] = JSON.parse(storedLogs)
+    if (logs.length === 0) return
+
+    // Attempt to send all persisted logs
+    await Promise.all(
+      logs.map((log: PersistentLog) =>
+        logToExternalServices(
+          log.level,
+          log.message,
+          log.context,
+          undefined,
+          log.error ? new Error(log.error) : undefined
+        )
+      )
+    )
+
+    // Clear persisted logs after successful sending
+    localStorage.removeItem('persistentLogs')
+    persistentLogs = []
+    console.debug(`Successfully sent ${logs.length} persisted logs`)
+  } catch (err) {
+    console.error('Failed to send persisted logs:', err)
+  }
+}
+
+/**
+ * Warn if logger is used in server context with client-only features
+ */
+function warnIfServer() {
+  if (!isBrowser() && !serverWarningShown) {
+    console.warn(
+      'Warning: simplified-logger is being used in a server context. ' +
+        'Sentry and LogRocket integrations will be disabled. ' +
+        'For server-side logging, consider using a server-compatible logger.'
+    )
+    serverWarningShown = true
+  }
+}
+
+/**
+ * Send persisted logs to external services
+ */
+export async function sendPersistedLogs() {
+  if (!isBrowser() || typeof localStorage === 'undefined') return
+
+  try {
+    // Get logs from localStorage
+    const storedLogs = localStorage.getItem('persistentLogs')
+    if (!storedLogs) return
+
+    const logs: PersistentLog[] = JSON.parse(storedLogs)
+    if (logs.length === 0) return
+
+    // Attempt to send all persisted logs
+    await Promise.all(
+      logs.map((log: PersistentLog) =>
+        logToExternalServices(
+          log.level,
+          log.message,
+          log.context,
+          undefined,
+          log.error ? new Error(log.error) : undefined
+        )
+      )
+    )
+
+    // Clear persisted logs after successful sending
+    localStorage.removeItem('persistentLogs')
+    persistentLogs = []
+    console.debug(`Successfully sent ${logs.length} persisted logs`)
+  } catch (err) {
+    console.error('Failed to send persisted logs:', err)
   }
 }
 
@@ -102,6 +241,20 @@ export function configureLogger(config: Partial<LoggerConfig>) {
   // In production, ensure we're not logging too verbosely
   if (process.env.NODE_ENV === 'production' && !config.minLevel) {
     loggerConfig.minLevel = LogLevel.WARN
+  }
+
+  // Set up online event listener to send persisted logs when connection is restored
+  if (isBrowser() && typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+    // Try to send any persisted logs on initialization
+    if (navigator.onLine) {
+      sendPersistedLogs()
+    }
+
+    // Add event listener for online status
+    window.addEventListener('online', () => {
+      console.debug('Network connection restored, attempting to send persisted logs')
+      sendPersistedLogs()
+    })
   }
 }
 
@@ -272,6 +425,11 @@ export async function setRequestId(requestId: string) {
 function sanitizeForLogging(data: any): any {
   if (!data) return data
 
+  // Handle string values - apply pattern-based sanitization
+  if (typeof data === 'string') {
+    return SENSITIVE_PATTERNS.reduce((acc, pattern) => acc.replace(pattern, '[REDACTED]'), data)
+  }
+
   if (typeof data === 'object' && data !== null) {
     if (Array.isArray(data)) {
       return data.map(sanitizeForLogging)
@@ -279,9 +437,12 @@ function sanitizeForLogging(data: any): any {
 
     const sanitized: Record<string, any> = {}
     for (const [key, value] of Object.entries(data)) {
+      // Field name check - redact based on sensitive field names
       if (SENSITIVE_FIELDS.some(field => key.toLowerCase().includes(field.toLowerCase()))) {
         sanitized[key] = '[REDACTED]'
-      } else {
+      }
+      // Value pattern check for strings and recursive sanitization for other types
+      else {
         sanitized[key] = sanitizeForLogging(value)
       }
     }
@@ -305,13 +466,29 @@ async function log(
   if (loggerConfig.minLevel && shouldSkipLog(level, loggerConfig.minLevel)) {
     return
   }
+  
+  // Skip if sampling rate not met (always process ERROR and FATAL logs)
+  if (level !== LogLevel.ERROR && level !== LogLevel.FATAL && 
+      loggerConfig.sampleRate !== undefined && 
+      !shouldSample(loggerConfig.sampleRate)) {
+    return
+  }
 
-  // Enhance context with requestId and userId if available in config
-  const enhancedContext = sanitizeForLogging({
+  // Create context with user and request info
+  const baseContext = {
     ...(context || {}),
     ...(loggerConfig.requestId ? { requestId: loggerConfig.requestId } : {}),
-    ...(loggerConfig.userId ? { userId: loggerConfig.userId } : {}),
-  })
+    ...(loggerConfig.userId ? { userId: loggerConfig.userId } : {})
+  };
+  
+  // Add device information based on environment
+  if (isBrowser()) {
+    baseContext.device = getDeviceInfo();
+  } else {
+    baseContext.environment = 'server';
+  }
+  
+  const enhancedContext = sanitizeForLogging(baseContext);
 
   // Log to console if enabled
   if (loggerConfig.enableConsole !== false) {
@@ -331,6 +508,38 @@ function shouldSkipLog(level: LogLevel, minLevel: LogLevel): boolean {
   const minLevelIndex = levels.indexOf(minLevel)
 
   return levelIndex < minLevelIndex
+}
+
+/**
+ * Determine if a log should be processed based on sampling rate
+ * @param sampleRate Number between 0 and 1 representing percentage of logs to process
+ * @returns Boolean indicating whether this particular log should be processed
+ */
+function shouldSample(sampleRate: number = 1.0): boolean {
+  return Math.random() < sampleRate
+}
+
+/**
+ * Retry a function with exponential backoff
+ * @param fn Function to retry
+ * @param retries Number of retries remaining
+ * @returns Result of the function
+ * @throws Last error encountered
+ */
+async function withRetries<T>(
+  fn: () => Promise<T>,
+  retries = loggerConfig.maxRetries || 3
+): Promise<T> {
+  try {
+    return await fn()
+  } catch (error) {
+    if (retries > 0) {
+      const delay = (loggerConfig.retryDelay || 1000) * Math.pow(2, loggerConfig.maxRetries! - retries)
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return withRetries(fn, retries - 1)
+    }
+    throw error
+  }
 }
 
 /**
@@ -380,55 +589,76 @@ async function logToExternalServices(
     return
   }
 
+  // Persist critical errors
+  if (level === LogLevel.FATAL || level === LogLevel.ERROR) {
+    persistLog({
+      timestamp: Date.now(),
+      level,
+      message,
+      context: sanitizeForLogging(context),
+      error: error?.toString(),
+    })
+
+    // Try to send persisted logs if online
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      sendPersistedLogs()
+    }
+  }
+
   // Send to Sentry if configured and level is ERROR or FATAL
   if (sentryInitialized && (level === LogLevel.ERROR || level === LogLevel.FATAL)) {
     try {
-      const Sentry = await import('@sentry/nextjs')
+      await withRetries(async () => {
+        const Sentry = await import('@sentry/nextjs')
 
-      // Set extra context
-      Sentry.configureScope(scope => {
-        if (context) {
-          Object.entries(context).forEach(([key, value]) => {
-            scope.setExtra(key, value)
-          })
-        }
+        // Set extra context
+        Sentry.configureScope(scope => {
+          if (context) {
+            Object.entries(context).forEach(([key, value]) => {
+              scope.setExtra(key, value)
+            })
+          }
 
-        if (tags) {
-          tags.forEach(tag => {
-            scope.setTag(tag, 'true')
-          })
+          if (tags) {
+            tags.forEach(tag => {
+              scope.setTag(tag, 'true')
+            })
+          }
+        })
+
+        // Capture the error or message
+        if (error) {
+          Sentry.captureException(error)
+        } else {
+          Sentry.captureMessage(message, level)
         }
       })
-
-      // Capture the error or message
-      if (error) {
-        Sentry.captureException(error)
-      } else {
-        Sentry.captureMessage(message, level)
-      }
     } catch (err) {
-      console.error('Failed to log to Sentry:', err)
+      console.error('Failed to log to Sentry after retries:', err)
     }
   }
 
   // Send to LogRocket if configured
   if (logRocketInitialized) {
     try {
-      const LogRocket = (await import('logrocket')).default as typeof import('logrocket').default
+      await withRetries(async () => {
+        const LogRocket = (await .default;
 
-      // Log the message
-      if (level === LogLevel.ERROR || level === LogLevel.FATAL) {
-        LogRocket.captureException(error || new Error(message), {
-          tags: tags?.reduce((acc, tag) => ({ ...acc, [tag]: true }), {}),
-          extra: context,
-        })
-      } else if (level === LogLevel.WARN) {
-        LogRocket.warn(message, context)
-      } else {
-        LogRocket.log(message, context)
-      }
+        // Log the message
+        if (level === LogLevel.ERROR || level === LogLevel.FATAL) {
+          LogRocket.captureException(error || new Error(message), {
+            tags: tags?.reduce((acc, tag) => ({ ...acc, [tag]: true }), {}),
+            extra: context,
+          });
+        } else if (level === LogLevel.WARN) {
+          LogRocket.warn(message, context);
+        } else {
+          LogRocket.log(message, context);
+        }
+      });
+      });
     } catch (err) {
-      console.error('Failed to log to LogRocket:', err)
+      console.error('Failed to log to LogRocket after retries:', err);
     }
   }
 }
@@ -478,6 +708,7 @@ const logger = {
   configureLogger,
   setLogUser,
   setRequestId,
+  sendPersistedLogs,
 }
 
 export default logger
