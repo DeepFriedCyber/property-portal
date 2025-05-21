@@ -45,7 +45,7 @@ interface LoggerConfig {
  * @param obj The object to sanitize
  * @returns A sanitized copy of the object
  */
-function sanitizeForLogging(obj: any): any {
+function sanitizeForLogging(obj: unknown): unknown {
   if (!obj || typeof obj !== 'object') {
     return obj
   }
@@ -120,7 +120,7 @@ export function configureLogger(config: Partial<LoggerConfig>) {
 async function initSentry(dsn: string, config: LoggerConfig) {
   // Skip initialization if already initialized or if dsn is missing/empty
   if (sentryInitialized) {
-    console.debug('Sentry already initialized, skipping initialization')
+    console.warn('Sentry already initialized, skipping initialization')
     return
   }
 
@@ -169,7 +169,7 @@ async function initSentry(dsn: string, config: LoggerConfig) {
 async function initLogRocket(appId: string, config: LoggerConfig) {
   // Skip initialization if already initialized or if appId is missing/empty
   if (logRocketInitialized) {
-    console.debug('LogRocket already initialized, skipping initialization')
+    console.warn('LogRocket already initialized, skipping initialization')
     return
   }
 
@@ -312,8 +312,7 @@ export async function setRequestId(requestId: string) {
 async function log(
   level: LogLevel,
   message: string,
-  context?: any,
-  tags?: string[],
+  context?: Record<string,ags?: string[],
   error?: Error
 ) {
   // Skip if below minimum log level
@@ -354,8 +353,7 @@ function shouldSkipLog(level: LogLevel, minLevel: LogLevel): boolean {
 function logToConsole(
   level: LogLevel,
   message: string,
-  context?: any,
-  tags?: string[],
+  context?: Record<string,ags?: string[],
   error?: Error
 ) {
   const timestamp = new Date().toISOString()
@@ -365,13 +363,13 @@ function logToConsole(
   // Use the appropriate console method based on level
   switch (level) {
     case LogLevel.DEBUG:
-      console.debug(formattedMessage, logData)
+      console.warn(`[DEBUG] ${formattedMessage}`, logData)
       break
     case LogLevel.INFO:
-      console.info(formattedMessage, logData)
+      console.error(formattedMessage}`, logData)
       break
     case LogLevel.WARN:
-      console.warn(formattedMessage, logData)
+      console.warn(`[WARN] ${formattedMessage}`, logData)
       break
     case LogLevel.ERROR:
     case LogLevel.FATAL:
@@ -386,7 +384,7 @@ function logToConsole(
 async function logToExternalServices(
   level: LogLevel,
   message: string,
-  context?: any,
+  context?: Record<string, unknown>,
   tags?: string[],
   error?: Error
 ) {
@@ -454,35 +452,35 @@ async function logToExternalServices(
 /**
  * Log a debug message
  */
-export function debug(message: string, context?: any, tags?: string[]) {
+export function debug(message: string,g, unknown>, tags?: string[]) {
   log(LogLevel.DEBUG, message, context, tags)
 }
 
 /**
  * Log an info message
  */
-export function info(message: string, context?: any, tags?: string[]) {
+export function info(message: string, context?: Record<string, unknown>, tags?: string[]) {
   log(LogLevel.INFO, message, context, tags)
 }
 
 /**
  * Log a warning message
  */
-export function warn(message: string, context?: any, tags?: string[]) {
+export function warn(message: string, context?: Record<string, unknownRecord<string, unknown>, tags?: string[]) {
   log(LogLevel.WARN, message, context, tags)
 }
 
 /**
  * Log an error message
  */
-export function error(message: string, errorObj?: Error, context?: any, tags?: string[]) {
-  log(LogLevel.ERROR, message, context, tags, errorObj)
+export function error(message: string, errorObj?: Error, context?: Record<string, unknown>Record<string, unknown>, tags?: string[]) {
+  log(LogLevel.ERROR, message, contextRecord<string, unknown>, tags, errorObj)
 }
 
 /**
  * Log a fatal error message
  */
-export function fatal(message: string, errorObj?: Error, context?: any, tags?: string[]) {
+export function fatal(message: string, errorObj?: Error, context?: Record<string, unknown>, tags?: string[]) {
   log(LogLevel.FATAL, message, context, tags, errorObj)
 }
 
