@@ -53,7 +53,7 @@ export default function SearchPage() {
 
           const data = await res.json()
           setResults(data?.properties || [])
-        } catch (err: any) {
+        } catch (err: Error | unknown) {
           console.error('Search failed:', err)
           setError('Failed to load search results. Please try again.')
           setResults([])
