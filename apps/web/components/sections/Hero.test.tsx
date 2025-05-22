@@ -15,9 +15,9 @@ vi.mock('next/navigation', () => ({
 }))
 
 // Mock the useDebounce hook with a function we can control in tests
-const mockUseDebounce = vi.fn().mockImplementation((value: any) => value)
+const mockUseDebounce = vi.fn().mockImplementation((value: string) => value)
 vi.mock('../../hooks/useDebounce', () => ({
-  useDebounce: (value: any, delay: number) => mockUseDebounce(value, delay),
+  useDebounce: (value: string, delay: number) => mockUseDebounce(value, delay),
 }))
 
 describe('Hero Component', () => {

@@ -11,7 +11,7 @@ type ApiErrorResponse = {
   error: {
     message: string
     code: string
-    details?: any
+    details?: Record<string, unknown>
   }
 }
 
@@ -27,7 +27,7 @@ export function createErrorResponse(
   message: string,
   status: number = HttpStatus.INTERNAL_SERVER_ERROR,
   code: string = ErrorCode.INTERNAL_SERVER_ERROR,
-  details?: any
+  details?: Record<string, unknown>
 ): NextResponse<ApiErrorResponse> {
   return NextResponse.json(
     {

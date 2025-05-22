@@ -173,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const EnhancedClerkProvider: React.FC<{
   children: React.ReactNode
   publishableKey?: string
-  appearance?: any
+  appearance?: Record<string, unknown>
 }> = ({ children, publishableKey, appearance }) => {
   return (
     <ClerkProvider publishableKey={publishableKey} appearance={appearance}>
@@ -284,7 +284,7 @@ export const AuthRequired: React.FC<{
           </svg>
           <h2 className="text-xl font-semibold text-yellow-700 mb-2">Access Denied</h2>
           <p className="text-yellow-600 mb-4">
-            You don't have the required permissions to access this page.
+            You don&apos;t have the required permissions to access this page.
           </p>
           <a
             href="/"

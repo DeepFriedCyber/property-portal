@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 
 import logger from '@/lib/logging/logger'
+
 import EnhancedErrorBoundary from './EnhancedErrorBoundary'
 
 interface RouteErrorBoundaryProps {
