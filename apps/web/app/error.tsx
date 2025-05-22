@@ -49,7 +49,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         </div>
 
         <p className="text-gray-600 mb-6">
-          We're sorry, but there was an error loading this page. Our team has been notified and is
+          We&apos;re sorry, but there was an error loading this page. Our team has been notified and is
           working to fix the issue.
         </p>
 

@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 
-import { Button } from '../../../src/ui'
-
 import { useAuthentication, AuthRequired } from '@/lib/auth/clerk-wrapper'
+
+import { Button } from '../../../src/ui'
 
 // Profile editor component
 const ProfileEditor = () => {

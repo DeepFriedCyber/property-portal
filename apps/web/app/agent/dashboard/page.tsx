@@ -110,12 +110,12 @@ export default function AgentDashboard() {
           message: null,
         }))
       }, 5000)
-    } catch (err: any) {
+    } catch (err: Error | unknown) {
       console.error('Upload error:', err)
       setUploadStatus({
         isUploading: false,
         success: false,
-        message: err.message || 'Failed to upload file. Please try again.',
+        message: err instanceof Error ? err.message : 'Failed to upload file. Please try again.',
       })
     }
   }
@@ -189,7 +189,7 @@ export default function AgentDashboard() {
         )}
 
         {!loading && !error && uploads.length === 0 && (
-          <div className="p-4 text-gray-600">You haven't uploaded any property files yet.</div>
+          <div className="p-4 text-gray-600">You haven&apos;t uploaded any property files yet.</div>
         )}
 
         {!loading && !error && uploads.length > 0 && (
@@ -277,7 +277,7 @@ export default function AgentDashboard() {
 
         {!loading && !error && properties.length === 0 && (
           <div className="p-4 text-gray-600">
-            You don't have any properties yet. Upload a CSV file to add properties.
+            You don&apos;t have any properties yet. Upload a CSV file to add properties.
           </div>
         )}
 
