@@ -107,7 +107,7 @@ function maskSensitiveData(data: Record<string, unknown>): Record<string, unknow
 
   for (const [key, value] of Object.entries(data)) {
     // Check if the key contains any sensitive field names
-    const isSensitive = SENSITIVE_FIELDS.some(field => 
+    const isSensitive = SENSITIVE_FIELDS.some(field =>
       key.toLowerCase().includes(field.toLowerCase())
     )
 
@@ -188,33 +188,21 @@ function logToConsole(
 /**
  * Log a message at DEBUG level
  */
-export function debug(
-  message: string,
-  context?: Record<string, unknown>,
-  tags?: string[]
-): void {
+export function debug(message: string, context?: Record<string, unknown>, tags?: string[]): void {
   logToConsole(LogLevel.DEBUG, message, context)
 }
 
 /**
  * Log a message at INFO level
  */
-export function info(
-  message: string,
-  context?: Record<string, unknown>,
-  tags?: string[]
-): void {
+export function info(message: string, context?: Record<string, unknown>, tags?: string[]): void {
   logToConsole(LogLevel.INFO, message, context)
 }
 
 /**
  * Log a message at WARN level
  */
-export function warn(
-  message: string,
-  context?: Record<string, unknown>,
-  tags?: string[]
-): void {
+export function warn(message: string, context?: Record<string, unknown>, tags?: string[]): void {
   logToConsole(LogLevel.WARN, message, context)
 }
 

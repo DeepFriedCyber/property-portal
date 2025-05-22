@@ -17,21 +17,11 @@ import logger, {
   info,
   warn,
   error,
-  fatal
+  fatal,
 } from './fixed-logger'
 
 // Re-export everything
-export {
-  LogLevel,
-  configureLogger,
-  setLogUser,
-  setRequestId,
-  debug,
-  info,
-  warn,
-  error,
-  fatal
-}
+export { LogLevel, configureLogger, setLogUser, setRequestId, debug, info, warn, error, fatal }
 
 // Export the default logger
 export default logger
