@@ -21,7 +21,7 @@ export interface LogEntry {
   level: LogLevel
   message: string
   timestamp: string
-  context?: Record<string, any>
+  context?: Record<string, unknown>
   tags?: string[]
   error?: Error
 }
@@ -104,7 +104,7 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
 
   try {
     // Dynamically import LogRocket to avoid bundling it unnecessarily
-    // @ts-ignore - LogRocket types may vary
+    // @ts-expect-error - LogRocket types may vary
     const LogRocket = (await import('logrocket')).default
 
     LogRocket.init(appId, {
@@ -155,8 +155,8 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
       LogRocket.getSessionURL(sessionURL => {
         // Use a try-catch to handle potential missing methods
         try {
-          // @ts-ignore - Sentry API might vary between versions
-          Sentry.withScope((scope: any) => {
+          // @ts-expect-error - Sentry API might vary between versions
+          Sentry.withScope((scope: Record<string, unknown>) => {
             scope.setExtra('logRocketSessionURL', sessionURL)
           })
         } catch (err) {
@@ -212,7 +212,7 @@ export async function setLogUser(userId?: string, userEmail?: string) {
   }
 
   if (logRocketInitialized && typeof window !== 'undefined') {
-    // @ts-ignore - LogRocket types may vary
+    // @ts-expect-error - LogRocket types may vary
     const LogRocket = (await import('logrocket')).default
     LogRocket.identify(userId || 'anonymous', {
       email: userEmail || '',
@@ -232,7 +232,7 @@ export async function setLogUser(userId?: string, userEmail?: string) {
 function createLogEntry(
   level: LogLevel,
   message: string,
-  context?: Record<string, any>,
+  context?: Record<string, unknown>,
   tags?: string[],
   error?: Error
 ): LogEntry {
@@ -294,8 +294,8 @@ async function logToExternalServices(entry: LogEntry) {
 
       // Set extra context
       try {
-        // @ts-ignore - Sentry API might vary between versions
-        Sentry.withScope((scope: any) => {
+        // @ts-expect-error - Sentry API might vary between versions
+        Sentry.withScope((scope: Record<string, unknown>) => {
           if (context) {
             Object.entries(context).forEach(([key, value]) => {
               scope.setExtra(key, value)
@@ -316,7 +316,8 @@ async function logToExternalServices(entry: LogEntry) {
       if (error) {
         Sentry.captureException(error)
       } else {
-        Sentry.captureMessage(message, level as any)
+        // Using type assertion for Sentry level compatibility
+        Sentry.captureMessage(message, level as unknown as string)
       }
     } catch (err) {
       console.error('Failed to log to Sentry:', err)
@@ -326,7 +327,7 @@ async function logToExternalServices(entry: LogEntry) {
   // Send to LogRocket if configured
   if (loggerConfig.logRocketAppId && logRocketInitialized) {
     try {
-      // @ts-ignore - LogRocket types may vary
+      // @ts-expect-error - LogRocket types may vary
       const LogRocket = (await import('logrocket')).default
 
       // Log the message
@@ -357,7 +358,7 @@ async function logToExternalServices(entry: LogEntry) {
 async function log(
   level: LogLevel,
   message: string,
-  context?: Record<string, any>,
+  context?: Record<string, unknown>,
   tags?: string[],
   error?: Error
 ) {
@@ -388,7 +389,7 @@ async function log(
  * @param context Additional context
  * @param tags Tags for categorizing logs
  */
-export function debug(message: string, context?: Record<string, any>, tags?: string[]) {
+export function debug(message: string, context?: Record<string, unknown>, tags?: string[]) {
   log(LogLevel.DEBUG, message, context, tags)
 }
 
@@ -398,7 +399,7 @@ export function debug(message: string, context?: Record<string, any>, tags?: str
  * @param context Additional context
  * @param tags Tags for categorizing logs
  */
-export function info(message: string, context?: Record<string, any>, tags?: string[]) {
+export function info(message: string, context?: Record<string, unknown>, tags?: string[]) {
   log(LogLevel.INFO, message, context, tags)
 }
 
@@ -408,7 +409,7 @@ export function info(message: string, context?: Record<string, any>, tags?: stri
  * @param context Additional context
  * @param tags Tags for categorizing logs
  */
-export function warn(message: string, context?: Record<string, any>, tags?: string[]) {
+export function warn(message: string, context?: Record<string, unknown>, tags?: string[]) {
   log(LogLevel.WARN, message, context, tags)
 }
 
@@ -422,7 +423,7 @@ export function warn(message: string, context?: Record<string, any>, tags?: stri
 export function error(
   message: string,
   error?: Error,
-  context?: Record<string, any>,
+  context?: Record<string, unknown>,
   tags?: string[]
 ) {
   log(LogLevel.ERROR, message, context, tags, error)
@@ -438,7 +439,7 @@ export function error(
 export function fatal(
   message: string,
   error?: Error,
-  context?: Record<string, any>,
+  context?: Record<string, unknown>,
   tags?: string[]
 ) {
   log(LogLevel.FATAL, message, context, tags, error)

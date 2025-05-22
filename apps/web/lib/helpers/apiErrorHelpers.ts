@@ -118,7 +118,7 @@ export const ApiErrors = {
   /**
    * Validation error
    */
-  validationError: (details: any) =>
+  validationError: (details: Record<string, unknown>) =>
     createErrorResponse(
       ErrorMessage[ErrorCode.VALIDATION_ERROR],
       HttpStatus.BAD_REQUEST,
@@ -129,7 +129,7 @@ export const ApiErrors = {
   /**
    * Database error
    */
-  databaseError: (message?: string, details?: any) =>
+  databaseError: (message?: string, details?: Record<string, unknown>) =>
     createErrorResponse(
       message || ErrorMessage[ErrorCode.DATABASE_ERROR],
       HttpStatus.INTERNAL_SERVER_ERROR,
