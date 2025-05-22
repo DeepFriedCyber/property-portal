@@ -5,7 +5,7 @@
  */
 
 // Export all components
-export * from './components/Button'
+export { Button } from './components/Button'
 export * from './components/Map'
 
 // Export component types
