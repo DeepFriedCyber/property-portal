@@ -32,7 +32,7 @@ export interface Property {
   createdBy?: string
   updatedBy?: string
   images?: PropertyImage[]
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 /**
