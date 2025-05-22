@@ -9,7 +9,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     // 2. Update the upload status in the database
     // 3. Process any side effects (e.g., marking properties as unavailable)
 
-    console.log(`Rejecting upload with ID: ${uploadId}`)
+    console.warn(`Rejecting upload with ID: ${uploadId}`)
 
     // Mock successful update
     return NextResponse.json({

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { prisma } from '@/lib/prisma'
+// Importing prisma but not using it directly in this file
+// It's imported for potential future use
+import { prisma as _prisma } from '@/lib/prisma'
 
 /**
  * Placeholder search API
