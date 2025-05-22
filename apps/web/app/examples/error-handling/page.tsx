@@ -1,6 +1,5 @@
 'use client'
 
-import { ApiError } from '@/lib/api/error-handling'
 import React, { useState } from 'react'
 
 import {
@@ -8,6 +7,7 @@ import {
   ApiErrorBoundary,
   FormErrorBoundary,
 } from '@/components/error-handling'
+import { ApiError } from '@/lib/api/error-handling'
 import CentralizedErrorHandlingExample from '@/components/examples/CentralizedErrorHandlingExample'
 import ErrorHandlingHookExample from '@/components/examples/ErrorHandlingHookExample'
 import { ValidationError } from '@/lib/api/validation'
@@ -294,7 +294,7 @@ export default function ErrorHandlingPage() {
       <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
         <h2 className="text-lg font-semibold text-blue-800 mb-2">Notes:</h2>
         <ul className="list-disc pl-5 text-blue-700 space-y-1">
-          <li>All errors are caught by error boundaries and won't crash the entire app</li>
+          <li>All errors are caught by error boundaries and won&apos;t crash the entire app</li>
           <li>Each error type has a specialized error boundary with appropriate UI</li>
           <li>All errors are logged with structured metadata for easier debugging</li>
           <li>The global error handler catches any uncaught errors</li>
