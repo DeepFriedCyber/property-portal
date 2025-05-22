@@ -4,9 +4,8 @@
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
-import EnhancedErrorBoundary from './EnhancedErrorBoundary'
-
 import logger from '@/lib/logging/logger'
+import EnhancedErrorBoundary from './EnhancedErrorBoundary'
 
 interface RouteErrorBoundaryProps {
   children: React.ReactNode

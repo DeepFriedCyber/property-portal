@@ -8,7 +8,8 @@ interface GitHubPagesLinkProps {
   href: string
   children: React.ReactNode
   className?: string
-  [key: string]: any
+  // Using Record for additional props instead of any
+  [key: string]: string | React.ReactNode | undefined
 }
 
 /**
@@ -20,7 +21,8 @@ export default function GitHubPagesLink({
   className,
   ...props
 }: GitHubPagesLinkProps) {
-  const pathname = usePathname()
+  // Pathname is not used but could be useful for future enhancements
+  // const pathname = usePathname()
 
   // Check if we're on GitHub Pages
   const isGitHubPages =
