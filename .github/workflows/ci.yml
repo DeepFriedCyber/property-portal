@@ -2,28 +2,165 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
+
+# Cancel in-progress runs when a new commit is pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  # Check environment variables first
+  env-check:
+    uses: ./.github/workflows/env-check.yml
+    secrets:
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+
   lint-test:
+    needs: env-check
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        node-version: [20.x] # Can add more versions if needed
+    
+    env:
+      # Database
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/property_portal_test
+      # Auth
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      # API Keys
+      NEXT_PUBLIC_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_MAPS_API_KEY }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      # Test environment
+      NODE_ENV: test
+      CI: true
+    
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: property_portal_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
-
-      - name: Install deps
-        run: pnpm install
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Run Tests
-        run: pnpm test
+          fetch-depth: 0 # Needed for proper git history
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8.15.0
+          run_install: false
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Setup Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Setup database
+        run: |
+          pnpm prisma generate
+          pnpm prisma db push
+          pnpm db:seed || true # Don't fail if seed fails
+      
+      - name: Verify Required Files
+        run: |
+          if [ ! -f "apps/web/cypress/e2e/search.cy.ts" ]; then
+            echo "Error: search.cy.ts is missing"
+            exit 1
+          fi
+          if [ ! -f "apps/web/middleware.ts" ]; then
+            echo "Error: middleware.ts is missing"
+            exit 1
+          fi
+      
+      - name: Type check
+        run: pnpm typecheck
+      
+      - name: Lint (fail only on errors, not warnings)
+        run: pnpm lint:fix
+        
+      - name: Verify critical linting errors
+        run: pnpm lint:ci || (echo "Linting failed with critical errors" && exit 1)
+      
+      - name: Run unit tests
+        run: pnpm test -- --coverage
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+      
+      - name: Build
+        run: pnpm build
+      
+      - name: Run E2E tests
+        run: |
+          pnpm exec playwright install --with-deps
+          pnpm cypress:run
+      
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            coverage/
+            playwright-report/
+            test-results/
+            cypress/screenshots/
+            cypress/videos/

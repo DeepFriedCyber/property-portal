@@ -17,7 +17,12 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "vitest.config.ts",
-    "vitest.setup.ts"
+    "vitest.setup.ts",
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "index.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

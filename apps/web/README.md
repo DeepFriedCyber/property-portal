@@ -62,3 +62,65 @@ pnpm build
 ```
 pnpm start
 ```
+
+## Testing
+
+This project uses Vitest for unit and integration testing, and Cypress for end-to-end and accessibility testing.
+
+### Running Unit Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Run tests with UI
+pnpm test:ui
+
+# Run tests with coverage
+pnpm test:coverage
+```
+
+### Running Cypress Tests
+
+```bash
+# Open Cypress test runner
+pnpm cypress
+
+# Run all Cypress tests headlessly
+pnpm cypress:run
+
+# Run only accessibility tests
+pnpm cypress:a11y
+```
+
+## Environment Variables
+
+This project uses type-safe environment variables with `@t3-oss/env-nextjs`. See the `.env.example` file for required variables.
+
+## Accessibility
+
+The components in this application are built with accessibility in mind. Key features include:
+
+- Semantic HTML
+- ARIA attributes
+- Keyboard navigation
+- Focus management
+- Screen reader support
+
+### PropertyCard
+
+The PropertyCard component displays property information in an accessible card format:
+
+```tsx
+<PropertyCard title="Modern Apartment" price={1500} />
+```
+
+Features:
+
+- Semantic HTML with `role="article"`
+- Descriptive ARIA labels
+- Keyboard navigation support
+- Focus indicators

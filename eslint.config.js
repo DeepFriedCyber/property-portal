@@ -1,5 +1,6 @@
 // eslint.config.js
 import { FlatCompat } from '@eslint/eslintrc';
+import { compat as eslintCompat } from '@eslint/compat';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -8,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Create a compatibility instance with required parameters
-const compat = new FlatCompat({
+const flatCompat = new FlatCompat({
   baseDirectory: __dirname,
   recommendedConfig: {},
   allConfig: {}
@@ -39,7 +40,7 @@ export default [
   },
   
   // Main configuration using compatibility layer
-  ...compat.config({
+  ...eslintCompat(flatCompat.config({
     extends: [
       'eslint:recommended',
       'plugin:react/recommended',
@@ -115,7 +116,7 @@ export default [
           'import/no-unresolved': [
             'error',
             {
-              'ignore': ['^@/', '^@root/', '^@lib/', '^@components/', '^@your-org/', '^leaflet$']
+              'ignore': ['^@/', '^@root/', '^@lib/', '^@components/', '^@your-org/', '^leaflet$', '^@t3-oss/env-nextjs$']
             }
           ],
           '@typescript-eslint/naming-convention': [
@@ -154,5 +155,5 @@ export default [
         }
       }
     ]
-  })
+  }))
 ];

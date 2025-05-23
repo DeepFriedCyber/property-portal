@@ -1,8 +1,10 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import { describe, it, expect, vi } from 'vitest'
+import '@testing-library/jest-dom'
 
-import SearchResults, { Property } from './SearchResults'
+import SearchResults from './SearchResults'
 
 describe('SearchResults Component', () => {
   // Mock data for testing
@@ -98,7 +100,7 @@ describe('SearchResults Component', () => {
   })
 
   it('calls onViewDetails when View Details button is clicked', async () => {
-    const mockOnViewDetails = jest.fn()
+    const mockOnViewDetails = vi.fn()
     const user = userEvent.setup()
 
     render(
@@ -121,7 +123,7 @@ describe('SearchResults Component', () => {
   })
 
   it('calls onClearSearch when Clear Search button is clicked', async () => {
-    const mockOnClearSearch = jest.fn()
+    const mockOnClearSearch = vi.fn()
     const user = userEvent.setup()
 
     render(

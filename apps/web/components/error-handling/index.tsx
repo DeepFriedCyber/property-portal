@@ -4,7 +4,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react'
 
 import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
-import logger from '@/lib/logging/logger'
+import { error as logError } from '@/lib/logging/logger'
 
 interface ErrorBoundaryProps {
   children: ReactNode
@@ -31,7 +31,7 @@ class EnhancedErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryS
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log the error to our monitoring service
-    logger.error('Error caught by error boundary:', error, {
+    logError('Error caught by error boundary:', error, {
       componentStack: errorInfo.componentStack,
       errorName: error.name,
       errorMessage: error.message,

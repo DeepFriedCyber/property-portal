@@ -1,8 +1,8 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { SignIn } from '@clerk/nextjs'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Login() {
   return (
@@ -19,14 +19,9 @@ export default function Login() {
             </Link>
           </p>
         </div>
-        
+
         {/* Clerk's SignIn component handles the entire authentication flow */}
-        <SignIn 
-          path="/login"
-          routing="path"
-          signUpUrl="/register"
-          redirectUrl="/dashboard"
-        />
+        <SignIn path="/login" routing="path" signUpUrl="/register" redirectUrl="/dashboard" />
       </div>
     </div>
   )

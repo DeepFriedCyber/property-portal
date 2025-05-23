@@ -1,0 +1,79 @@
+{
+  "success": true,
+  "data": {
+    "query": "cosy flat near parks",
+    "results": [
+      {
+        "id": "prop-1",
+        "title": "Cosy 1-Bedroom Flat Near Hyde Park",
+        "description": "A charming and cosy flat located just minutes away from Hyde Park. Perfect for nature lovers.",
+        "price": 350000,
+        "location": "London, UK",
+        "bedrooms": 1,
+        "bathrooms": 1,
+        "squareFeet": 550,
+        "propertyType": "flat",
+        "status": "available",
+        "similarity": 0.92
+      },
+      {
+        "id": "prop-2",
+        "title": "Comfortable Studio Near Regent's Park",
+        "description": "Bright and comfortable studio apartment within walking distance to Regent's Park.",
+        "price": 275000,
+        "location": "London, UK",
+        "bedrooms": 0,
+        "bathrooms": 1,
+        "squareFeet": 400,
+        "propertyType": "flat",
+        "status": "available",
+        "similarity": 0.87
+      },
+      {
+        "id": "prop-3",
+        "title": "Cosy 2-Bedroom Flat Near Victoria Park",
+        "description": "Spacious and cosy 2-bedroom flat with a beautiful view of Victoria Park.",
+        "price": 425000,
+        "location": "London, UK",
+        "bedrooms": 2,
+        "bathrooms": 1,
+        "squareFeet": 700,
+        "propertyType": "flat",
+        "status": "available",
+        "similarity": 0.85
+      },
+      {
+        "id": "prop-4",
+        "title": "Charming Flat Near Battersea Park",
+        "description": "Charming and well-maintained flat just a short walk from Battersea Park.",
+        "price": 390000,
+        "location": "London, UK",
+        "bedrooms": 1,
+        "bathrooms": 1,
+        "squareFeet": 600,
+        "propertyType": "flat",
+        "status": "available",
+        "similarity": 0.82
+      },
+      {
+        "id": "prop-5",
+        "title": "Cosy Apartment Near Green Park",
+        "description": "Cosy and modern apartment located near Green Park and Piccadilly.",
+        "price": 450000,
+        "location": "London, UK",
+        "bedrooms": 1,
+        "bathrooms": 1,
+        "squareFeet": 580,
+        "propertyType": "flat",
+        "status": "available",
+        "similarity": 0.79
+      }
+    ],
+    "count": 5,
+    "filters": {},
+    "options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}

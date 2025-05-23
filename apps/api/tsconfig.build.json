@@ -8,7 +8,14 @@
     "outDir": "dist",
     "plugins": []
   },
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "../../lib/**/*.ts",
+    "../../services/**/*.ts"
+  ],
   "exclude": ["node_modules", "dist", "**/*.test.ts"],
-  "references": [{ "path": "../../packages/db" }]
+  "references": [
+    { "path": "../../packages/db" },
+    { "path": "../../packages/types" }
+  ]
 }

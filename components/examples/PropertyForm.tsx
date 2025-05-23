@@ -65,7 +65,7 @@ const propertyFormSchema = z.object({
   featured: z.boolean().optional().default(false),
 
   // UK-specific fields
-  councilTaxBand: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '').optional(),
+  councilTaxBand: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '']).optional(),
   tenure: z.enum(['Freehold', 'Leasehold', 'Share of Freehold', '']).optional(),
   epcRating: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G', '']).optional(),
 

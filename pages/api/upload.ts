@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+
 import { prisma } from '@/lib/db'
+
 import { generateEmbedding } from '@/lib/embedding'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

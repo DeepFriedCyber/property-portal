@@ -49,7 +49,7 @@ const mockUploads = [
   },
 ]
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // In a real implementation, you would:
     // 1. Verify the user has admin permissions

@@ -47,7 +47,7 @@ export default function SearchPage() {
           </button>
         </div>
         <p className="text-sm text-gray-500 mt-2">
-          Try: "modern apartment in city center" or "family home with garden"
+          Try: &quot;modern apartment in city center&quot; or &quot;family home with garden&quot;
         </p>
       </form>
 
@@ -70,7 +70,8 @@ export default function SearchPage() {
                     </div>
                   )}
                   <div className="absolute bottom-0 right-0 bg-blue-500 text-white px-2 py-1 text-sm">
-                    Similarity: {(property.score * 100).toFixed(1)}%
+                    Similarity:{' '}
+                    {(property.score !== undefined ? property.score * 100 : 0).toFixed(1)}%
                   </div>
                 </div>
                 <div className="p-4">

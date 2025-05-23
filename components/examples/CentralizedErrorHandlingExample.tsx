@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react'
 
-import { useCentralizedErrorHandler } from '@/hooks/useCentralizedErrorHandler'
 import { ApiError } from '@/lib/api/error-handling'
+
+import { useCentralizedErrorHandler } from '@/hooks/useCentralizedErrorHandler'
 import { ValidationError } from '@/lib/api/validation'
 import { ErrorType, ErrorSeverity } from '@/lib/error/error-service'
 

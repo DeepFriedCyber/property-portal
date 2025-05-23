@@ -73,7 +73,7 @@ vi.mock('../../../../../lib/api/response', () => {
 // Mock the validation utilities
 vi.mock('../../../../../lib/api/validation', () => {
   return {
-    validateQuery: vi.fn(async (req: NextRequest, schema: any) => {
+    validateQuery: vi.fn(async (req: NextRequest, _schema: z.ZodSchema) => {
       const url = new URL(req.url)
       const searchParams = Object.fromEntries(url.searchParams.entries())
 
@@ -99,11 +99,15 @@ vi.mock('../../../../../lib/api/validation', () => {
         throw error
       }
     }),
-    withValidation: vi.fn((handler: Function) => {
+    withValidation: vi.fn((handler: (req: NextRequest) => Promise<Response>) => {
       return async (req: NextRequest) => {
         try {
           return await handler(req)
-        } catch (error: any) {
+<<<<<<< Updated upstream
+        } catch (error) {
+=======
+        } catch (error: unknown) {
+>>>>>>> Stashed changes
           if (error instanceof z.ZodError) {
             return Response.json(
               {
@@ -385,7 +389,8 @@ describe('GET /search', () => {
   it('handles very large limit values', async () => {
     // Setup
     const { db } = await import('@your-org/db')
-    const { generateEmbedding } = await import('../../../../../lib/embedding')
+    // Import generateEmbedding but don't use it directly in this test
+    await import('../../../../../lib/embedding')
 
     // Mock successful database response
     vi.mocked(db.execute).mockResolvedValueOnce({

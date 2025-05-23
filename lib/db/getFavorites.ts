@@ -1,4 +1,5 @@
 import { prisma } from '../db'
+
 import { PaginationOptions } from './getProperties'
 
 /**
@@ -14,14 +15,14 @@ export async function getUserFavorites(
   // Validate pagination parameters
   let page = pagination.page || 1
   let limit = pagination.limit || 20
-  
+
   // Ensure page and limit are positive integers
   page = Math.max(1, Math.floor(page))
   limit = Math.max(1, Math.min(100, Math.floor(limit)))
-  
+
   // Calculate skip for pagination
   const skip = (page - 1) * limit
-  
+
   // Get favorites with pagination and ordering
   const favorites = await prisma.favorite.findMany({
     where: { userId },
@@ -34,13 +35,13 @@ export async function getUserFavorites(
     skip,
     take: limit,
   })
-  
+
   // Get total count for pagination info
   const total = await prisma.favorite.count({ where: { userId } })
-  
+
   // Calculate total pages
   const totalPages = Math.ceil(total / limit)
-  
+
   return {
     properties: favorites.map(favorite => favorite.property),
     pagination: {
@@ -48,7 +49,7 @@ export async function getUserFavorites(
       page,
       limit,
       totalPages,
-    }
+    },
   }
 }
 

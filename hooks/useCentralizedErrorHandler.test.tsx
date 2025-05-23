@@ -1,10 +1,10 @@
 // hooks/useCentralizedErrorHandler.test.tsx
+import { ApiError } from '@/lib/api/error-handling'
 import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { useCentralizedErrorHandler } from './useCentralizedErrorHandler'
 
-import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
 import { errorService } from '@/lib/error/error-service'
 

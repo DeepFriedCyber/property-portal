@@ -35,7 +35,8 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({ feature, className = '
   return (
     <div
       className={`bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 h-full flex flex-col ${className}`}
-      tabIndex={0}
+      role="region"
+      aria-label={`Feature: ${feature.title}`}
     >
       <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
         {renderIcon(feature.icon)}

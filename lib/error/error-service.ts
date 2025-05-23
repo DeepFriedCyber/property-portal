@@ -1,5 +1,6 @@
 // lib/error/error-service.ts
 import { ApiError } from '@/lib/api/error-handling'
+
 import { ValidationError } from '@/lib/api/validation'
 import logger from '@/lib/logging/logger'
 
