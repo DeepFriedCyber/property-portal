@@ -1,15 +1,13 @@
 // scripts/generate-property-embeddings.ts
+/* eslint-disable no-console */
 import dotenv from 'dotenv'
 import { Pool } from 'pg'
-import pgvector from 'pgvector'
+import { toSql } from 'pgvector'
 
 import { generateEmbeddings } from '../services/vectorSearch'
 
 // Load environment variables
 dotenv.config()
-
-// Initialize pgvector
-pgvector.init()
 
 // Create a connection pool
 const pool = new Pool({
@@ -55,7 +53,7 @@ async function generatePropertyEmbeddings() {
 
         // Update the property with the embedding
         await client.query(`UPDATE properties SET embedding = $1 WHERE id = $2`, [
-          pgvector.toSql(embedding),
+          toSql(embedding),
           property.id,
         ])
 

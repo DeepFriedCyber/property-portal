@@ -7,32 +7,40 @@
  */
 export interface Property {
   id: string
-  uploadId: string
-  address: string
+  uploadId?: string
+  title?: string
+  address?: string
+  location?: string // Combined location (e.g., "Cambridge, UK")
   city?: string
   state?: string
   zipCode?: string
   postcode?: string // UK-specific postal code
   country?: string
-  price?: number
+  price?: number | string // Allow both number and formatted string (e.g., "£350,000")
   bedrooms?: number
   bathrooms?: number
   squareFeet?: number
+  area?: string // Formatted area (e.g., "850 sq ft")
   description?: string
   features?: string[]
   status?: 'available' | 'pending' | 'sold' | 'deleted'
-
+  imageUrl?: string // Single image URL
+  
   // UK-specific fields
   councilTaxBand?: string // A–H
   tenure?: string // Freehold / Leasehold
   epcRating?: string // A–G
 
-  createdAt: string
+  createdAt?: string
   updatedAt?: string
   createdBy?: string
   updatedBy?: string
   images?: PropertyImage[]
+<<<<<<< Updated upstream
   metadata?: Record<string, unknown>
+=======
+  metadata?: Record<string, unknown> // Use unknown instead of any
+>>>>>>> Stashed changes
 }
 
 /**

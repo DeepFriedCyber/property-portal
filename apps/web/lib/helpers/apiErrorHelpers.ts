@@ -11,7 +11,11 @@ type ApiErrorResponse = {
   error: {
     message: string
     code: string
+<<<<<<< Updated upstream
     details?: Record<string, unknown>
+=======
+    details?: unknown
+>>>>>>> Stashed changes
   }
 }
 
@@ -27,7 +31,11 @@ export function createErrorResponse(
   message: string,
   status: number = HttpStatus.INTERNAL_SERVER_ERROR,
   code: string = ErrorCode.INTERNAL_SERVER_ERROR,
+<<<<<<< Updated upstream
   details?: Record<string, unknown>
+=======
+  details?: unknown
+>>>>>>> Stashed changes
 ): NextResponse<ApiErrorResponse> {
   return NextResponse.json(
     {
@@ -118,7 +126,11 @@ export const ApiErrors = {
   /**
    * Validation error
    */
+<<<<<<< Updated upstream
   validationError: (details: Record<string, unknown>) =>
+=======
+  validationError: (details: unknown) =>
+>>>>>>> Stashed changes
     createErrorResponse(
       ErrorMessage[ErrorCode.VALIDATION_ERROR],
       HttpStatus.BAD_REQUEST,

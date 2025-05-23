@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import React from 'react'
 
 interface GitHubPagesLinkProps {
@@ -21,8 +20,12 @@ export default function GitHubPagesLink({
   className,
   ...props
 }: GitHubPagesLinkProps) {
+<<<<<<< Updated upstream
   // Pathname is not used but could be useful for future enhancements
   // const pathname = usePathname()
+=======
+
+>>>>>>> Stashed changes
 
   // Check if we're on GitHub Pages
   const isGitHubPages =

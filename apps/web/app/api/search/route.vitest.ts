@@ -103,7 +103,11 @@ vi.mock('../../../../../lib/api/validation', () => {
       return async (req: NextRequest) => {
         try {
           return await handler(req)
+<<<<<<< Updated upstream
         } catch (error) {
+=======
+        } catch (error: unknown) {
+>>>>>>> Stashed changes
           if (error instanceof z.ZodError) {
             return Response.json(
               {

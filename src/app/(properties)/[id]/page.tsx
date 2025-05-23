@@ -23,10 +23,10 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       title: `${property.title} | Property Portal`,
       description: `View details for ${property.title} located at ${property.location}. Priced at $${property.price.toLocaleString()}.`,
       openGraph: {
-        images: [property.imageUrl],
+        images: property.imageUrl ? [{ url: property.imageUrl }] : [],
       },
     }
-  } catch (error) {
+  } catch (_) {
     return {
       title: 'Property Details | Property Portal',
       description: 'View detailed information about this property.',

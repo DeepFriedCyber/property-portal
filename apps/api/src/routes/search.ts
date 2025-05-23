@@ -6,8 +6,13 @@ import { BadRequest, InternalServerError } from '../../../../lib/middleware/erro
 import { createRateLimitMiddleware } from '../../../../lib/rate-limit/factory'
 import {
   generateEmbeddings,
+<<<<<<< Updated upstream
   semanticPropertySearch,
   getSimilarProperties,
+=======
+  getSimilarProperties,
+  semanticPropertySearch,
+>>>>>>> Stashed changes
 } from '../../../../services/vectorSearch'
 
 const router = Router()

@@ -67,3 +67,4 @@ src/app/theme-demo/
 
 # duplicate config files
 src/app/next.config.js
+property-portal/

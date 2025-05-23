@@ -4,7 +4,13 @@
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
+<<<<<<< Updated upstream
 import { error as logError } from '@/lib/logging/logger'
+
+import EnhancedErrorBoundary from './EnhancedErrorBoundary'
+=======
+import logger from '@/lib/logging/logger'
+>>>>>>> Stashed changes
 
 import EnhancedErrorBoundary from './EnhancedErrorBoundary'
 

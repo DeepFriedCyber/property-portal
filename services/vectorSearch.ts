@@ -3,9 +3,12 @@ import { Pool } from 'pg'
 import pgvector from 'pgvector'
 
 import { winstonLogger as logger } from '../lib/logging/winston-logger'
+<<<<<<< Updated upstream
 
 // Initialize pgvector
 pgvector.init()
+=======
+>>>>>>> Stashed changes
 
 // Create a connection pool
 const pool = new Pool({

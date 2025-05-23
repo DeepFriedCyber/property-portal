@@ -9,6 +9,10 @@ import {
   Forbidden,
 } from '../../../../lib/middleware/errorHandler'
 import { createRateLimitMiddleware } from '../../../../lib/rate-limit/factory'
+<<<<<<< Updated upstream
+=======
+import { winstonLogger as logger } from '../../../../lib/logging/winston-logger'
+>>>>>>> Stashed changes
 
 const router = Router()
 

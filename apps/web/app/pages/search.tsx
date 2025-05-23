@@ -54,7 +54,12 @@ export default function SearchPage() {
           const data = await res.json()
           setResults(data?.properties || [])
         } catch (err: Error | unknown) {
+<<<<<<< Updated upstream
           console.error('Search failed:', err)
+=======
+          const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
+          console.error('Search failed:', errorMessage)
+>>>>>>> Stashed changes
           setError('Failed to load search results. Please try again.')
           setResults([])
         } finally {

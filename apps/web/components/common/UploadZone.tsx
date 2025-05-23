@@ -135,7 +135,7 @@ export default function UploadZone({
           setValidationError(result.message)
           return
         }
-      } catch (error) {
+      } catch (err) {
         setValidationError('File validation failed.')
         return
       }
@@ -159,14 +159,7 @@ export default function UploadZone({
     }
   }
 
-  const clearFile = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
-    setSelectedFile(null)
-    setPreviewUrl(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
+
 
   return (
     <div className={`${className}`}>

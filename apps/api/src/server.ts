@@ -2,9 +2,15 @@
 import express from 'express'
 
 // Import middleware and utilities
+<<<<<<< Updated upstream
 import { winstonLogger as logger } from '../../../lib/logging/winston-logger'
 import { setupMiddleware } from '../../../lib/middleware'
 import { createRateLimitMiddleware } from '../../../lib/rate-limit/factory'
+=======
+import { setupMiddleware } from '../../../lib/middleware'
+import { createRateLimitMiddleware } from '../../../lib/rate-limit/factory'
+import { winstonLogger as logger } from '../../../lib/logging/winston-logger'
+>>>>>>> Stashed changes
 
 // Import route handlers
 import propertiesRoutes from './routes/properties'

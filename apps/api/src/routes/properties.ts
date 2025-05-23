@@ -1,6 +1,26 @@
 // apps/api/src/routes/properties.ts
+<<<<<<< Updated upstream
 import { Router } from 'express'
 
+=======
+import { Router, Request as ExpressRequest, Response, NextFunction } from 'express'
+
+// Define a custom Request interface that extends Express.Request
+// This approach uses ES2015 module syntax instead of namespace declarations
+// The proper way would be to use module augmentation in a separate .d.ts file,
+// which is already done in lib/middleware/express.d.ts, but we're using this
+// approach here for direct compatibility with this file.
+interface Request extends ExpressRequest {
+  user?: {
+    id: string
+    email?: string
+    role?: string
+    [key: string]: unknown
+  }
+  id?: string
+}
+
+>>>>>>> Stashed changes
 import { winstonLogger as logger } from '../../../../lib/logging/winston-logger'
 import {
   BadRequest,
@@ -31,7 +51,7 @@ const writeLimiter = createRateLimitMiddleware({
  * GET /api/properties
  * Get all properties with filtering and pagination
  */
-router.get('/', readLimiter, async (req, res, next) => {
+router.get('/', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Extract query parameters
     const { page = '1', limit = '10', minPrice, maxPrice, location, propertyType } = req.query
@@ -68,11 +88,19 @@ router.get('/', readLimiter, async (req, res, next) => {
     }
 
     if (location) {
+<<<<<<< Updated upstream
       filter.location = location
     }
 
     if (propertyType) {
       filter.propertyType = propertyType
+=======
+      filter.location = location as string
+    }
+
+    if (propertyType) {
+      filter.propertyType = propertyType as string
+>>>>>>> Stashed changes
     }
 
     // Log the request
@@ -80,7 +108,7 @@ router.get('/', readLimiter, async (req, res, next) => {
       context: {
         filter,
         pagination: { page: pageNum, limit: limitNum },
-        requestId: req.id,
+        requestId: req.id || 'unknown',
       },
     })
 
@@ -109,7 +137,7 @@ router.get('/', readLimiter, async (req, res, next) => {
  * GET /api/properties/:id
  * Get a single property by ID
  */
-router.get('/:id', readLimiter, async (req, res, next) => {
+router.get('/:id', readLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
 
@@ -117,7 +145,7 @@ router.get('/:id', readLimiter, async (req, res, next) => {
     logger.info(`Fetching property with ID: ${id}`, {
       context: {
         propertyId: id,
-        requestId: req.id,
+        requestId: req.id || 'unknown',
       },
     })
 
@@ -143,7 +171,7 @@ router.get('/:id', readLimiter, async (req, res, next) => {
  * POST /api/properties
  * Create a new property
  */
-router.post('/', writeLimiter, async (req, res, next) => {
+router.post('/', writeLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Check authentication
     if (!req.user) {
@@ -170,23 +198,28 @@ router.post('/', writeLimiter, async (req, res, next) => {
     }
 
     // Create property object
-    const propertyData = {
+    const propertyData: Record<string, string | number | boolean> = {
       title,
       description,
       price: Number(price),
       location,
-      bedrooms: bedrooms ? Number(bedrooms) : undefined,
-      bathrooms: bathrooms ? Number(bathrooms) : undefined,
-      squareFeet: squareFeet ? Number(squareFeet) : undefined,
       createdBy: req.user.id,
     }
+<<<<<<< Updated upstream
+=======
+
+    // Only add optional fields if they are defined
+    if (bedrooms) propertyData.bedrooms = Number(bedrooms)
+    if (bathrooms) propertyData.bathrooms = Number(bathrooms)
+    if (squareFeet) propertyData.squareFeet = Number(squareFeet)
+>>>>>>> Stashed changes
 
     // Log the creation attempt
     logger.info('Creating new property', {
       context: {
         propertyData: { ...propertyData, description: undefined }, // Don't log full description
         userId: req.user.id,
-        requestId: req.id,
+        requestId: req.id || 'unknown',
       },
     })
 
@@ -207,7 +240,7 @@ router.post('/', writeLimiter, async (req, res, next) => {
  * PUT /api/properties/:id
  * Update an existing property
  */
-router.put('/:id', writeLimiter, async (req, res, next) => {
+router.put('/:id', writeLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
 
@@ -263,7 +296,7 @@ router.put('/:id', writeLimiter, async (req, res, next) => {
         propertyId: id,
         updateData: { ...updateData, description: undefined }, // Don't log full description
         userId: req.user.id,
-        requestId: req.id,
+        requestId: req.id || 'unknown',
       },
     })
 
@@ -284,7 +317,7 @@ router.put('/:id', writeLimiter, async (req, res, next) => {
  * DELETE /api/properties/:id
  * Delete a property
  */
-router.delete('/:id', writeLimiter, async (req, res, next) => {
+router.delete('/:id', writeLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
 
@@ -311,7 +344,7 @@ router.delete('/:id', writeLimiter, async (req, res, next) => {
       context: {
         propertyId: id,
         userId: req.user.id,
-        requestId: req.id,
+        requestId: req.id || 'unknown',
       },
     })
 
@@ -338,6 +371,7 @@ interface Property {
   title: string
   description: string
   price: number
+<<<<<<< Updated upstream
   bedrooms: number
   bathrooms: number
   sqft: number
@@ -355,6 +389,29 @@ interface Property {
   images: string[]
   createdAt: string
   updatedAt: string
+=======
+  bedrooms?: number
+  bathrooms?: number
+  squareFeet?: number
+  location:
+    | string
+    | {
+        address: string
+        city: string
+        state: string
+        zip: string
+        coordinates: {
+          lat: number
+          lng: number
+        }
+      }
+  features?: string[]
+  images?: string[]
+  createdAt: string
+  updatedAt?: string
+  createdBy?: string
+  status?: string
+>>>>>>> Stashed changes
 }
 
 // In a real application, these would be imported from a service layer
@@ -383,6 +440,7 @@ async function fetchProperties(
   let filtered = [...mockProperties]
 
   if (filter.minPrice) {
+<<<<<<< Updated upstream
     filtered = filtered.filter(p => p.price >= filter.minPrice)
   }
 
@@ -394,11 +452,35 @@ async function fetchProperties(
     filtered = filtered.filter(p =>
       p.location.toLowerCase().includes(filter.location.toLowerCase())
     )
+=======
+    const minPrice = Number(filter.minPrice)
+    filtered = filtered.filter(p => p.price >= minPrice)
+  }
+
+  if (filter.maxPrice) {
+    const maxPrice = Number(filter.maxPrice)
+    filtered = filtered.filter(p => p.price <= maxPrice)
+  }
+
+  if (filter.location) {
+    const locationStr = String(filter.location).toLowerCase()
+    filtered = filtered.filter(p => {
+      if (typeof p.location === 'string') {
+        return p.location.toLowerCase().includes(locationStr)
+      }
+      return false
+    })
+>>>>>>> Stashed changes
   }
 
   if (filter.propertyType) {
+    const propertyType = String(filter.propertyType)
     // In a real app, properties would have a type field
+<<<<<<< Updated upstream
     filtered = filtered.filter(p => p.id.includes(filter.propertyType))
+=======
+    filtered = filtered.filter(p => p.id.includes(propertyType))
+>>>>>>> Stashed changes
   }
 
   // Apply pagination
@@ -446,7 +528,14 @@ async function createProperty(data: Record<string, string | number | boolean>): 
   // Return created property
   return {
     id,
-    ...data,
+    title: String(data.title || ''),
+    description: String(data.description || ''),
+    price: Number(data.price || 0),
+    location: String(data.location || ''),
+    bedrooms: data.bedrooms ? Number(data.bedrooms) : undefined,
+    bathrooms: data.bathrooms ? Number(data.bathrooms) : undefined,
+    squareFeet: data.squareFeet ? Number(data.squareFeet) : undefined,
+    createdBy: data.createdBy ? String(data.createdBy) : undefined,
     createdAt: new Date().toISOString(),
   }
 }
@@ -461,11 +550,36 @@ async function updateProperty(
   // Get existing property
   const existing = await fetchPropertyById(id)
 
-  // Return updated property
+  if (!existing) {
+    throw new Error(`Property with ID ${id} not found`)
+  }
+
+  // Return updated property with type assertion to ensure all required fields are present
   return {
     ...existing,
     ...data,
     id, // Ensure ID doesn't change
+<<<<<<< Updated upstream
+=======
+    // Ensure required properties are always defined
+    title: (data.title as string) || existing.title,
+    description: (data.description as string) || existing.description,
+    price: (data.price as number) || existing.price,
+    location:
+      (data.location as
+        | string
+        | {
+            address: string
+            city: string
+            state: string
+            zip: string
+            coordinates: {
+              lat: number
+              lng: number
+            }
+          }) || existing.location,
+    createdAt: existing.createdAt,
+>>>>>>> Stashed changes
   }
 }
 

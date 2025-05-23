@@ -111,11 +111,19 @@ export default function AgentDashboard() {
         }))
       }, 5000)
     } catch (err: Error | unknown) {
+<<<<<<< Updated upstream
+=======
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
+>>>>>>> Stashed changes
       console.error('Upload error:', err)
       setUploadStatus({
         isUploading: false,
         success: false,
+<<<<<<< Updated upstream
         message: err instanceof Error ? err.message : 'Failed to upload file. Please try again.',
+=======
+        message: errorMessage || 'Failed to upload file. Please try again.',
+>>>>>>> Stashed changes
       })
     }
   }

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+<<<<<<< Updated upstream
 // Prisma import removed as it's not being used
+=======
+import { prisma } from '@/lib/prisma'
+>>>>>>> Stashed changes
 
 /**
  * Placeholder search API

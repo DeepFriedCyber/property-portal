@@ -1,75 +1,75 @@
 module.exports = {
   root: true,
-  env: {
-    browser: true,
-    node: true,
-    es6: true,
-  },
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
-    'prettier', // Make sure this is last to override other configs
+    'prettier'
   ],
   parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
-    },
-    ecmaVersion: 2020,
-    sourceType: 'module',
-  },
   plugins: ['@typescript-eslint', 'react', 'jsx-a11y', 'import'],
+  rules: {
+    // Errors - these will cause CI to fail
+    'no-console': ['error', { allow: ['warn', 'error'] }],
+    'no-unused-vars': 'off', // Turned off in favor of TypeScript's version
+    '@typescript-eslint/no-unused-vars': ['error', { 
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+      caughtErrorsIgnorePattern: '^_'
+    }],
+    'react/prop-types': 'off', // Not needed with TypeScript
+    'react/react-in-jsx-scope': 'off', // Not needed with React 17+
+    
+    // Warnings - these won't cause CI to fail
+    'prefer-const': 'warn',
+    'no-var': 'warn',
+    'eqeqeq': 'warn',
+    'import/order': 'warn',
+    'jsx-a11y/anchor-is-valid': 'warn',
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+  },
   settings: {
     react: {
       version: 'detect',
     },
     'import/resolver': {
-      node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
-      },
+      typescript: {},
     },
   },
-  rules: {
-    // React
-    'react/prop-types': 'off',
-    'react/react-in-jsx-scope': 'off',
-    'react/display-name': 'off',
-
-    // TypeScript
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-
-    // General
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
-    'prefer-const': 'warn',
-    'no-duplicate-imports': 'error',
-
-    // Import
-    'import/no-unresolved': [
-      'error',
-      {
-        ignore: ['^leaflet$'],
-      },
-    ],
+  env: {
+    browser: true,
+    node: true,
+    es6: true,
   },
+  ignorePatterns: [
+    'node_modules',
+    'dist',
+    'build',
+    '.next',
+    '.turbo',
+    'coverage',
+    'public',
+    '*.config.js',
+    '*.config.ts',
+  ],
   overrides: [
-    // Next.js specific rules
     {
-      files: ['**/pages/**/*.{ts,tsx}', '**/app/**/*.{ts,tsx}'],
-      rules: {
-        'import/no-default-export': 'off',
-      },
-    },
-    // Test files
-    {
-      files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+      files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
       env: {
         jest: true,
       },
+      extends: ['plugin:testing-library/react', 'plugin:jest/recommended'],
+    },
+    {
+      files: ['cypress/**/*.ts', 'cypress/**/*.tsx', '**/*.cy.ts', '**/*.cy.tsx'],
+      plugins: ['cypress'],
+      extends: ['plugin:cypress/recommended'],
+      env: {
+        'cypress/globals': true,
+      },
     },
   ],
-}
+};

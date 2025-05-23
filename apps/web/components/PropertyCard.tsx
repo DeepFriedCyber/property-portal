@@ -1,16 +1,8 @@
-import Image from 'next/image'
-
-export function PropertyCard({ image, title }: { image: string; title: string }) {
+export function PropertyCard({ title, price }: { title: string; price: number }) {
   return (
-    <div className="rounded shadow overflow-hidden">
-      <Image
-        src={image}
-        alt={title}
-        width={300}
-        height={200}
-        className="w-full h-48 object-cover"
-      />
-      <h3 className="p-2 text-xl font-bold">{title}</h3>
+    <div role="article" aria-label={`${title}, $${price} per month`} className="rounded p-2">
+      <h3 className="text-xl font-bold">{title}</h3>
+      <p>${price}/month</p>
     </div>
   )
 }
