@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react'
 
-import logger from '@/lib/logging/logger'
+import { info as logInfo } from '@/lib/logging/logger'
 
 import Footer from '../components/layout/Footer'
-import Header from '../components/layout/Header'
+import HeaderComponent from '../components/layout/Header'
 import CallToAction from '../components/sections/CallToAction'
 import Features from '../components/sections/Features'
 import Hero from '../components/sections/Hero'
@@ -193,35 +193,35 @@ export default function HomePage() {
   }
 
   const handleViewDetails = (propertyId: string) => {
-    logger.info('View details for property:', { propertyId })
+    logInfo('View details for property:', { propertyId })
     alert(`Viewing details for property ID: ${propertyId}`)
     // In a real app, you would navigate to a property details page
   }
 
   // Event handlers
   const handleLogin = () => {
-    logger.info('Login clicked')
+    logInfo('Login clicked')
     alert('Login functionality disabled for testing')
   }
 
   const handleSignup = () => {
-    logger.info('Signup clicked')
+    logInfo('Signup clicked')
     alert('Signup functionality disabled for testing')
   }
 
   const handlePrimaryCTA = () => {
-    logger.info('Primary CTA clicked')
+    logInfo('Primary CTA clicked')
     alert('Start your property journey!')
   }
 
   const handleSecondaryCTA = () => {
-    logger.info('Secondary CTA clicked')
+    logInfo('Secondary CTA clicked')
     alert('Contact an agent!')
   }
 
   return (
     <main>
-      <Header navLinks={navLinks} onLogin={handleLogin} onSignup={handleSignup} />
+      <HeaderComponent navLinks={navLinks} onLogin={handleLogin} onSignup={handleSignup} />
 
       <Hero
         title="Find Your Dream Property"
