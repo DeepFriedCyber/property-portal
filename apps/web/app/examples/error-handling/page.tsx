@@ -11,7 +11,12 @@ import CentralizedErrorHandlingExample from '@/components/examples/CentralizedEr
 import ErrorHandlingHookExample from '@/components/examples/ErrorHandlingHookExample'
 import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
-import { debug as logDebug, info as logInfo, warn as logWarn, error as logError } from '@/lib/logging/logger'
+import {
+  debug as logDebug,
+  info as logInfo,
+  warn as logWarn,
+  error as logError,
+} from '@/lib/logging/logger'
 
 // Component that throws a render error
 const RenderErrorComponent = () => {
