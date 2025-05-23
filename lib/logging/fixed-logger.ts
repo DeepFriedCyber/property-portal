@@ -97,7 +97,7 @@ function getDeviceInfo(): Record<string, string | number | null> {
   if (!isBrowser()) {
     return { environment: 'server' }
   }
-  
+
   try {
     return {
       userAgent: navigator.userAgent,
@@ -108,13 +108,13 @@ function getDeviceInfo(): Record<string, string | number | null> {
       platform: navigator.platform,
       vendor: navigator.vendor,
       deviceMemory: (navigator as any).deviceMemory || null,
-      connectionType: (navigator as any).connection?.effectiveType || null
+      connectionType: (navigator as any).connection?.effectiveType || null,
     }
   } catch (error) {
     // Fallback if any browser APIs are not available
-    return { 
+    return {
       userAgent: navigator.userAgent,
-      environment: 'browser'
+      environment: 'browser',
     }
   }
 }
@@ -430,23 +430,27 @@ function sanitizeForLogging(data: any): any {
 /**
  * Retry a function with exponential backoff
  */
-async function withRetries<T>(fn: () => Promise<T>, maxRetries = loggerConfig.maxRetries || 3, baseDelay = loggerConfig.retryDelay || 1000): Promise<T> {
+async function withRetries<T>(
+  fn: () => Promise<T>,
+  maxRetries = loggerConfig.maxRetries || 3,
+  baseDelay = loggerConfig.retryDelay || 1000
+): Promise<T> {
   let lastError: Error | undefined
-  
+
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       return await fn()
     } catch (error) {
       lastError = error as Error
-      
+
       // Calculate delay with exponential backoff and jitter
       const delay = baseDelay * Math.pow(2, attempt) * (0.5 + Math.random() * 0.5)
-      
+
       // Wait before next attempt
       await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
-  
+
   throw lastError || new Error('Operation failed after retries')
 }
 
@@ -488,7 +492,7 @@ async function log(
   // Log to console if enabled
   if (loggerConfig.enableConsole) {
     const consoleMessage = `[${level.toUpperCase()}] ${message}`
-    
+
     switch (level) {
       case LogLevel.DEBUG:
         console.debug(consoleMessage, sanitizedContext)
@@ -578,22 +582,22 @@ async function logToExternalServices(
   if (logRocketInitialized) {
     try {
       await withRetries(async () => {
-        const LogRocket = (await import('logrocket')).default;
+        const LogRocket = (await import('logrocket')).default
 
         // Log the message
         if (level === LogLevel.ERROR || level === LogLevel.FATAL) {
           LogRocket.captureException(error || new Error(message), {
             tags: tags?.reduce((acc, tag) => ({ ...acc, [tag]: true }), {}),
             extra: context,
-          });
+          })
         } else if (level === LogLevel.WARN) {
-          LogRocket.warn(message, context);
+          LogRocket.warn(message, context)
         } else {
-          LogRocket.log(message, context);
+          LogRocket.log(message, context)
         }
-      });
+      })
     } catch (err) {
-      console.error('Failed to log to LogRocket after retries:', err);
+      console.error('Failed to log to LogRocket after retries:', err)
     }
   }
 }
@@ -622,14 +626,19 @@ export function warn(message: string, context?: any, tags?: string[]) {
 /**
  * Log an error message
  */
-export function error(message: string, errorOrContext?: Error | any, context?: any, tags?: string[]) {
+export function error(
+  message: string,
+  errorOrContext?: Error | any,
+  context?: any,
+  tags?: string[]
+) {
   let errorObj: Error | undefined
   let contextObj: any = context
 
   // Handle case where errorOrContext is an Error object
   if (errorOrContext instanceof Error) {
     errorObj = errorOrContext
-  } 
+  }
   // Handle case where errorOrContext is a context object
   else if (errorOrContext && typeof errorOrContext === 'object') {
     contextObj = errorOrContext
@@ -641,14 +650,19 @@ export function error(message: string, errorOrContext?: Error | any, context?: a
 /**
  * Log a fatal error message
  */
-export function fatal(message: string, errorOrContext?: Error | any, context?: any, tags?: string[]) {
+export function fatal(
+  message: string,
+  errorOrContext?: Error | any,
+  context?: any,
+  tags?: string[]
+) {
   let errorObj: Error | undefined
   let contextObj: any = context
 
   // Handle case where errorOrContext is an Error object
   if (errorOrContext instanceof Error) {
     errorObj = errorOrContext
-  } 
+  }
   // Handle case where errorOrContext is a context object
   else if (errorOrContext && typeof errorOrContext === 'object') {
     contextObj = errorOrContext
@@ -671,7 +685,7 @@ export default {
   setLogUser,
   setRequestId,
   sendPersistedLogs,
-}/**
+} /**
  * Sensitive fields that should never be logged
  * Add any field names that might contain sensitive information
  */
@@ -770,7 +784,7 @@ function getDeviceInfo(): Record<string, string | number | null> {
   if (!isBrowser()) {
     return { environment: 'server' }
   }
-  
+
   try {
     return {
       userAgent: navigator.userAgent,
@@ -781,13 +795,13 @@ function getDeviceInfo(): Record<string, string | number | null> {
       platform: navigator.platform,
       vendor: navigator.vendor,
       deviceMemory: (navigator as any).deviceMemory || null,
-      connectionType: (navigator as any).connection?.effectiveType || null
+      connectionType: (navigator as any).connection?.effectiveType || null,
     }
   } catch (error) {
     // Fallback if any browser APIs are not available
-    return { 
+    return {
       userAgent: navigator.userAgent,
-      environment: 'browser'
+      environment: 'browser',
     }
   }
 }
@@ -1103,23 +1117,27 @@ function sanitizeForLogging(data: any): any {
 /**
  * Retry a function with exponential backoff
  */
-async function withRetries<T>(fn: () => Promise<T>, maxRetries = loggerConfig.maxRetries || 3, baseDelay = loggerConfig.retryDelay || 1000): Promise<T> {
+async function withRetries<T>(
+  fn: () => Promise<T>,
+  maxRetries = loggerConfig.maxRetries || 3,
+  baseDelay = loggerConfig.retryDelay || 1000
+): Promise<T> {
   let lastError: Error | undefined
-  
+
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       return await fn()
     } catch (error) {
       lastError = error as Error
-      
+
       // Calculate delay with exponential backoff and jitter
       const delay = baseDelay * Math.pow(2, attempt) * (0.5 + Math.random() * 0.5)
-      
+
       // Wait before next attempt
       await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
-  
+
   throw lastError || new Error('Operation failed after retries')
 }
 
@@ -1161,7 +1179,7 @@ async function log(
   // Log to console if enabled
   if (loggerConfig.enableConsole) {
     const consoleMessage = `[${level.toUpperCase()}] ${message}`
-    
+
     switch (level) {
       case LogLevel.DEBUG:
         console.debug(consoleMessage, sanitizedContext)
@@ -1251,22 +1269,22 @@ async function logToExternalServices(
   if (logRocketInitialized) {
     try {
       await withRetries(async () => {
-        const LogRocket = (await import('logrocket')).default;
+        const LogRocket = (await import('logrocket')).default
 
         // Log the message
         if (level === LogLevel.ERROR || level === LogLevel.FATAL) {
           LogRocket.captureException(error || new Error(message), {
             tags: tags?.reduce((acc, tag) => ({ ...acc, [tag]: true }), {}),
             extra: context,
-          });
+          })
         } else if (level === LogLevel.WARN) {
-          LogRocket.warn(message, context);
+          LogRocket.warn(message, context)
         } else {
-          LogRocket.log(message, context);
+          LogRocket.log(message, context)
         }
-      });
+      })
     } catch (err) {
-      console.error('Failed to log to LogRocket after retries:', err);
+      console.error('Failed to log to LogRocket after retries:', err)
     }
   }
 }
@@ -1295,14 +1313,19 @@ export function warn(message: string, context?: any, tags?: string[]) {
 /**
  * Log an error message
  */
-export function error(message: string, errorOrContext?: Error | any, context?: any, tags?: string[]) {
+export function error(
+  message: string,
+  errorOrContext?: Error | any,
+  context?: any,
+  tags?: string[]
+) {
   let errorObj: Error | undefined
   let contextObj: any = context
 
   // Handle case where errorOrContext is an Error object
   if (errorOrContext instanceof Error) {
     errorObj = errorOrContext
-  } 
+  }
   // Handle case where errorOrContext is a context object
   else if (errorOrContext && typeof errorOrContext === 'object') {
     contextObj = errorOrContext
@@ -1314,14 +1337,19 @@ export function error(message: string, errorOrContext?: Error | any, context?: a
 /**
  * Log a fatal error message
  */
-export function fatal(message: string, errorOrContext?: Error | any, context?: any, tags?: string[]) {
+export function fatal(
+  message: string,
+  errorOrContext?: Error | any,
+  context?: any,
+  tags?: string[]
+) {
   let errorObj: Error | undefined
   let contextObj: any = context
 
   // Handle case where errorOrContext is an Error object
   if (errorOrContext instanceof Error) {
     errorObj = errorOrContext
-  } 
+  }
   // Handle case where errorOrContext is a context object
   else if (errorOrContext && typeof errorOrContext === 'object') {
     contextObj = errorOrContext
