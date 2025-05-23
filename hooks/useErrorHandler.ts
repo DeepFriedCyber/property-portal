@@ -1,7 +1,7 @@
 // hooks/useErrorHandler.ts
+import { ApiError } from '@/lib/api/error-handling'
 import { useState, useCallback } from 'react'
 
-import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
 import logger from '@/lib/logging/logger'
 

@@ -1,6 +1,8 @@
 // lib/error/error-service.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
+import { ApiError } from '@/lib/api/error-handling'
+
 import {
   errorService,
   ErrorType,
@@ -10,7 +12,6 @@ import {
   withAsyncErrorHandling,
 } from './error-service'
 
-import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
 import logger from '@/lib/logging/logger'
 

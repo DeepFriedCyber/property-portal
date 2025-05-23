@@ -1,0 +1,200 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
+import { generateEmbeddings, generatePropertyEmbedding, cosineSimilarity } from './embeddings'
+
+// Mock the fetch function
+global.fetch = vi.fn()
+
+describe('Embeddings Module', () => {
+  beforeEach(() => {
+    // Reset mocks before each test
+    vi.resetAllMocks()
+  })
+
+  afterEach(() => {
+    // Clear mocks after each test
+    vi.clearAllMocks()
+  })
+
+  describe('generateEmbeddings', () => {
+    it('generates embeddings for UK property terms', async () => {
+      // Mock the fetch response
+      const mockEmbeddings = Array(1536).fill(0.1) // OpenAI embedding dimensions
+      const mockResponse = {
+        ok: true,
+        json: async () => ({ embeddings: [mockEmbeddings] }),
+      }
+
+      // @ts-expect-error - mocking fetch
+      global.fetch.mockResolvedValueOnce(mockResponse)
+
+      // Call the function
+      const embeddings = await generateEmbeddings(['3-bed London flat'])
+
+      // Verify the result
+      expect(embeddings[0]).toHaveLength(1536)
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/embed'),
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ texts: ['3-bed London flat'] }),
+        })
+      )
+    })
+
+    it('handles multiple text inputs', async () => {
+      // Mock the fetch response with multiple embeddings
+      const mockEmbeddings1 = Array(1536).fill(0.1)
+      const mockEmbeddings2 = Array(1536).fill(0.2)
+      const mockResponse = {
+        ok: true,
+        json: async () => ({ embeddings: [mockEmbeddings1, mockEmbeddings2] }),
+      }
+
+      // @ts-expect-error - mocking fetch
+      global.fetch.mockResolvedValueOnce(mockResponse)
+
+      // Call the function with multiple texts
+      const embeddings = await generateEmbeddings(['London flat', 'Manchester house'])
+
+      // Verify the result
+      expect(embeddings).toHaveLength(2)
+      expect(embeddings[0]).toHaveLength(1536)
+      expect(embeddings[1]).toHaveLength(1536)
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/embed'),
+        expect.objectContaining({
+          body: JSON.stringify({ texts: ['London flat', 'Manchester house'] }),
+        })
+      )
+    })
+
+    it('throws an error when the embedding service returns an error', async () => {
+      // Mock a failed response
+      const mockResponse = {
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+
+      // @ts-expect-error - mocking fetch
+      global.fetch.mockResolvedValueOnce(mockResponse)
+
+      // Expect the function to throw an error
+      await expect(generateEmbeddings(['test'])).rejects.toThrow('Embedding service error')
+    })
+
+    it('throws an error when the fetch fails', async () => {
+      // Mock a network error
+      const networkError = new Error('Network error')
+      // @ts-expect-error - mocking fetch
+      global.fetch.mockRejectedValueOnce(networkError)
+
+      // Expect the function to throw an error
+      await expect(generateEmbeddings(['test'])).rejects.toThrow('Network error')
+    })
+  })
+
+  describe('generatePropertyEmbedding', () => {
+    it('combines property fields and generates an embedding', async () => {
+      // Mock the generateEmbeddings function
+      const mockEmbedding = Array(1536).fill(0.1)
+      const mockResponse = {
+        ok: true,
+        json: async () => ({ embeddings: [mockEmbedding] }),
+      }
+
+      // @ts-expect-error - mocking fetch
+      global.fetch.mockResolvedValueOnce(mockResponse)
+
+      // Call the function
+      const property = {
+        title: 'Luxury Apartment',
+        location: 'London',
+        description: 'A beautiful apartment in central London',
+      }
+
+      const embedding = await generatePropertyEmbedding(property)
+
+      // Verify the result
+      expect(embedding).toHaveLength(1536)
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/embed'),
+        expect.objectContaining({
+          body: JSON.stringify({
+            texts: ['Luxury Apartment London A beautiful apartment in central London'],
+          }),
+        })
+      )
+    })
+
+    it('handles missing description', async () => {
+      // Mock the generateEmbeddings function
+      const mockEmbedding = Array(1536).fill(0.1)
+      const mockResponse = {
+        ok: true,
+        json: async () => ({ embeddings: [mockEmbedding] }),
+      }
+
+      // @ts-expect-error - mocking fetch
+      global.fetch.mockResolvedValueOnce(mockResponse)
+
+      // Call the function with a property missing description
+      const property = {
+        title: 'Luxury Apartment',
+        location: 'London',
+      }
+
+      const embedding = await generatePropertyEmbedding(property)
+
+      // Verify the result
+      expect(embedding).toHaveLength(1536)
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/embed'),
+        expect.objectContaining({
+          body: JSON.stringify({
+            texts: ['Luxury Apartment London '],
+          }),
+        })
+      )
+    })
+  })
+
+  describe('cosineSimilarity', () => {
+    it('calculates similarity between identical vectors', () => {
+      const vector = [1, 2, 3]
+      const similarity = cosineSimilarity(vector, vector)
+      expect(similarity).toBe(1) // Identical vectors have similarity 1
+    })
+
+    it('calculates similarity between different vectors', () => {
+      const vector1 = [1, 0, 0]
+      const vector2 = [0, 1, 0]
+      const similarity = cosineSimilarity(vector1, vector2)
+      expect(similarity).toBe(0) // Orthogonal vectors have similarity 0
+    })
+
+    it('calculates similarity between similar vectors', () => {
+      const vector1 = [1, 1, 0]
+      const vector2 = [1, 0, 0]
+      const similarity = cosineSimilarity(vector1, vector2)
+      expect(similarity).toBeCloseTo(0.7071, 4) // Similarity should be close to 1/√2
+    })
+
+    it('throws an error for vectors of different dimensions', () => {
+      const vector1 = [1, 2, 3]
+      const vector2 = [1, 2]
+      expect(() => cosineSimilarity(vector1, vector2)).toThrow(
+        'Vectors must have the same dimensions'
+      )
+    })
+
+    it('handles zero vectors', () => {
+      const vector1 = [0, 0, 0]
+      const vector2 = [1, 2, 3]
+      const similarity = cosineSimilarity(vector1, vector2)
+      expect(similarity).toBe(0) // Similarity with zero vector is 0
+    })
+  })
+})

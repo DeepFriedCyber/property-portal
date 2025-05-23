@@ -11,7 +11,12 @@ import CentralizedErrorHandlingExample from '@/components/examples/CentralizedEr
 import ErrorHandlingHookExample from '@/components/examples/ErrorHandlingHookExample'
 import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
-import logger from '@/lib/logging/logger'
+import {
+  debug as logDebug,
+  info as logInfo,
+  warn as logWarn,
+  error as logError,
+} from '@/lib/logging/logger'
 
 // Component that throws a render error
 const RenderErrorComponent = () => {
@@ -97,22 +102,22 @@ const LoggingExample = () => {
   const [logCount, setLogCount] = useState(0)
 
   const handleLogDebug = () => {
-    logger.debug('This is a debug message', { count: logCount })
+    logDebug('This is a debug message', { count: logCount })
     setLogCount(prev => prev + 1)
   }
 
   const handleLogInfo = () => {
-    logger.info('This is an info message', { count: logCount })
+    logInfo('This is an info message', { count: logCount })
     setLogCount(prev => prev + 1)
   }
 
   const handleLogWarn = () => {
-    logger.warn('This is a warning message', { count: logCount })
+    logWarn('This is a warning message', { count: logCount })
     setLogCount(prev => prev + 1)
   }
 
   const handleLogError = () => {
-    logger.error('This is an error message', new Error('Test error'), { count: logCount }, [
+    logError('This is an error message', new Error('Test error'), { count: logCount }, [
       'test',
       'error',
     ])
@@ -294,7 +299,7 @@ export default function ErrorHandlingPage() {
       <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
         <h2 className="text-lg font-semibold text-blue-800 mb-2">Notes:</h2>
         <ul className="list-disc pl-5 text-blue-700 space-y-1">
-          <li>All errors are caught by error boundaries and won't crash the entire app</li>
+          <li>All errors are caught by error boundaries and won&apos;t crash the entire app</li>
           <li>Each error type has a specialized error boundary with appropriate UI</li>
           <li>All errors are logged with structured metadata for easier debugging</li>
           <li>The global error handler catches any uncaught errors</li>

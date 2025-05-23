@@ -44,6 +44,7 @@ This is a simple microservice that provides text embedding functionality using t
 **Method:** POST
 
 **Request Body:**
+
 ```json
 {
   "texts": ["This is a sample text", "Another example text"]
@@ -51,6 +52,7 @@ This is a simple microservice that provides text embedding functionality using t
 ```
 
 **Response:**
+
 ```json
 {
   "embeddings": [
@@ -70,9 +72,9 @@ async function getEmbeddings(texts: string[]): Promise<number[][]> {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ texts }),
-  });
-  
-  const data = await response.json();
-  return data.embeddings;
+  })
+
+  const data = await response.json()
+  return data.embeddings
 }
 ```

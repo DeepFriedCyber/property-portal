@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 import { Prisma } from '@prisma/client'
 
 import { Property } from '@/types/property'
 
 import { logger } from './api/logger'
+=======
+import { Property } from '@/types/property'
+
+>>>>>>> clean-branch
 import { prisma } from './db'
 
 /**

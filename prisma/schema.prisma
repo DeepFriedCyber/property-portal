@@ -1,12 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  extensions = [vector]
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
 }
 
 // Your models here...
@@ -36,12 +36,17 @@ model Property {
   listingType    String?    // Type of listing (sale, rent)
   metadata       Json?      // Additional metadata as JSON
   embedding      Unsupported("vector(1536)")? // Vector embedding for similarity search
-                                                 // Note: Indexed with IVFFlat for performance:
-                                                 // CREATE INDEX "Property_embedding_idx" ON "Property" USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   createdBy      String?    // User ID who created the property
   favorites      Favorite[]
+
+  // Performance indexes
+  @@index([lat, lng])
+  @@index([price])
+  @@index([createdAt])
+  @@index([bedrooms, bathrooms])
+  @@index([location])
 }
 
 model User {

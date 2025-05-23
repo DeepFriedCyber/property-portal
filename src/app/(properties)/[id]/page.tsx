@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     const metadata: Metadata = {
       title: `${property.title} | Property Portal`,
       description: `View details for ${property.title} located at ${property.location}. Priced at $${property.price.toLocaleString()}.`,
+<<<<<<< HEAD
     }
 
     // Only add openGraph images if imageUrl exists
@@ -35,6 +36,12 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     }
 
     return metadata
+=======
+      openGraph: {
+        images: property.imageUrl ? [{ url: property.imageUrl }] : [],
+      },
+    }
+>>>>>>> clean-branch
   } catch (_) {
     return {
       title: 'Property Details | Property Portal',

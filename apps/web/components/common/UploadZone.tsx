@@ -135,7 +135,7 @@ export default function UploadZone({
           setValidationError(result.message)
           return
         }
-      } catch (error) {
+      } catch (err) {
         setValidationError('File validation failed.')
         return
       }
@@ -159,19 +159,20 @@ export default function UploadZone({
     }
   }
 
-  const clearFile = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
-    setSelectedFile(null)
-    setPreviewUrl(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
+
 
   return (
     <div className={`${className}`}>
       <div
         ref={dropZoneRef}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-disabled={disabled}
+        onKeyDown={e => {
+          if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
+            handleButtonClick()
+          }
+        }}
         className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
           disabled
             ? 'bg-gray-100 border-gray-300 cursor-not-allowed opacity-60'

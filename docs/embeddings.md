@@ -73,9 +73,9 @@ model Property {
 async function findSimilarProperties(query: string, limit = 3) {
   const response = await fetch(
     `/api/properties/similar?query=${encodeURIComponent(query)}&limit=${limit}`
-  );
-  const data = await response.json();
-  return data.properties;
+  )
+  const data = await response.json()
+  return data.properties
 }
 
 // Find properties similar to an existing property
@@ -86,9 +86,9 @@ async function findSimilarToProperty(propertyId: string, limit = 3) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ propertyId, limit }),
-  });
-  const data = await response.json();
-  return data.properties;
+  })
+  const data = await response.json()
+  return data.properties
 }
 ```
 
@@ -102,19 +102,19 @@ When property data changes significantly, you should update its embedding:
 async function updatePropertyEmbedding(propertyId: string) {
   const property = await prisma.property.findUnique({
     where: { id: propertyId },
-  });
-  
-  if (!property) return null;
-  
+  })
+
+  if (!property) return null
+
   const embedding = await generatePropertyEmbedding({
     title: property.title,
     location: property.location,
     description: property.description,
-  });
-  
+  })
+
   return prisma.property.update({
     where: { id: propertyId },
     data: { embedding },
-  });
+  })
 }
 ```

@@ -1,0 +1,58 @@
+{
+  "success": true,
+  "data": {
+    "query": "modern apartment",
+    "results": [
+      {
+        "id": "prop-10",
+        "title": "Modern 2-Bedroom Apartment in Canary Wharf",
+        "description": "Sleek and modern apartment with stunning views of the Thames and the city skyline.",
+        "price": 450000,
+        "location": "London, UK",
+        "bedrooms": 2,
+        "bathrooms": 2,
+        "squareFeet": 850,
+        "propertyType": "apartment",
+        "status": "available",
+        "similarity": 0.94
+      },
+      {
+        "id": "prop-11",
+        "title": "Contemporary 2-Bedroom Flat in Shoreditch",
+        "description": "Contemporary and stylish apartment in the heart of trendy Shoreditch.",
+        "price": 425000,
+        "location": "London, UK",
+        "bedrooms": 2,
+        "bathrooms": 2,
+        "squareFeet": 800,
+        "propertyType": "apartment",
+        "status": "available",
+        "similarity": 0.91
+      },
+      {
+        "id": "prop-12",
+        "title": "Modern 3-Bedroom Apartment in Islington",
+        "description": "Spacious and modern apartment with high-end finishes in a desirable Islington location.",
+        "price": 495000,
+        "location": "London, UK",
+        "bedrooms": 3,
+        "bathrooms": 2,
+        "squareFeet": 1100,
+        "propertyType": "apartment",
+        "status": "available",
+        "similarity": 0.88
+      }
+    ],
+    "count": 3,
+    "filters": {
+      "minPrice": 200000,
+      "maxPrice": 500000,
+      "location": "London",
+      "bedrooms": 2
+    },
+    "options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}

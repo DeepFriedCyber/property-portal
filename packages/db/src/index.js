@@ -53,17 +53,17 @@ var __importStar =
   })()
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.schema = exports.pool = exports.db = void 0
-const node_postgres_1 = require('drizzle-orm/node-postgres')
-const pg_1 = require('pg')
+const nodePostgres = require('drizzle-orm/node-postgres')
+const pg = require('pg')
 const schema = __importStar(require('./schema')) // Import the schema
 exports.schema = schema
 const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable is not set.')
 }
-const pool = new pg_1.Pool({
+const pool = new pg.Pool({
   connectionString: databaseUrl,
 })
 exports.pool = pool
 // Initialize Drizzle client WITH the schema
-exports.db = (0, node_postgres_1.drizzle)(pool, { schema }) // Pass schema here
+exports.db = (0, nodePostgres.drizzle)(pool, { schema }) // Pass schema here

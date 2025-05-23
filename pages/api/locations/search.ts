@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+
 import { autocompleteUKLocation } from '../../../lib/services/locationService'
 
 /**

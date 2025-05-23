@@ -1,0 +1,61 @@
+{
+  "success": true,
+  "data": {
+    "referencePropertyId": "prop-123",
+    "similarProperties": [
+      {
+        "id": "prop-124",
+        "title": "Luxury Penthouse with City Views",
+        "description": "Stunning penthouse apartment with panoramic views of the city skyline.",
+        "price": 1200000,
+        "location": "London, UK",
+        "bedrooms": 3,
+        "bathrooms": 3,
+        "squareFeet": 2000,
+        "propertyType": "penthouse",
+        "status": "available",
+        "similarity": 0.89
+      },
+      {
+        "id": "prop-125",
+        "title": "Spacious Apartment with Balcony",
+        "description": "Modern and spacious apartment featuring a large balcony with city views.",
+        "price": 950000,
+        "location": "London, UK",
+        "bedrooms": 3,
+        "bathrooms": 2,
+        "squareFeet": 1800,
+        "propertyType": "apartment",
+        "status": "available",
+        "similarity": 0.85
+      },
+      {
+        "id": "prop-126",
+        "title": "Elegant Apartment in Historic Building",
+        "description": "Beautifully renovated apartment in a historic building with original features.",
+        "price": 1050000,
+        "location": "London, UK",
+        "bedrooms": 3,
+        "bathrooms": 2,
+        "squareFeet": 1900,
+        "propertyType": "apartment",
+        "status": "available",
+        "similarity": 0.82
+      },
+      {
+        "id": "prop-127",
+        "title": "Modern Loft with High Ceilings",
+        "description": "Converted warehouse loft with high ceilings and industrial-chic design.",
+        "price": 1100000,
+        "location": "London, UK",
+        "bedrooms": 2,
+        "bathrooms": 2,
+        "squareFeet": 1700,
+        "propertyType": "loft",
+        "status": "available",
+        "similarity": 0.78
+      }
+    ],
+    "count": 4
+  }
+}

@@ -1,4 +1,4 @@
-# Property Portal Project
+# Property Portal [![CI](https://github.com/DeepFriedCyber/property-portal/actions/workflows/ci.yml/badge.svg)](https://github.com/DeepFriedCyber/property-portal/actions/workflows/ci.yml) [![Deploy](https://github.com/DeepFriedCyber/property-portal/actions/workflows/deploy.yml/badge.svg)](https://github.com/DeepFriedCyber/property-portal/actions/workflows/deploy.yml) [![Security](https://github.com/DeepFriedCyber/property-portal/actions/workflows/security.yml/badge.svg)](https://github.com/DeepFriedCyber/property-portal/actions/workflows/security.yml)
 
 This monorepo contains the frontend and backend services for the Property Portal.
 
@@ -9,6 +9,18 @@ This monorepo contains the frontend and backend services for the Property Portal
 - `packages/ui`: Shared UI components used by `apps/web` and potentially other frontends.
 - `packages/db`: Shared database client and schema definitions.
 - `packages/utils`: (Example) Shared utility functions.
+
+## CI/CD Workflows
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+- **CI**: Runs tests, linting, and type checking on every pull request and push to main
+- **Deploy**: Deploys the application to GitHub Pages on push to main
+- **Security**: Runs security scans to identify vulnerabilities
+- **Release**: Creates GitHub releases when a new version tag is pushed
+- **Dependency Updates**: Automatically updates dependencies weekly
+
+For more details on the workflows, see [docs/GITHUB_ACTIONS.md](docs/GITHUB_ACTIONS.md).
 
 ## Getting Started
 
@@ -97,38 +109,74 @@ Choose ONE of the following map providers:
   - Production: Your deployed URL
 - `NODE_ENV`: Environment setting (`development`, `test`, or `production`)
 
-## GitHub Pages Deployment
+## Deployment
 
-This project is configured for deployment to GitHub Pages. The deployment is handled automatically through GitHub Actions when you push to the main branch.
+This project is configured for automated deployment through GitHub Actions.
+
+### GitHub Pages Deployment
+
+The application is automatically deployed to GitHub Pages when you push to the `main` branch. The deployment process includes:
+
+1. Environment variable validation
+2. Building the application
+3. Deploying to GitHub Pages
+4. Post-deployment verification
+
+You can view the deployment status in the [Actions tab](https://github.com/DeepFriedCyber/property-portal/actions/workflows/deploy.yml).
+
+### Release Process
+
+To create a new release:
+
+1. Tag the commit you want to release:
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+2. The release workflow will automatically:
+   - Build the application
+   - Create a GitHub release with release notes
+   - Attach the built files to the release
 
 ### Manual Deployment
 
 If you want to deploy manually:
 
 1. Build the project for production:
-
-```bash
-cd apps/web
-npm run build:static
-```
+   ```bash
+   cd apps/web
+   pnpm build
+   pnpm export
+   ```
 
 2. The static files will be generated in the `apps/web/out` directory.
 
-3. Deploy to GitHub Pages using the GitHub Actions workflow or manually by pushing the `out` directory to the `gh-pages` branch.
-
 ### Configuration
 
-The GitHub Pages deployment is configured with:
+The deployment is configured with:
 
 - Base path: `/property-portal`
+- Custom domain: `property-portal.example.com` (configurable)
 - Custom 404 page for SPA routing
-- GitHub Actions workflow for automated deployment
+- Automated verification checks
 
-### Environment Variables for GitHub Pages
+### Environment Variables
 
-For GitHub Pages deployment, you'll need to set the following secrets in your GitHub repository:
+For deployment, you'll need to set the following secrets in your GitHub repository:
 
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Your Clerk publishable key
-- `CLERK_SECRET_KEY`: Your Clerk secret key
+#### Required Secrets
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Clerk publishable key
+- `CLERK_SECRET_KEY`: Clerk secret key
+- `DATABASE_URL`: Development database URL
+- `DATABASE_URL_PROD`: Production database URL
+- `NEXTAUTH_SECRET`: NextAuth secret key
 
-These will be used by the GitHub Actions workflow to build the application with the correct environment variables.
+#### Optional Secrets
+- `NEXT_PUBLIC_MAPS_API_KEY`: Google Maps API key
+- `REDIS_URL`: Redis connection string
+- `SENTRY_DSN`: Sentry error tracking DSN
+- `SLACK_WEBHOOK_URL`: For deployment notifications
+- `DISCORD_WEBHOOK_URL`: Alternative notifications
+
+For detailed instructions on environment variables, see [docs/ENV_VARIABLES.md](docs/ENV_VARIABLES.md).

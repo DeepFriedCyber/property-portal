@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+
 import LocationSearch from '@/components/LocationSearch'
 import { LocationResult } from '@/lib/services/locationService'
 

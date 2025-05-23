@@ -1,0 +1,71 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Run every Monday at midnight
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed for proper git history
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8.15.0
+          run_install: false
+      
+      - name: Update dependencies
+        run: |
+          # Create a new branch for the updates
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Create a new branch with the current date
+          BRANCH_NAME="deps/update-$(date +'%Y-%m-%d')"
+          git checkout -b $BRANCH_NAME
+          
+          # Install dependencies
+          pnpm install
+          
+          # Update dependencies (interactive mode is not possible in CI)
+          pnpm update --latest
+          
+          # Check if there are changes
+          if [[ -z $(git status --porcelain) ]]; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          # Commit changes
+          git add .
+          git commit -m "chore(deps): update dependencies"
+          
+          # Push changes
+          git push origin $BRANCH_NAME
+          
+          # Create a pull request
+          gh pr create \
+            --title "chore(deps): update dependencies $(date +'%Y-%m-%d')" \
+            --body "This PR updates the project dependencies to their latest versions. Please review and test before merging." \
+            --base main \
+            --head $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Check for vulnerabilities
+        run: pnpm audit

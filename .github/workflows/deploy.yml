@@ -1,58 +1,141 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
   push:
-    branches:
-      - main # Set this to your default branch
+    branches: [main]
+  workflow_dispatch: # Allow manual deployment
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+# Only one deployment at a time
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  # Check environment variables first
+  env-check:
+    uses: ./.github/workflows/env-check.yml
+    secrets:
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+
+  build:
+    needs: env-check
     runs-on: ubuntu-latest
+    env:
+      # Production environment variables
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      NEXTAUTH_URL: https://deepfriedcyber.github.io/property-portal
+      # Feature flags
+      NEXT_PUBLIC_ENVIRONMENT: production
+      NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      # Build configuration
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js ⚙️
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: 20
 
-      - name: Install dependencies 📦
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8.15.0
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-prod-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-prod-
+
+      - name: Setup Next.js cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/web/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prod
+
+      - name: Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: Build application
         run: |
           cd apps/web
-          npm ci
+          pnpm build
+          pnpm export
 
-      - name: Build for production 🔧
+      - name: Add custom domain CNAME
         run: |
-          cd apps/web
-          NODE_ENV=production npm run build
-        env:
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
-          NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
-          NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /agent/dashboard
-          NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: /agent/dashboard
-          NEXT_PUBLIC_CLERK_DEVELOPMENT_MODE: false
+          echo "property-portal.example.com" > apps/web/out/CNAME
 
-      # Create a 404.html file that redirects to index.html for SPA routing
-      - name: Create 404.html for SPA routing
+      - name: Create 404 page for SPA
         run: |
-          cd apps/web/out
-          cp index.html 404.html
+          cp apps/web/out/index.html apps/web/out/404.html
 
-      # Create .nojekyll file to prevent Jekyll processing
-      - name: Create .nojekyll file
-        run: |
-          cd apps/web/out
-          touch .nojekyll
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
-      - name: Deploy to GitHub Pages 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          folder: apps/web/out
-          branch: gh-pages
+          path: apps/web/out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Post-deployment checks
+  verify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Check deployment health
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://deepfriedcyber.github.io/property-portal)
+          if [ $response -eq 200 ]; then
+            echo "Deployment successful!"
+          else
+            echo "Deployment failed with status code: $response"
+            exit 1
+          fi
+
+      - name: Run smoke tests
+        run: |
+          # Add basic smoke tests here
+          curl -f https://deepfriedcyber.github.io/property-portal || exit 1

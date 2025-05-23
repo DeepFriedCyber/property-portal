@@ -82,10 +82,14 @@ export default function SearchPage() {
                       No image available
                     </div>
                   )}
+<<<<<<< HEAD
                   <div
                     className="absolute bottom-0 right-0 bg-blue-500 text-white px-2 py-1 text-sm"
                     data-testid="similarity-score"
                   >
+=======
+                  <div className="absolute bottom-0 right-0 bg-blue-500 text-white px-2 py-1 text-sm">
+>>>>>>> clean-branch
                     Similarity:{' '}
                     {(property.score !== undefined ? property.score * 100 : 0).toFixed(1)}%
                   </div>

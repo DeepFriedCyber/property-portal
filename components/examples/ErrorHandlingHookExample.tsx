@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react'
 
-import { useErrorHandler } from '@/hooks/useErrorHandler'
 import { ApiError } from '@/lib/api/error-handling'
+
+import { useErrorHandler } from '@/hooks/useErrorHandler'
 import { ValidationError } from '@/lib/api/validation'
 
 /**

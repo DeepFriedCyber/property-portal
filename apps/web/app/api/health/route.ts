@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
  * Health check endpoint
  * GET /api/health
  */
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   const dbStatus = getDatabaseStatus()
   const isDbHealthy = isDatabaseHealthy()
 

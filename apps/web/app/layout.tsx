@@ -1,10 +1,10 @@
+import { ClerkProvider } from '@clerk/nextjs'
 import React from 'react'
 
 import './globals.css'
 import GlobalErrorHandler from '@/components/error-handling/GlobalErrorHandler'
 import RouteErrorBoundary from '@/components/error-handling/RouteErrorBoundary'
 import PerformanceMonitor from '@/components/monitoring/PerformanceMonitor'
-import { ClerkProvider } from '@clerk/nextjs'
 
 export const metadata = {
   title: {

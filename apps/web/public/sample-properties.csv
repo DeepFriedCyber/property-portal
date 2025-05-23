@@ -1,0 +1,6 @@
+address,city,state,zipCode,price,bedrooms,bathrooms,squareFeet,description,type
+123 Main St,New York,NY,10001,750000,2,2,1200,"Beautiful apartment in the heart of Manhattan",Apartment
+456 Oak Ave,Los Angeles,CA,90001,1250000,3,2.5,2000,"Spacious home with a large backyard",House
+789 Pine Rd,Chicago,IL,60601,500000,1,1,800,"Cozy studio with great views",Studio
+101 Cedar Ln,Miami,FL,33101,2000000,4,3,3000,"Luxury waterfront property with pool",Villa
+202 Elm St,Seattle,WA,98101,850000,2,2,1500,"Modern condo with city views",Condo

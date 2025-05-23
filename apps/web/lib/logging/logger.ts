@@ -7,6 +7,14 @@
  * to send logs to external services like Sentry or LogRocket.
  */
 
+<<<<<<< Updated upstream
+// Import from fixed-logger.ts to avoid duplicate exports
+import logger, {
+  LogLevel,
+  configureLogger,
+  setLogUser,
+  setRequestId,
+=======
 // Log levels in order of severity
 export enum LogLevel {
   DEBUG = 'debug',
@@ -155,9 +163,16 @@ async function initLogRocket(appId: string, config: LoggerConfig) {
       LogRocket.getSessionURL(sessionURL => {
         // Use a try-catch to handle potential missing methods
         try {
+<<<<<<< HEAD
           // Using any type for scope as Sentry API might vary between versions
           Sentry.withScope((scope: any) => {
             scope.setExtra('logRocketSessionURL', sessionURL)
+=======
+          // Use type assertion for Sentry scope
+          Sentry.withScope((scope) => {
+            // Use type assertion to handle potential API variations
+            (scope as { setExtra: (key: string, value: string) => void }).setExtra('logRocketSessionURL', sessionURL)
+>>>>>>> clean-branch
           })
         } catch (err) {
           console.error('Failed to set LogRocket session URL in Sentry:', err)
@@ -294,17 +309,28 @@ async function logToExternalServices(entry: LogEntry) {
 
       // Set extra context
       try {
+<<<<<<< HEAD
         // Using any type for scope as Sentry API might vary between versions
         Sentry.withScope((scope: any) => {
+=======
+        // Use type assertion for Sentry scope
+        Sentry.withScope((scope) => {
+          // Use type assertion to handle potential API variations
+          const typedScope = scope as {
+            setExtra: (key: string, value: unknown) => void;
+            setTag: (key: string, value: string) => void;
+          };
+          
+>>>>>>> clean-branch
           if (context) {
             Object.entries(context).forEach(([key, value]) => {
-              scope.setExtra(key, value)
+              typedScope.setExtra(key, value)
             })
           }
 
           if (tags) {
             tags.forEach(tag => {
-              scope.setTag(tag, 'true')
+              typedScope.setTag(tag, 'true')
             })
           }
         })
@@ -446,13 +472,16 @@ export function fatal(
 
 // Export a default logger object
 const logger = {
+>>>>>>> Stashed changes
   debug,
   info,
   warn,
   error,
   fatal,
-  configureLogger,
-  setLogUser,
-}
+} from './fixed-logger'
 
+// Re-export everything
+export { LogLevel, configureLogger, setLogUser, setRequestId, debug, info, warn, error, fatal }
+
+// Export the default logger
 export default logger

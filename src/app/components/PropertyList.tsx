@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+
 import { Property } from '@/types/property'
+
 import PropertyCard from './PropertyCard'
 
 interface PropertyListProps {
