@@ -4,7 +4,7 @@
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
-import logger from '@/lib/logging/logger'
+import { error as logError } from '@/lib/logging/logger'
 
 import EnhancedErrorBoundary from './EnhancedErrorBoundary'
 
@@ -58,7 +58,7 @@ const RouteErrorBoundary: React.FC<RouteErrorBoundaryProps> = ({ children, fallb
   // Handle route errors
   const handleError = (error: Error) => {
     // Log the error
-    logger.error(
+    logError(
       'Route error caught by boundary',
       error,
       {

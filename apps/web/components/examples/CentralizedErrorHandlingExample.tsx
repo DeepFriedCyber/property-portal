@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 
 import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
-import logger from '@/lib/logging/logger'
+import { error as logError } from '@/lib/logging/logger'
 
 /**
  * Example component demonstrating centralized error handling
@@ -22,7 +22,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
       } catch (err) {
         if (err instanceof Error) {
           // Log the error
-          logger.error('Generic error occurred:', err)
+          logError('Generic error occurred:', err)
           // Set the error state
           setError(err)
         }
@@ -41,7 +41,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
       } catch (err) {
         if (err instanceof Error) {
           // Log the error
-          logger.error('API error occurred:', err)
+          logError('API error occurred:', err)
           // Set the error state
           setError(err)
         }
@@ -61,7 +61,7 @@ const CentralizedErrorHandlingExample: React.FC = () => {
       } catch (err) {
         if (err instanceof Error) {
           // Log the error
-          logger.error('Validation error occurred:', err)
+          logError('Validation error occurred:', err)
           // Set the error state
           setError(err)
         }
