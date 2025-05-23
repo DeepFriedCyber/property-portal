@@ -48,15 +48,12 @@
     "prisma:studio": "prisma studio",
     "prisma:setup": "node scripts/setup-db.js",
     "prisma:seed": "tsx prisma/seed.ts",
-<<<<<<< HEAD
     "prisma:optimize": "node scripts/apply-db-optimizations.js",
-=======
     "prisma:vector-index": "tsx scripts/setup-vector-index.js",
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean",
     "db:push": "prisma db push",
     "cleanup:configs": "tsx scripts/cleanup-configs.js",
->>>>>>> clean-branch
     "cypress": "cypress open",
     "cypress:run": "cypress run",
     "cypress:property-detail": "cypress run --spec \"cypress/e2e/property-detail.cy.ts\"",
@@ -67,21 +64,15 @@
   "dependencies": {
     "@clerk/nextjs": "^6.20.0",
     "@prisma/client": "^6.8.2",
-<<<<<<< HEAD
     "@types/pg": "^8.10.9",
-=======
     "@t3-oss/env-nextjs": "^0.9.2",
->>>>>>> clean-branch
     "@types/uuid": "^10.0.0",
     "axios": "^1.9.0",
     "clsx": "^2.1.1",
     "csv-parse": "^5.6.0",
     "dotenv": "^16.5.0",
-<<<<<<< HEAD
-    "pg": "^8.11.3",
-=======
     "framer-motion": "^12.12.1",
->>>>>>> clean-branch
+    "pg": "^8.11.3",
     "pgvector": "^0.2.0",
     "prisma": "^6.8.2",
     "uuid": "^11.1.0",
