@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 
+import logger from '@/lib/logging/logger'
+
 import Footer from '../components/layout/Footer'
 import Header from '../components/layout/Header'
 import CallToAction from '../components/sections/CallToAction'
@@ -191,29 +193,29 @@ export default function HomePage() {
   }
 
   const handleViewDetails = (propertyId: string) => {
-    console.log('View details for property:', propertyId)
+    logger.info('View details for property:', { propertyId })
     alert(`Viewing details for property ID: ${propertyId}`)
     // In a real app, you would navigate to a property details page
   }
 
   // Event handlers
   const handleLogin = () => {
-    console.log('Login clicked')
+    logger.info('Login clicked')
     alert('Login functionality disabled for testing')
   }
 
   const handleSignup = () => {
-    console.log('Signup clicked')
+    logger.info('Signup clicked')
     alert('Signup functionality disabled for testing')
   }
 
   const handlePrimaryCTA = () => {
-    console.log('Primary CTA clicked')
+    logger.info('Primary CTA clicked')
     alert('Start your property journey!')
   }
 
   const handleSecondaryCTA = () => {
-    console.log('Secondary CTA clicked')
+    logger.info('Secondary CTA clicked')
     alert('Contact an agent!')
   }
 

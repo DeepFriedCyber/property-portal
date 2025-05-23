@@ -222,12 +222,14 @@ function setupPerformanceObservers() {
     let cumulativeLayoutShift = 0
 
     const layoutShiftObserver = new PerformanceObserver(entries => {
-      entries.getEntries().forEach((entry: PerformanceEntry & { hadRecentInput?: boolean; value?: number }) => {
-        // Only count layout shifts without recent user input
-        if (!entry.hadRecentInput) {
-          cumulativeLayoutShift += entry.value
-        }
-      })
+      entries
+        .getEntries()
+        .forEach((entry: PerformanceEntry & { hadRecentInput?: boolean; value?: number }) => {
+          // Only count layout shifts without recent user input
+          if (!entry.hadRecentInput) {
+            cumulativeLayoutShift += entry.value
+          }
+        })
 
       const metric: PerformanceMetric = {
         name: 'cumulative_layout_shift',
