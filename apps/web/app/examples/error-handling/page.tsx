@@ -11,7 +11,7 @@ import CentralizedErrorHandlingExample from '@/components/examples/CentralizedEr
 import ErrorHandlingHookExample from '@/components/examples/ErrorHandlingHookExample'
 import { ApiError } from '@/lib/api/error-handling'
 import { ValidationError } from '@/lib/api/validation'
-import logger from '@/lib/logging/logger'
+import { debug as logDebug, info as logInfo, warn as logWarn, error as logError } from '@/lib/logging/logger'
 
 // Component that throws a render error
 const RenderErrorComponent = () => {
@@ -97,22 +97,22 @@ const LoggingExample = () => {
   const [logCount, setLogCount] = useState(0)
 
   const handleLogDebug = () => {
-    logger.debug('This is a debug message', { count: logCount })
+    logDebug('This is a debug message', { count: logCount })
     setLogCount(prev => prev + 1)
   }
 
   const handleLogInfo = () => {
-    logger.info('This is an info message', { count: logCount })
+    logInfo('This is an info message', { count: logCount })
     setLogCount(prev => prev + 1)
   }
 
   const handleLogWarn = () => {
-    logger.warn('This is a warning message', { count: logCount })
+    logWarn('This is a warning message', { count: logCount })
     setLogCount(prev => prev + 1)
   }
 
   const handleLogError = () => {
-    logger.error('This is an error message', new Error('Test error'), { count: logCount }, [
+    logError('This is an error message', new Error('Test error'), { count: logCount }, [
       'test',
       'error',
     ])
